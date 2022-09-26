@@ -1,0 +1,136 @@
+  .fw-semibold {
+    font-weight: 600;
+  }
+    
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+      monospace;
+  }
+
+  .bg-infoss {
+    background-color: #2e6e9e !important;
+  }
+
+  .btn-infoss {
+    color: #fff !important;
+    background-color: #2e6e9e !important;
+    border-color: #2e6e9e !important;
+    border-radius: 10px !important;
+  }
+
+  .btn-infoss-thin {
+    color: #2e6e9e !important;
+    border-color: #2e6e9e !important;
+    padding: 0.15rem 0.75rem !important;
+    min-width: 90px;
+    border-radius: 10px !important;
+  }
+
+  .btn-infoss-thin.active {
+    color: #fff !important;
+    background-color: #2e6e9e !important;
+    border-radius: 10px !important;
+  }
+
+  .btn-outline-infoss {
+    border-color: #2e6e9e !important;
+    color: #2e6e9e !important;
+    background-color: #fff !important;
+    border-radius: 10px !important;
+  }
+
+  .border-infoss {
+    border-color: #2e6e9e !important;
+  }
+
+  .text-infoss {
+    color: #2e6e9e !important;
+  }
+  
+  .img-rounded {
+    border-radius: 50% !important;
+  }
+  
+  .rounded-10 {
+    border-radius: 10px !important;
+  }
+  
+  .rounded-20 {
+    border-radius: 20px !important;
+  }
+  
+  .rounded-30 {
+    border-radius: 30px !important;
+  }
+
+  .rounded-left-10 {
+    border-radius: 10px 0px 0px 10px !important;    
+  }
+
+  .rounded-right-10 {
+    border-radius: 0px 10px 10px 0px !important;    
+  }
+  
+  .text-xs {
+    font-size: 8px;
+  }
+  .text-sm {
+    font-size: 10px;
+  }
+  .text-md {
+    font-size: 12px;
+  }
+  .text-right {
+    text-align: right !important;
+  }
+  .text-left {
+    text-align: left;
+  }
+
+  .btn {
+    font-size: 14px;
+  }
+
+  .v-align {
+    vertical-align: middle;
+  }
+
+  .block {
+    width: 100%;
+  }
+
+  .btn-block {
+    width: 100%;
+  }
+
+  .form-control {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-color: #2e6e9e !important;
+  }
+
+  .infoss-form {
+    border-radius: 10px !important;
+    padding-top: 13px !important;
+    padding-bottom: 13px !important;
+  }
+
+  .col-search-form {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .infoss-btn {
+    border-radius: 10px !important;
+    padding-top: 9px !important;
+    padding-bottom: 9px !important;
+  }
+
+  .show-modal {
+    margin-top: 50px !important;
+  }
+
+  ::placeholder {
+    font-size: 14px;
+  }
+  
