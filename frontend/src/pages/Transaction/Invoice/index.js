@@ -18,6 +18,7 @@ import FormControl from '@mui/material/FormControl';
 // import axios from 'axios';
 import { Table, Dropdown, Pagination, Button } from 'react-bootstrap'
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import { useNavigate } from "react-router-dom";
 
 const InvoicePage = () => {
     // const invoices2 = {
@@ -213,6 +214,7 @@ const InvoicePage = () => {
     const [loading, setLoading] = useState(false)
     const [invoices, setInvoices] = useState(invoices3)
     const [invoicesMap, setInvoicesMap] = useState(invoices3)
+    const history = useNavigate();
 
     useEffect(() => {
     //     setInvoices(invoices2)
@@ -228,42 +230,42 @@ const InvoicePage = () => {
     };
 
     const filterTable = (key, val) => {
-        // console.log(key)
-        // console.log(val)
+        console.log(key)
+        console.log(val)
 
-        if (val === '') {
-            setInvoicesMap(invoices)
-            return false
-        } 
+        // if (val === '') {
+        //     setInvoicesMap(invoices)
+        //     return false
+        // } 
         
-        let temp = invoices
-        let arr = [];
+        // let temp = invoices
+        // let arr = [];
     
-        if(key === 'delete') {
-            invoices.data.forEach((v, k) => {
-                console.log(v)
-                v.delete.includes(val) && arr.push(v)
-            })
-            setInvoicesMap(arr)
-        }
+        // if(key === 'delete') {
+        //     invoices.data.forEach((v, k) => {
+        //         console.log(v)
+        //         v.delete.includes(val) && arr.push(v)
+        //     })
+        //     setInvoicesMap(arr)
+        // }
 
-        if(key === 'type') {
-            invoices.data.forEach((v, k) => {
-                // console.log(v)
-                v.type.includes(val) && arr.push(v)
-            })
-            temp.data = arr
-            setInvoicesMap(temp)
-        }
+        // if(key === 'type') {
+        //     invoices.data.forEach((v, k) => {
+        //         // console.log(v)
+        //         v.type.includes(val) && arr.push(v)
+        //     })
+        //     temp.data = arr
+        //     setInvoicesMap(temp)
+        // }
 
-        if(key === 'inv. no.') {
-            invoices.data.forEach((v, k) => {
-                v.invNo.includes(val) && arr.push(v)
-            })
-            setInvoicesMap(arr)
-        }
+        // if(key === 'inv. no.') {
+        //     invoices.data.forEach((v, k) => {
+        //         v.invNo.includes(val) && arr.push(v)
+        //     })
+        //     setInvoicesMap(arr)
+        // }
 
-        console.log(invoicesMap)
+        // console.log(invoicesMap)
     }
 
     return (
@@ -277,7 +279,7 @@ const InvoicePage = () => {
                         <Button variant="outline-infoss" className='btn-sm'>
                             <CachedIcon /> Reload Data
                         </Button>
-                        <Button variant="outline-infoss" className='btn-sm'>
+                        <Button variant="outline-infoss" className='btn-sm' onClick={() => history('/booking/invoice/create')}>
                             <AddToPhotosIcon /> Add New
                         </Button>
                         <Button variant="outline-infoss" className='btn-sm'>
@@ -328,7 +330,7 @@ const InvoicePage = () => {
                     </FormControl>
                 </Grid>
             </Grid>
-            <Grid item xs={12} style={{'maxWidth': '100vw'}}>
+            <Grid item xs={12} style={{'maxWidth': '97vw'}}>
                 <div className='mt-3 border rounded-10 p-2 table-responsive'>
                     {
                         loading ? 
@@ -425,27 +427,30 @@ const InvoicePage = () => {
                                 </tbody>
                             </Table>
                             <div className='row mt-2'>
-                                <div className='col text-right'>
-                                    <div className='mx-4' style={{ display: 'inline-block' }}>
-                                    <Pagination>
-                                        <Pagination.Prev onClick={() => numPage > 1 ? setNumPage(numPage - 1) : setNumPage(1)} />
-                                        <Pagination.Item active>
-                                            {numPage}
-                                        </Pagination.Item>
-                                        <Pagination.Next onClick={() => setNumPage(numPage + 1)} />
-                                    </Pagination>
-                                    </div>
+                                <div>
+                                    <div>
+                                        <div className='mx-4' style={{ display: 'inline-block' }}>
+                                            <Pagination>
+                                                <Pagination.Prev onClick={() => numPage > 1 ? setNumPage(numPage - 1) : setNumPage(1)} />
+                                                <Pagination.Item active>
+                                                    {numPage}
+                                                </Pagination.Item>
+                                                <Pagination.Next onClick={() => setNumPage(numPage + 1)} />
+                                            </Pagination>
+                                        </div>
 
-                                    <Dropdown style={{ display: 'inline-block' }} className='mx-2'>
-                                    <Dropdown.Toggle variant="outline-infoss sm" id="dropdown-basic">
-                                        {rowsCount} Rows
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(50); setNumPage(1) }}>50 Rows</Dropdown.Item>
-                                        <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(100); setNumPage(1) }}>100 Rows</Dropdown.Item>
-                                        <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(150); setNumPage(1) }}>150 Rows</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                    </Dropdown>
+                                        <Dropdown style={{ display: 'inline-block' }} className='mx-2'>
+                                            <Dropdown.Toggle variant="outline-infoss sm" id="dropdown-basic">
+                                                {rowsCount} Rows
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(50); setNumPage(1) }}>50 Rows</Dropdown.Item>
+                                                <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(100); setNumPage(1) }}>100 Rows</Dropdown.Item>
+                                                <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(150); setNumPage(1) }}>150 Rows</Dropdown.Item>
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+
+                                    </div>
                                 </div>
                             </div>
                         </>

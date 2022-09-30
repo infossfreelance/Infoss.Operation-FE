@@ -59,6 +59,7 @@ const EstimateProfitLossPage = () => {
         setEPLDataMap(response.data.data)
     })
     .catch(function (error) {
+      console.error(error)
       setIsLoading(false);
       NotifAlert("Something Went Wrong!", "error")
     })
