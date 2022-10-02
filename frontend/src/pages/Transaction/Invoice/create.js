@@ -34,6 +34,7 @@ import TableRow from '@mui/material/TableRow';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ModalListSOInvoice from './modalListSOInvoice'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -91,12 +92,14 @@ function a11yProps(index) {
       id: `simple-tab-${index}`,
       'aria-controls': `simple-tabpanel-${index}`,
     };
-}  
+}
 
 const CreateInvoicePage = () => {
     const history = useNavigate()
     const [header, setHeader] = useState('')
-    const [tabValue, setTabValue] = React.useState(0);
+    const [tabValue, setTabValue] = useState(0);
+    const [shipmentData, setShipmentData] = useState({})
+    const [openMLSO, setOpenMLSO] = useState(false)
 
     const handleTab = (event, newValue) => {
         setTabValue(newValue);
@@ -106,6 +109,13 @@ const CreateInvoicePage = () => {
         setHeader(event.target.value);
     };
 
+    const handleSubmit = (event) => {
+        console.log('submited')
+        console.log(event)
+    }
+
+    console.log('ship = ', shipmentData)
+
     return (
         <Grid container spacing={2} direction="column">
             <Grid item xs={12}>
@@ -113,7 +123,7 @@ const CreateInvoicePage = () => {
             </Grid>
             <Grid item xs={12}>
                 <Stack direction='row' spacing={1}>
-                    <Button variant="outlined" startIcon={<SaveIcon />}>
+                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={() => handleSubmit()}>
                         save
                     </Button>
                     <Button variant="outlined" startIcon={<ReplyIcon />} onClick={() => history('/booking/invoice')}>
@@ -134,6 +144,8 @@ const CreateInvoicePage = () => {
                 </Stack>
             </Grid>
             <Paper variant="outlined" sx={{ m: 2, p: 2 }}>
+                <ModalListSOInvoice open={openMLSO} onClose={() => setOpenMLSO(false)} setSelectedData={(e) => setShipmentData(e)} />
+
                 <Grid container item spacing={3} direction="row">
                     <Grid item xs={6}>
                         <FormControl fullWidth>
@@ -173,6 +185,14 @@ const CreateInvoicePage = () => {
                                 </Grid>
                             </Box>
 
+                            <TextField 
+                            id="etd-invoice" 
+                            label="ETD / ETA" 
+                            variant="filled" 
+                            margin="normal" 
+                            value={ shipmentData.etd ? shipmentData.etd : '' }
+                            disabled
+                            />
                             <TextField id="principle-invoice" label="Principle By" variant="filled" margin="normal" />
                             
                             <FormControl sx={{ mt: 2 }}>
@@ -195,7 +215,13 @@ const CreateInvoicePage = () => {
                     </Grid>
                     <Grid item xs={6}>
                         <FormControl fullWidth>
-                            <TextField id="shipment-order-number" label="Shipment Order No" variant="standard" />
+                            <TextField 
+                            id="shipment-order-number" 
+                            label="Shipment Order Number" 
+                            variant="filled" 
+                            onClick={() => setOpenMLSO(true)} 
+                            value={ shipmentData.shipmentOrder ? shipmentData.shipmentOrder : '' }
+                            />
 
                             <Box m={1}>
                                 <FormLabel id="invoice-dc-label">Debet / Credit</FormLabel>
@@ -318,7 +344,6 @@ const CreateInvoicePage = () => {
                             </Table>
                         </TableContainer>
                         <Grid
-                        xs={12}
                         container
                         justifyContent="space-between"
                         alignItems="center"
@@ -351,7 +376,7 @@ const CreateInvoicePage = () => {
                         </Grid>
                     </Box>
                 </Grid>
-                <Grid xs={12} container spacing={2} flexDirection="row" alignItems="center">
+                <Grid container spacing={2} flexDirection="row" alignItems="center">
                     <Grid item>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1, mt: 1 }}>
                             <RadioGroup name="paid-radio">
@@ -373,7 +398,7 @@ const CreateInvoicePage = () => {
                         <TextField id="payment-usd" label="Total Vat IDR" variant="filled" disabled />
                     </Grid>
                 </Grid>
-                <Grid xs={12} container spacing={2} flexDirection="row" alignItems="center">
+                <Grid container spacing={2} flexDirection="row" alignItems="center">
                     <Grid item>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1, mt: 1 }}>
                             <FormLabel id="invoice-rate-label">Rate</FormLabel>

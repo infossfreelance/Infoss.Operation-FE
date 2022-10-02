@@ -15,10 +15,11 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
-// import axios from 'axios';
+import axios from 'axios';
 import { Table, Dropdown, Pagination, Button } from 'react-bootstrap'
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import { useNavigate } from "react-router-dom";
+import { API_URL } from '../../../helpers/constant';
 
 const InvoicePage = () => {
     // const invoices2 = {
@@ -212,18 +213,36 @@ const InvoicePage = () => {
     const [SelectedData, setSelectedData] = useState({});
     const [job, setJob] = useState('');
     const [loading, setLoading] = useState(false)
-    const [invoices, setInvoices] = useState(invoices3)
-    const [invoicesMap, setInvoicesMap] = useState(invoices3)
+    const [invoices, setInvoices] = useState([])
+    const [invoicesMap, setInvoicesMap] = useState([])
+    const [columnData, setColumnData] = useState([])
     const history = useNavigate();
 
     useEffect(() => {
-    //     setInvoices(invoices2)
-    //     setInvoicesMap(invoices2)
-    //     console.log(invoicesMap)
-    }, [invoicesMap])
+        fetchInvoices()
+    }, [])
 
-    // setInvoices(invoices2)
-    // setInvoicesMap(invoices2)
+    const fetchInvoices = (pageNumber = 1, pageSize = 7) => {
+        setLoading(true)
+        const payload = {
+            "userCode": "luna",
+            "countryId": 101,
+            "companyId": 32,
+            "branchId": 12
+        }
+        axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        .then((response) => {
+            setLoading(false)
+            console.log('response ', response)
+            setInvoices(response.data.data.invoices);
+            setInvoicesMap(response.data.data.invoices)
+            setColumnData(response.data.data.columns)
+        })
+        .catch(function (error) {
+            setLoading(false)
+            console.error(error)
+        })
+    }
 
     const handleChange = (event) => {
         setJob(event.target.value);
@@ -276,7 +295,7 @@ const InvoicePage = () => {
             <Grid container item spacing={2} direction="row" style={{'maxWidth': '100vw'}}>
                 <Grid item xs={10}>
                     <Stack direction='row' spacing={1}>
-                        <Button variant="outline-infoss" className='btn-sm'>
+                        <Button variant="outline-infoss" className='btn-sm' onClick={() => fetchInvoices()}>
                             <CachedIcon /> Reload Data
                         </Button>
                         <Button variant="outline-infoss" className='btn-sm' onClick={() => history('/booking/invoice/create')}>
@@ -341,9 +360,9 @@ const InvoicePage = () => {
                                 <thead className='text-center text-infoss'>
                                     <tr>
                                         {
-                                            invoices.headers.map((el, index) => {
+                                            columnData.map((el, index) => {
                                                 return (
-                                                    <td key={index}>{el}</td>
+                                                    <td key={index}>{el.text}</td>
                                                 )
                                             })
                                         }
@@ -352,10 +371,10 @@ const InvoicePage = () => {
                                 <tbody className="text-muted">
                                     <tr>
                                         {
-                                            invoices.headers.map((el, index) => {
-                                                if(el === 'delete') {
+                                            columnData.map((el, index) => {
+                                                if(el.text === 'deleted') {
                                                     return (
-                                                        <td>
+                                                        <td key={index}>
                                                             <select className='form-control col-search-form border-infoss'>
                                                                 <option value="all">All</option>
                                                                 <option value="yes">Yes</option>
@@ -368,8 +387,8 @@ const InvoicePage = () => {
                                                         <td key={index}>
                                                             <input 
                                                             className="form-control col-search-form border-infoss" 
-                                                            onChange={(e) => filterTable(el, e.target.value)} 
-                                                            style={{ 'min-width': '100px' }}/>
+                                                            onChange={(e) => filterTable(el.column, e.target.value)} 
+                                                            style={{ 'minWidth': '100px' }}/>
                                                         </td> 
                                                     )
                                                 }
@@ -377,16 +396,24 @@ const InvoicePage = () => {
                                         }
                                     </tr>
                                     {
-                                        invoicesMap.data.length > 0 
+                                        invoicesMap.length > 0 
                                         ?
-                                        invoicesMap.data.map((el, index) => {
+                                        invoicesMap.map((el, index) => {
                                             return (
                                                 <tr 
                                                 key={index} 
                                                 onClick={(e) => setSelectedData(el)}
-                                                className={SelectedData.id === el.id ? "bg-infoss text-white" : ( el.delete === 1 && "text-danger")}>
-                                                    <td>{el.delete}</td>
-                                                    <td>{el.type}</td>
+                                                className={SelectedData.id === el.id ? "bg-infoss text-white" : ( el.deleted === true && "text-danger")}>
+                                                    {
+                                                       columnData.map((headersEl, indexHeaders) => {
+                                                            return (
+                                                                <td key={indexHeaders}>{el[headersEl.column]}</td> 
+                                                            )
+                                                       }) 
+                                                    }
+                                                    {/* <td>{el.id}</td>
+                                                    <td>{el.deleted}</td>
+                                                    <td>{el.jenisInvoices}</td>
                                                     <td>{el.ctc}</td>
                                                     <td style={{ position: 'sticky' }}>{el.invNo}</td>
                                                     <td>{el.paid}</td>
@@ -415,7 +442,7 @@ const InvoicePage = () => {
                                                     <td>{el.dateDelivered}</td>
                                                     <td>{el.approvalCredit}</td>
                                                     <td>{el.bcReference}</td>
-                                                    <td>{el.stampDuty}</td>
+                                                    <td>{el.stampDuty}</td> */}
                                                 </tr>
                                             )
                                         })
