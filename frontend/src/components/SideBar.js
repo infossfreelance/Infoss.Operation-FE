@@ -41,6 +41,7 @@ import EstimateProfitLossPage from '../pages/Report/EstimateProfitLoss';
 import EstimateProfitLossDetailPage from '../pages/Report/EstimateProfitLoss/detail';
 import EstimateProfitLossEditPage from '../pages/Report/EstimateProfitLoss/edit';
 import InvoicePage from '../pages/Transaction/Invoice';
+import CreateInvoicePage from '../pages/Transaction/Invoice/create';
 import PaymentRequestPage from '../pages/Transaction/PaymentRequest';
 import PaymentRequestDetailPage from '../pages/Transaction/PaymentRequest/detail';
 import PaymentRequestEditPage from '../pages/Transaction/PaymentRequest/edit';
@@ -579,6 +580,7 @@ export default function MiniDrawer() {
                     <Route path="/payment-request/detail" element={<><PaymentRequestDetailPage /></>} />
                     <Route path="/payment-request/edit/:SOId" element={<><PaymentRequestEditPage /></>} />
                     <Route path="/invoice" element={<><InvoicePage /></>} />
+                    <Route path='/invoice/create' element={<><CreateInvoicePage /></>} />
                 </Routes>
 
                 <Footer />
