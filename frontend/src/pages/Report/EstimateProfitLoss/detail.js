@@ -203,7 +203,7 @@ const EstimateProfitLossDetailPage = () => {
 
     const getDataById = () => {
         // axios.get(API_URL + 'estimateprofitloss/Estimateprofitloss/ApiV1/Detail/' + staticId)
-        axios.get(API_URL + 'estimateprofitloss/Estimateprofitloss/ApiV1/Detail/' + localStorage.getItem("id"))
+        axios.get(API_URL + 'estimateprofitloss/Estimateprofitloss/ApiV1/Detail/' + localStorage.getItem("id")) //untuk munculin detail
         .then((response) => {
             let datas = response.data.data.estimateProfitLossDetails;
             MappingListByTab(datas);
@@ -321,7 +321,7 @@ const EstimateProfitLossDetailPage = () => {
 
     const getShipperById = (id) => {
 
-        axios.get(API_URL_MASTER + `regContact/regContact/PostById?id=${id}`)
+        axios.get(API_URL_MASTER + `regContact/regContact/PostById?id=${id}`) //untuk dapat contact detail
         .then((response) => {
             
         })

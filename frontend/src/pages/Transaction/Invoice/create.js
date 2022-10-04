@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import FormControl from '@mui/material/FormControl';
@@ -35,6 +35,8 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModalListSOInvoice from './modalListSOInvoice'
+import axios from 'axios'
+import {API_URL, dateFormat} from '../../../helpers/constant';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -65,14 +67,9 @@ function TabPanel(props) {
                         <TextareaAutosize
                         maxRows={3}
                         aria-label="maximum height"
-                        placeholder="Maximum 4 rows"
-                        defaultValue="Lorem ipsum dolor sit amet, 
-                        consectetur adipiscing elit, 
-                        sed do eiusmod tempor incididunt
-                        ut labore et 
-                        dolore magna aliqua."
-                        style={{ width: 600 }}
-                        disabled/>
+                        placeholder="Address"
+                        style={{ maxWidth: 600, minWidth: 400, minHeight: 50 }}
+                        />
                     </Grid>
                 </Grid>
             </Box>
@@ -94,12 +91,28 @@ function a11yProps(index) {
     };
 }
 
-const CreateInvoicePage = () => {
+const CreateInvoicePage = (props) => {
     const history = useNavigate()
     const [header, setHeader] = useState('')
     const [tabValue, setTabValue] = useState(0);
     const [shipmentData, setShipmentData] = useState({})
     const [openMLSO, setOpenMLSO] = useState(false)
+    const [LSOData, setLSOData] = useState([])
+
+    useEffect(() => {
+        getShipmentOrder(10, 1)
+    }, []);
+
+    const getShipmentOrder = (rowsCount = 50, NumPage = 1) => {
+        axios.get(API_URL + `shipmentorder/shipmentorder/${NumPage}/${rowsCount}`)
+        .then((response) => {
+            setLSOData(response.data)
+            console.log('data ship list', response)
+        })
+        .catch(function (error) {
+          console.error(error)
+        })
+    }
 
     const handleTab = (event, newValue) => {
         setTabValue(newValue);
@@ -144,7 +157,12 @@ const CreateInvoicePage = () => {
                 </Stack>
             </Grid>
             <Paper variant="outlined" sx={{ m: 2, p: 2 }}>
-                <ModalListSOInvoice open={openMLSO} onClose={() => setOpenMLSO(false)} setSelectedData={(e) => setShipmentData(e)} />
+                <ModalListSOInvoice 
+                open={openMLSO} 
+                onClose={() => setOpenMLSO(false)} 
+                setSelectedData={(e) => setShipmentData(e)}
+                LSOData={LSOData} 
+                />
 
                 <Grid container item spacing={3} direction="row">
                     <Grid item xs={6}>
@@ -171,7 +189,7 @@ const CreateInvoicePage = () => {
                                 <FormControlLabel value="ctc" control={<Radio />} label="Cost To Cost" />
                             </RadioGroup>
 
-                            <TextField id="invoice-number" label="Invoice Number" variant="standard" />
+                            <TextField id="invoice-number" label="Invoice Number" variant="filled" disabled />
 
                             <Box mt={1}>
                                 <FormLabel id="invoice-print-label">Printing</FormLabel>
@@ -190,10 +208,17 @@ const CreateInvoicePage = () => {
                             label="ETD / ETA" 
                             variant="filled" 
                             margin="normal" 
-                            value={ shipmentData.etd ? shipmentData.etd : '' }
+                            value={ shipmentData.etd ? dateFormat(shipmentData.etd) : '' }
                             disabled
                             />
-                            <TextField id="principle-invoice" label="Principle By" variant="filled" margin="normal" />
+                            <TextField 
+                            id="principle-invoice" 
+                            label="Principle By" 
+                            variant="filled" 
+                            margin="normal" 
+                            value={ shipmentData.jobOwnerId ? shipmentData.jobOwnerId : '' } 
+                            disabled 
+                            />
                             
                             <FormControl sx={{ mt: 2 }}>
                                 <InputLabel id="invoice-header-label">Invoice Header</InputLabel>
@@ -220,7 +245,7 @@ const CreateInvoicePage = () => {
                             label="Shipment Order Number" 
                             variant="filled" 
                             onClick={() => setOpenMLSO(true)} 
-                            value={ shipmentData.shipmentOrder ? shipmentData.shipmentOrder : '' }
+                            value={ shipmentData.shipmentNo ? shipmentData.shipmentNo : '' }
                             />
 
                             <Box m={1}>
@@ -263,7 +288,7 @@ const CreateInvoicePage = () => {
                         <Grid item container spacing={2} direction="row">
                             <Grid item xs={6}>
                                 <TextField variant="standard" label="Ref. E-Faktur" id="invoice-faktur" margin="normal" />
-                                <TextField variant="standard" label="Revised Tax Inv. No" id="invoice-tax" margin="normal" />
+                                <TextField variant="filled" label="Revised Tax Inv. No" id="invoice-tax" margin="normal" />
                             </Grid>
                             <Grid item xs={6}>
                                 <Box sx={{ border: 1, borderRadius: 1, p: 1, mt: 2 }}>
@@ -379,7 +404,7 @@ const CreateInvoicePage = () => {
                 <Grid container spacing={2} flexDirection="row" alignItems="center">
                     <Grid item>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1, mt: 1 }}>
-                            <RadioGroup name="paid-radio">
+                            <RadioGroup name="paid-radio" defaultValue={'0'}>
                                 <FormControlLabel value="1" control={<Radio />} label="Paid" />
                                 <FormControlLabel value="0" control={<Radio />} label="Not Paid" />
                             </RadioGroup>
@@ -424,6 +449,7 @@ const CreateInvoicePage = () => {
                             >
                                 <MenuItem value={1}>USD</MenuItem>
                                 <MenuItem value={2}>IDR</MenuItem>
+                                <MenuItem value={2}>ALL</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>
