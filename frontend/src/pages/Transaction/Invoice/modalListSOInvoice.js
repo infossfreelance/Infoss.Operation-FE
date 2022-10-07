@@ -11,6 +11,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { dateFormat } from '../../../helpers/constant';
+import { Dropdown, Pagination } from 'react-bootstrap'
 
 // const dummy = [
 //     {
@@ -33,12 +34,12 @@ import { dateFormat } from '../../../helpers/constant';
 
 const style = {
     position: 'absolute',
-    top: '30%',
+    top: '20%',
     left: '5%',
     bgcolor: 'background.paper', 
     p: 1,
     maxWidth: 1300,
-    maxHeight: 500,
+    maxHeight: 600,
     boxShadow: 24,
     borderRadius: 1,
 }
@@ -48,6 +49,8 @@ const selectedStyle = { bgcolor: (theme) => theme.palette.primary.main }
 const ModalListShipmentOrderInvoice = (props) => {
     // const [dataList, setDataList] = useState(dummy)
     const [selectedData, setSelectedData] = useState({})
+    const [rowsCount, setRowsCount] = useState(50)
+    const [numPage, setNumPage] = useState(1)
 
     const handleSelect = (rowValue) => {
         console.log(rowValue)
@@ -62,6 +65,58 @@ const ModalListShipmentOrderInvoice = (props) => {
     const saveSelectedData = () => {
         props.setSelectedData(selectedData)
         handleClose()
+    }
+
+    const renderPagination = () => {
+        let MaxPage = 1
+        if(props.LSOData.length > 0) {
+            MaxPage = Math.ceil( props.LSOData.length / rowsCount )
+        }
+        if (numPage === 1 && numPage !== MaxPage) {
+          return (
+            <div style={{ display: 'inline-block' }}>
+              <Pagination>
+                <Pagination.Item active>
+                  {numPage}
+                </Pagination.Item>
+                <Pagination.Next onClick={() => { props.fetchData(rowsCount, 2); setNumPage(numPage + 1) }} />
+              </Pagination>
+            </div>
+          )
+        } else if (numPage === 1 && numPage === MaxPage) {
+          return (
+            <div style={{ display: 'inline-block' }}>
+              <Pagination>
+                <Pagination.Item active>
+                  {numPage}
+                </Pagination.Item>
+              </Pagination>
+            </div>
+          )
+        } else if (numPage === MaxPage) {
+          return (
+            <div style={{ display: 'inline-block' }}>
+              <Pagination>
+                <Pagination.Prev onClick={() => { props.fetchData(rowsCount, numPage - 1); setNumPage(numPage - 1) }} />
+                <Pagination.Item active>
+                  {numPage}
+                </Pagination.Item>
+              </Pagination>
+            </div>
+          )
+        } else {
+          return (
+            <div style={{ display: 'inline-block' }}>
+              <Pagination>
+                <Pagination.Prev onClick={() => { props.fetchData(rowsCount, numPage - 1); setNumPage(numPage - 1) }} />
+                <Pagination.Item active>
+                  {numPage}
+                </Pagination.Item>
+                <Pagination.Next onClick={() => { props.fetchData(rowsCount, numPage + 1); setNumPage(numPage + 1) }} />
+              </Pagination>
+            </div>
+          )
+        }
     }
 
     return (
@@ -81,7 +136,7 @@ const ModalListShipmentOrderInvoice = (props) => {
                     </Grid>
                 </Grid>
                 <Grid item>
-                    <Box sx={{ border: 1, borderRadius: 1, p: 1, overflow: 'hidden', maxHeight: 400 }}>
+                    <Box sx={{ border: 1, borderRadius: 1, p: 1, overflow: 'hidden', maxHeight: 450 }}>
                         <TableContainer component={Paper} sx={{ maxHeight: 390 }}>
                             <Table sx={{ minWidth: 650 }} aria-label="sticky table" stickyHeader>
                                 <TableHead>
@@ -112,12 +167,33 @@ const ModalListShipmentOrderInvoice = (props) => {
                                         })
                                         :
                                         <TableRow>
-                                            <TableCell colSpan={5}>Data Empty</TableCell>
+                                            <TableCell colSpan={6} sx={{ textAlign: 'center' }}>Data Empty</TableCell>
                                         </TableRow>
                                     }
                                 </TableBody>
                             </Table>
                         </TableContainer>
+                        <div className='row mt-2'>
+                        <div>
+                            <div>
+                                <div className='mx-4' style={{ display: 'inline-block' }}>
+                                    {renderPagination()}
+                                </div>
+
+                                <Dropdown style={{ display: 'inline-block' }} className='mx-2'>
+                                    <Dropdown.Toggle variant="outline-infoss sm" id="dropdown-basic">
+                                        {rowsCount} Rows
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(50); setNumPage(1); props.fetchData(50, 1) }}>50 Rows</Dropdown.Item>
+                                        <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(100); setNumPage(1); props.fetchData(100, 1) }}>100 Rows</Dropdown.Item>
+                                        <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(150); setNumPage(1); props.fetchData(150, 1) }}>150 Rows</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+
+                            </div>
+                        </div>
+                    </div>
                     </Box>
                 </Grid>
             </Grid>
