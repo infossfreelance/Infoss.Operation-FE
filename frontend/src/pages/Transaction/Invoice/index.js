@@ -34,16 +34,32 @@ const InvoicePage = () => {
     const [columnData, setColumnData] = useState([])
     const history = useNavigate();
 
-    const ErrorAlert = (string) => {
+    const ErrorAlert = (string, isError = false) => {
+        let icon = 'warning'
+        let title = 'Peringatan'
+        if(isError === true) {
+            icon = 'error'
+            title = 'Terjadi Kesalahan'
+        }
         Swal.fire({
-            icon: 'warning',
-            title: 'Oops',
+            icon,
+            title,
             text: string,
             customClass: {
                 confirmButton: 'btn btn-infoss px-4'
             }
         });
     };
+
+    const succesAlert = (text) => {
+        Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: text,
+            showConfirmButton: false,
+            timer: 1500
+        })
+    }
 
     useEffect(() => {
         fetchInvoices(numPage, rowsCount)
@@ -57,11 +73,12 @@ const InvoicePage = () => {
             "companyId": 32,
             "branchId": 12
         }
-        // axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
-        axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        // axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         .then((response) => {
             console.log('response fetch invoice', response)
             if(response.data.code === 200) {
+                setSelectedData({})
                 setInvoices(response.data.data.invoices);
                 setInvoicesMap(response.data.data.invoices)
                 // setColumnData(response.data.data.columns)
@@ -89,6 +106,11 @@ const InvoicePage = () => {
                             "format": ""
                         },
                         {
+                            "column": "siCustomerNo",
+                            "text": "SiCustomerNo",
+                            "format": ""
+                        },
+                        {
                             "column": "printing",
                             "text": "Print",
                             "format": ""
@@ -98,18 +120,35 @@ const InvoicePage = () => {
                             text: 'Print Date',
                             format: 'date'
                         },
+                        {
+                            column: 'rePrintApproved',
+                            text: 'RePrint Approved',
+                            format: ''
+                        },
+                        {
+                            column: 'rePrintApprovedBy',
+                            text: 'Approved By',
+                            format: ''
+                        },
+                        {
+                            column: 'rePrintApprovedOn',
+                            text: 'Approved On',
+                            format: 'date'
+                        },
                     ]
                 )
                 setLoading(false)
-            } else {
-                setLoading(false)
-                ErrorAlert(response.data.message)
-            }
+            } 
+            // else {
+            //     setLoading(false)
+            //     ErrorAlert(response.data.message, true)
+            // }
+            setLoading(false)
         })
         .catch(function (error) {
             setLoading(false)
-            console.error(error)
-            ErrorAlert(error.toString())
+            console.error('error saat fetch', error)
+            ErrorAlert(error.toString(), true)
         })
     }
 
@@ -145,19 +184,19 @@ const InvoicePage = () => {
                 .then(response => {
                     console.log('hasil api print', response)
                     if(response.data.code === 200) {
-                        fetchInvoices()
-                        ErrorAlert('Data berhasil di print')
+                        fetchInvoices(numPage, rowsCount)
+                        succesAlert('Data berhasil di print')
                         setLoading(false)
                     } else {
-                        ErrorAlert(response.data.message)
+                        ErrorAlert(response.data.message, true)
                         setLoading(false)
                     }
                 }).catch(error => {
                     console.error(error)
-                    ErrorAlert(error.toString())
+                    ErrorAlert(error.toString(), true)
                 })
             } else {
-                ErrorAlert('Data sudah pernah di print')
+                ErrorAlert('Harap minta persetujuan print ulang')
                 setLoading(false)
             }
         } else {
@@ -166,7 +205,11 @@ const InvoicePage = () => {
     }
 
     const handleEdit = () => {
-        console.log('edit ', SelectedData)
+        if (SelectedData.id === undefined) {
+            ErrorAlert("Please Select Data!")
+        } else {
+          history('/booking/invoice/edit/'+ SelectedData.id)
+        }
     }
 
     const handleRePrint = () => {
@@ -174,7 +217,8 @@ const InvoicePage = () => {
         if(SelectedData.id) {
             setLoading(true)
             if(SelectedData.rePrintApproved === true) {
-                ErrorAlert('Permintaan print ulang sudah di setujui')
+                succesAlert('Print ulang sudah di setujui')
+                setLoading(false)
             } else {
                 const payload = {
                     "rowStatus": SelectedData.rowStatus,
@@ -192,22 +236,79 @@ const InvoicePage = () => {
                     console.log('response re print', response)
                     if(response.data.code === 200) {
                         fetchInvoices(numPage, rowsCount)
-                        ErrorAlert('Permintaan print ulang sudah di setujui')
+                        succesAlert('Print ulang sudah di setujui')
                         setLoading(false)
                     } else {
                         setLoading(false)
-                        ErrorAlert(response.data.message)
+                        ErrorAlert(response.data.message, true)
                     }
                 })
                 .catch(error => {
                     console.error(error)
                     setLoading(false)
-                    ErrorAlert(error.toString())
+                    ErrorAlert(error.toString(), true)
                 })
             }
         } else {
             ErrorAlert('Harap pilih data terlebih dahulu')
         }
+    }
+
+    const handleDelete = () => {
+        if (SelectedData.id === undefined) {
+            ErrorAlert("Harap pilih data terlebih dahulu")
+        } else {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.put(
+                        `http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Delete?id=${SelectedData.id}`,
+                        {
+                            "rowStatus": "ACT",
+                            "countryId": 101,
+                            "companyId": 32,
+                            "branchId": 12,
+                            "user": "luna"
+                        }
+                    ).then(response => {
+                        console.log('res delete', response)
+                        Swal.fire(
+                            'Deleted!',
+                            'Your file has been deleted.',
+                            'success'
+                        )
+                        fetchInvoices(numPage, rowsCount)
+                    })
+                    .catch(error => {
+                        console.error(error)
+                        ErrorAlert(error.toString(), true)
+                    })
+                }
+            })
+        }
+    }
+
+    const handleAdd = () => {
+        Swal.fire({
+            title: 'Harap print terlebih dahulu invoice berikut',
+            text: "InvoiceNo: 000333, ShipmentNo: AMJKT.10.000263-00",
+            icon: 'warning',
+            showCancelButton: false,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+              history('/booking/invoice/create')
+            }
+        })
     }
 
     const handleChange = (event) => {
@@ -303,7 +404,7 @@ const InvoicePage = () => {
             </div>
           )
         }
-      }
+    }
 
     return (
         <Grid container spacing={0} direction="column">
@@ -316,13 +417,13 @@ const InvoicePage = () => {
                         <Button variant="outline-infoss" className='btn-sm' onClick={() => fetchInvoices(numPage, rowsCount)}>
                             <CachedIcon /> Reload Data
                         </Button>
-                        <Button variant="outline-infoss" className='btn-sm' onClick={() => history('/booking/invoice/create')}>
+                        <Button variant="outline-infoss" className='btn-sm' onClick={() => handleAdd()}>
                             <AddToPhotosIcon /> Add New
                         </Button>
                         <Button variant="outline-infoss" className='btn-sm' onClick={() => handleEdit()}>
                             <ModeEditOutlineIcon /> Edit Data
                         </Button>
-                        <Button variant="outline-infoss" className='btn-sm'>
+                        <Button variant="outline-infoss" className='btn-sm' onClick={() => handleDelete()}>
                             <DeleteForeverIcon /> Delete
                         </Button>
                         <Button variant="outline-infoss" className='btn-sm' onClick={() => handlePrint()}>
@@ -392,7 +493,7 @@ const InvoicePage = () => {
                                             columnData.map((el, index) => {
                                                 if(el.text === 'Delete') {
                                                     return (
-                                                        <td key={index}>
+                                                        <td key={index}> 
                                                             <select className='form-control col-search-form border-infoss'>
                                                                 <option value="all">All</option>
                                                                 <option value="yes">Yes</option>
