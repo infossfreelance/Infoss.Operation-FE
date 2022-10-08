@@ -2,8 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {Button, Modal} from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import FindInPageIcon from '@mui/icons-material/FindInPage';
-import AddIncShipperList from './AddIncShipperList';
-import AddIncAccountList from './AddIncAccountList';
+import AddAccountList from './AddAccountList';
+import MarginRateList from './MarginRateList';
+import SOCRateList from './SOCRateList';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -11,15 +12,17 @@ import axios from 'axios';
 import {API_URL} from '../../helpers/constant';
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 import { Alert, AlertTitle } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
-export default function AddIncShipper(props) {
+export default function AddbeingForPayment(props) {
 
   useEffect(() => {
     props.data && handleChecked(props.data.amountIDR, props.data.amountUSD)
   }, []);
 
-  const [showAddIncShipperList, setShowAddIncShipperList] = useState(false)
-  const [showAddIncAccountList, setShowAddIncAccountList] = useState(false)
+  const [showAddAccountList, setShowAddAccountList] = useState(false)
+  const [showMarginRateList, setShowMarginRateList] = useState(false)
+  const [showSOCRateList, setShowSOCRateList] = useState(false)
   const [SelectedShipper, setSelectedShipper] = useState({})
   const [SelectedAccount, setSelectedAccount] = useState({})
 
@@ -34,6 +37,7 @@ export default function AddIncShipper(props) {
   const [Amount, setAmount] = useState(0);
   const [OriginalRate, setOriginalRate] = useState(0);
   const [OriginalUSD, setOriginalUSD] = useState(0);
+  const [DifferentCost, setDifferentCost] = useState(0);
 
   const [OpenAlert, setOpenAlert] = useState(false);
   const [TextAlert, setTextAlert] = useState("");
@@ -55,44 +59,10 @@ export default function AddIncShipper(props) {
     setAmount(0);
     setOriginalRate(0);
     setOriginalUSD(0);
+    setDifferentCost(0);
   }
 
   const saveData = () => {
-    // if (SelectedShipper.code === undefined) {
-    //   NotifAlert("Please Select Shipper!", "warning")
-    //   return false
-    // }
-    // if (SelectedAccount.id === undefined) {
-    //   NotifAlert("Please Select Account!", "warning")
-    //   return false
-    // }
-    // if (Desc.length < 1 && SelectedAccount.length < 1) {
-    //   NotifAlert("Description Can't Be Empty!", "warning")
-    //   return false
-    // }
-    // // if (QtyUnit === 0) {
-    // //   NotifAlert("Quantity Unit Can't Be Empty!", "warning")
-    // //   return false
-    // // }
-    // // if (PerUnitCost === 0) {
-    // //   NotifAlert("Per Unit Cost Can't Be Empty!", "warning")
-    // //   return false
-    // // }
-    // if (Currency === '') {
-    //   NotifAlert("Please Select Currency!", "warning")
-    //   return false
-    // }
-    // // if (OriginalRate === 0) {
-    // //   NotifAlert("Original Rate Can't Be Empty!", "warning")
-    // //   return false
-    // // }
-    // // if (OriginalUSD === 0) {
-    // //   NotifAlert("Original USD Can't Be Empty!", "warning")
-    // //   return false
-    // // }
-
-    // console.log("Currency", Currency)
-    // console.log("amount", Amount)
 
     let amount_IDR = 0
     let amount_USD = 0
@@ -100,17 +70,11 @@ export default function AddIncShipper(props) {
     if (Currency === 'IDR') {
       amount_IDR = Amount ? Amount : (props.data.amountIDR === 0 ? props.data.amountUSD : props.data.amountIDR)
       amount_USD = 0
-      // console.log("IDR")
-      // console.log("def USD", amount_USD)
-      // console.log("def IDR", amount_IDR)
     }
     
     if (Currency === 'USD') {
       amount_USD = Amount ? Amount : (props.data.amountUSD === 0 ? props.data.amountIDR : props.data.amountUSD)  
       amount_IDR = 0    
-      // console.log("USD")
-      // console.log("def USD", amount_USD)
-      // console.log("def IDR", amount_IDR)
     }
 
     let CTI = ''
@@ -202,125 +166,6 @@ export default function AddIncShipper(props) {
     )
   }
 
-  const renderForm = () => {
-    if (props.TabType === 'Inc Agent' || props.TabType === 'Cost Agent') {
-      return (
-        <>
-          <div className='row mt-3'>
-            <div className='col-5 row'>
-              <div className='col-5'>
-                Per Unit Cost
-              </div>
-              <div className='col-7'>
-                <input min={0} type="number" className='form-control ms-1'
-                  defaultValue={ props.IsAdd ? 0 : props.data.perQty }
-                  onChange={(e) => setPerUnitCost(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className='col-3'></div>
-            <div className='col-4 row'>
-              <div className='col-6 text-end'>
-                Original Rate
-              </div>
-              <div className='col-6'>
-                <input min={0} type="number" className='form-control'
-                  defaultValue={ props.IsAdd ? 0 : props.data.originalRate }
-                  onChange={(e) => setOriginalRate(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-          <div className='row mt-3'>
-            <div className='col-5 row'>
-              <div className='col-5'>
-                Amount
-              </div>
-              <div className='col-7'>
-                <input min={0} type="number" className='form-control ms-1'                  
-                  defaultValue={ props.IsAdd ? 0 : (props.data.amountUSD == 0 ? props.data.amountIDR : props.data.amountUSD ) }
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className='col-3 d-flex justify-content-center'>
-              <RadioGroup
-                row
-                aria-labelledby="demo-row-radio-buttons-group-label"
-                name="row-radio-buttons-group"
-                className=''
-              >
-                <FormControlLabel value="+" control={<Radio onChange={(e) => setUpDown("+")} />} label="+" />
-                <FormControlLabel value="-" control={<Radio onChange={(e) => setUpDown("-")} />} label="-" />
-              </RadioGroup>
-            </div>
-            <div className='col-4 row'>
-              <div className='col-6 text-end'>
-                Original USD
-              </div>
-              <div className='col-6'>
-                <input type="number" className='form-control'
-                  defaultValue={ props.IsAdd ? 0 : props.data.originalUsd }
-                  onChange={(e) => setOriginalUSD(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        </>
-      )
-    } else {
-      return (
-        <>
-          <div className='row mt-3'>
-            <div className='col-5 row'>
-              <div className='col-5'>
-                Per Unit Cost
-              </div>
-              <div className='col-7'>
-                <input type="number" className='form-control ms-1'
-                  defaultValue={ props.IsAdd ? 0 : props.data.perQty }
-                  onChange={(e) => setPerUnitCost(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className='col-5 row'>
-              <div className='col-5 text-end'>
-                Original Rate
-              </div>
-              <div className='col-7'>
-                <input type="number" className='form-control'
-                defaultValue={ props.IsAdd ? 0 : props.data.originalRate }
-                onChange={(e) => setOriginalRate(e.target.value)} />
-              </div>
-            </div>
-          </div>
-          <div className='row mt-3'>
-            <div className='col-5 row'>
-              <div className='col-5'>
-                Amount
-              </div>
-              <div className='col-7'>
-                <input type="number" className='form-control ms-1'
-                  defaultValue={ props.IsAdd ? 0 : (props.data.amountUSD == 0 ? props.data.amountIDR : props.data.amountUSD ) }
-                onChange={(e) => setAmount(e.target.value)} />
-              </div>
-            </div>
-            <div className='col-5 row'>
-              <div className='col-5 text-end'>
-                Original USD
-              </div>
-              <div className='col-7'>
-                <input type="number" className='form-control'
-                defaultValue={ props.IsAdd ? 0 : props.data.originalUsd }
-                onChange={(e) => setOriginalUSD(e.target.value)} />
-              </div>
-            </div>
-          </div>
-        </>
-      )
-    }
-  }
-
   const [checkUSD, setCheckUSD] = useState(false)
   const [checkIDR, setCheckIDR] = useState(false)
 
@@ -385,47 +230,23 @@ export default function AddIncShipper(props) {
             { TextAlert }
             </Alert>
         </Snackbar>
-        
+
         <div className='row'>
-          <div className='col-2'>
-            Invoice To
-          </div>
-          <div className='col-10'>
-            { props.TabType.toUpperCase() }
-          </div>
-        </div>
-
-        <div className='row mt-3'>
-          <div className='col-2'>
-            Shipper
-          </div>
-          <div className='col-10 row'>
-            <div className='col-3'>
-              <input className='form-control' disabled
-                value={ props.IsAdd ? SelectedShipper.code : SelectedShipper.code ? SelectedShipper.code : props.data.customerId }
-              />
-            </div>
-            <div className='col-1'>
-              <FindInPageIcon className='text-infoss' onClick={() => setShowAddIncShipperList(true)} />
-            </div>
-            <div className='col-7'>
-              <input className='form-control block' disabled defaultValue={ SelectedShipper.contactName } />
-            </div>
-          </div>
-        </div>
-
-        <div className='row mt-3'>
           <div className='col-2'>
             Account
           </div>
           <div className='col-10 row'>
-            <div className='col-3'>
+            <div className='col-2'>
               <input className='form-control' disabled
                 value={ props.IsAdd ? SelectedAccount.id : SelectedAccount.id ? SelectedAccount.id : props.data.accountId }
               />
             </div>
             <div className='col-1'>
-              <FindInPageIcon className='text-infoss' onClick={() => setShowAddIncAccountList(true)} />
+              <FindInPageIcon className='text-infoss' onClick={() => setShowAddAccountList(true)} />
+            </div>
+            <div className='col-4'>
+              <input type='radio' /> Paid
+              <input type='radio' className='ms-2' /> Not Paid
             </div>
             <div className='col-5'>
               <input type='checkbox' disabled /> 20
@@ -433,9 +254,6 @@ export default function AddIncShipper(props) {
               <input type='checkbox' disabled className='ms-2' /> 45
               <input type='checkbox' disabled className='ms-2' /> M3
               <input type='checkbox' disabled className='ms-2' /> All
-            </div>
-            <div className='col-3'>
-              <input type='checkbox' onChange={() => setSplitAccount(!SplitAccount)} /> Split Account
             </div>
           </div>
         </div>
@@ -515,63 +333,126 @@ export default function AddIncShipper(props) {
                     }
                     label="IDR"
                   />
-                  {/* <FormControlLabel value="USD"
-                    checked={checkUSD}
-                    // checked={handleChecked(props.data.amountUSD)}
-                    control={
-                      <Radio
-                        onClick={(e) => { setCurrency("USD") }}
-                        // onChange={(e) => setCurrency("USD")}
-                      />
-                    }
-                    label="USD"
-                  />
-                  <FormControlLabel value="IDR"
-                    checked={checkIDR}
-                    // checked={handleChecked(props.data.amountIDR)}
-                    control={
-                      <Radio
-                        onChange={(e) => { setCurrency("IDR") }}
-                      />
-                    }
-                    label="IDR"
-                  /> */}
                 </>
-              }
-              
+              }              
 
             </RadioGroup>
           </div>          
-          <div className='col-7 row'>
-            <div className='col-4 pt-2'>
-              <input type='checkbox' disabled /> Additional
-            </div>     
-            <div className='col-4 pt-2'>
+          <div className='col-7 row'>  
+            <div className='col-4 offset-4 pt-2'>
               <input type='checkbox'onChange={(e) => setCostTrucking(!CostTrucking)} /> Cost Trucking
             </div>     
             <div className='col-4 pt-2'>
               <input type='checkbox' onChange={(e) => setCostToCost(!CostToCost)} /> Cost To Cost
             </div>
           </div>
+        </div>        
+        
+        <div className='row mt-3'>
+          <div className='col-6 row'>
+            <div className='col-4'>
+              Quantity Unit
+            </div>
+            <div className='col-6 ms-1'>
+              <input min={0} type="number" className='form-control ms-1'
+                defaultValue={ props.IsAdd ? 0 : props.data.perQty }
+                onChange={(e) => setQtyUnit(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className='col-6 row'>
+            <div className='col-6 text-end'>
+              Original Rate
+            </div>
+            <div className='col-6'>
+              <input min={0} type="number" className='form-control'
+                defaultValue={ props.IsAdd ? 0 : props.data.originalRate }
+                onChange={(e) => setOriginalRate(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>   
+        
+        <div className='row mt-3'>
+          <div className='col-6 row'>
+            <div className='col-4'>
+              Per Unit Cost
+            </div>
+            <div className='col-6 ms-1'>
+              <input min={0} type="number" className='form-control ms-1'
+                defaultValue={ props.IsAdd ? 0 : props.data.perQty }
+                onChange={(e) => setPerUnitCost(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className='col-6 row'>
+            <div className='col-6 text-end'>
+              Original USD
+            </div>
+            <div className='col-6'>
+              <input type="number" className='form-control'
+                defaultValue={ props.IsAdd ? 0 : props.data.originalUsd }
+                onChange={(e) => setOriginalUSD(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
         <div className='row mt-3'>
-          <div className='col-2'>
-            Quantity Unit
+          <div className='col-6 row'>
+            <div className='col-4'>
+              Amount
+            </div>
+            <div className='col-6 ms-1'>
+              <input min={0} type="number" className='form-control ms-1'                  
+                defaultValue={ props.IsAdd ? 0 : (props.data.amountUSD == 0 ? props.data.amountIDR : props.data.amountUSD ) }
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </div>
           </div>
-          <div className='col-3'>
-            <input min={0} type="number" className='form-control'
-              defaultValue={ props.IsAdd ? 0 : props.data.quantity }
-              onChange={(e) => setQtyUnit(e.target.value)}
-            />
+          <div className='col-6 row'>
+            <div className='col-6 text-end'>
+              Different Cost
+            </div>
+            <div className='col-6'>
+              <input type="number" disabled className='form-control'
+                defaultValue={ props.IsAdd ? 0 : props.data.originalUsd }
+                onChange={(e) => setDifferentCost(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
-        { renderForm() }
+        <hr />
+        <div className='row mt-3'>
+          <div className='col-5 row'>
+            <div className='col-7 ms-1'>
+              <input type='checkbox' className='me-3' />
+              Subject VAT 10%
+            </div>
+          </div>
+          <div className='col-7 row'>
+            <div className='col-4 text-end'>
+              Faktur No.
+            </div>
+            <div className='col-8'>
+              <input type="number" disabled className='form-control'
+                defaultValue={ props.IsAdd ? 0 : props.data.originalUsd }
+                onChange={(e) => setDifferentCost(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
 
       </Modal.Body>
 
       <Modal.Footer>
+        <Button variant="outline-infoss" onClick={() => setShowMarginRateList(true)}>
+          <SearchIcon /> Margin Rate
+        </Button>
+        <Button variant="outline-infoss" className='me-3' onClick={() => setShowSOCRateList(true)}>
+          <SearchIcon /> SOC Rate
+        </Button>
         <Button variant="outline-infoss" onClick={() => {props.onHide(); clearForm()}}>
           Close
         </Button>
@@ -579,17 +460,22 @@ export default function AddIncShipper(props) {
           { props.IsAdd ? 'Save' : 'Update' }
         </Button>
       </Modal.Footer>
-
       
-      <AddIncShipperList
-          show={showAddIncShipperList}
-          onHide={() => setShowAddIncShipperList(false)}
-          setSelectedShipper={(e) => setSelectedShipper(e)}
+      <AddAccountList
+          show={showAddAccountList}
+          onHide={() => setShowAddAccountList(false)}
+          setSelectedAccount={(e) => setSelectedAccount(e)}
       />
       
-      <AddIncAccountList
-          show={showAddIncAccountList}
-          onHide={() => setShowAddIncAccountList(false)}
+      <MarginRateList
+          show={showMarginRateList}
+          onHide={() => setShowMarginRateList(false)}
+          setSelectedAccount={(e) => setSelectedAccount(e)}
+      />
+      
+      <SOCRateList
+          show={showSOCRateList}
+          onHide={() => setShowSOCRateList(false)}
           setSelectedAccount={(e) => setSelectedAccount(e)}
       />
 

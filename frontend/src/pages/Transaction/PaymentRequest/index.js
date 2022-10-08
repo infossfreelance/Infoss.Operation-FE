@@ -39,6 +39,9 @@ const EstimateProfitLossPage = () => {
   const [rowsCount, setRowsCount] = useState(50);
   const [SelectedData, setSelectedData] = useState({});
 
+  // console.log("EPLData", EPLData[0])
+  // console.log("EPLDataMap", EPLDataMap)
+
   useEffect(() => {
     getData();
   }, []);
@@ -46,18 +49,17 @@ const EstimateProfitLossPage = () => {
   const getData = (rowsCount = 50, NumPage = 1) => {
     setIsLoading(true);
     const payload = {
-      PageNumber: NumPage,
-      PageSize: rowsCount,
-      CountryId: 101,
-      CompanyId: 32,
-      BranchId: 12
-  }
-    axios.post(API_URL + 'estimateProfitLoss/Estimateprofitloss/ApiV1/Header', payload)
+      userCode: "string",
+      countryId: 101,
+      companyId: 32,
+      branchId: 12
+    }
+    axios.post(API_URL + `PaymentRequest/PostByPage?pageNumber=${NumPage}&pageSize=${rowsCount}`, payload)
     .then((response) => {
-        setIsLoading(false);
-        setMaxPage(response.data.totalPages)
-        setEPLData(response.data.data);
-        setEPLDataMap(response.data.data)
+      setIsLoading(false);
+      setMaxPage(response.data.totalPage)
+      setEPLData(response.data.data);
+      response.data.data.length > 0 && setEPLDataMap(response.data.data)
     })
     .catch(function (error) {
       setIsLoading(false);
@@ -103,9 +105,12 @@ const EstimateProfitLossPage = () => {
     .then((result) => {
       if (result.value) {
         const payload = {
-          id: SelectedData.id
+          userCode: "string",
+          countryId: 0,
+          companyId: 0,
+          branchId: 0
         }
-        axios.put(API_URL + 'estimateProfitLoss/Estimateprofitloss/ApiV1/Header/Delete', payload)
+        axios.put(API_URL + `PaymentRequest/Delete?id=${SelectedData.id}`, payload)
         .then((response) => {
             setSelectedData({})            
             NotifAlert('Data Deleted!', 'success')
@@ -120,20 +125,21 @@ const EstimateProfitLossPage = () => {
     
   }  
 
-  const handleUnDelete = () => {
+  const handleApprove = (appv_id) => {
+    console.log("APPV ID", appv_id)
     if (SelectedData.id === undefined) {
       NotifAlert("Please Select Data!", "warning")
       return false
     }    
 
     if (SelectedData.deleted === 0) {
-      NotifAlert("Data Already Un-Deleted!", "error")
+      NotifAlert("Data Already Approved!", "error")
       return false
     }
 
     Swal.fire({
       icon: 'question',
-      title: 'Are you sure you want to un-delete the selected data?',
+      title: 'Are you sure you want to Multi Approval - Payment Request?',
       showCancelButton: true,
       confirmButtonText: 'Ok',
       cancelButtonText: 'Cancel',
@@ -401,16 +407,16 @@ const EstimateProfitLossPage = () => {
                 <Button variant="outline-infoss" className='me-2 mb-2'>
                     <PrintIcon /> Print EPL
                 </Button>
-                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleUnDelete()}>
+                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleApprove(1)}>
                     <CheckCircleIcon /> Approve By Acc Mgr
                 </Button>
-                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleUnDelete()}>
+                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleApprove(2)}>
                     <CheckCircleIcon /> Open Approve By Acc Mgr
                 </Button>
-                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleUnDelete()}>
+                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleApprove(3)}>
                     <CheckCircleIcon /> Approve General PR
                 </Button>
-                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleUnDelete()}>
+                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleApprove(4)}>
                     <CheckCircleIcon /> Approve MKT
                 </Button>
             </div>

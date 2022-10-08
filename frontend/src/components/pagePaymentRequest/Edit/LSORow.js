@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   dateFormat
-} from '../../helpers/constant';
+} from '../../../helpers/constant';
 
 export default function LSORow(props) {
     return (
