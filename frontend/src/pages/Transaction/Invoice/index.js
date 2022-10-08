@@ -73,8 +73,8 @@ const InvoicePage = () => {
             "companyId": 32,
             "branchId": 12
         }
-        // axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
-        axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        // axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         .then((response) => {
             console.log('response fetch invoice', response)
             if(response.data.code === 200) {
@@ -86,8 +86,8 @@ const InvoicePage = () => {
                 setColumnData(
                     [
                         {
-                            "column": "deleted",
-                            "text": "Delete",
+                            "column": "rowStatus",
+                            "text": "Deleted",
                             "format": ""
                         },
                         {
@@ -521,7 +521,7 @@ const InvoicePage = () => {
                                             let tempStyle = 'text-dark'
                                             if(SelectedData.id === el.id) {
                                                 tempStyle = "bg-infoss text-white"
-                                            } else if(el.deleted === true) {
+                                            } else if(el.rowStatus === 'DEL') {
                                                 tempStyle = "text-danger"
                                             } else if(el.printing > 0) {
                                                 tempStyle = "text-secondary"
@@ -547,6 +547,14 @@ const InvoicePage = () => {
                                                                 temp = 'Yes'
                                                             } else if(el[headersEl.column] === false) {
                                                                 temp = 'No'
+                                                            }
+
+                                                            if(headersEl.column === 'rowStatus') {
+                                                                if(el.rowStatus === 'DEL') {
+                                                                    temp = "Yes"
+                                                                } else {
+                                                                    temp = 'No'
+                                                                }
                                                             }
                                                             return (
                                                                 <td key={indexHeaders}>{temp}</td> 
@@ -579,8 +587,8 @@ const InvoicePage = () => {
                                     {rowsCount} Rows
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
-                                    <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(2); setNumPage(1); fetchInvoices(1, 2) }}>2 Rows</Dropdown.Item>
                                     <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(5); setNumPage(1); fetchInvoices(1, 5) }}>5 Rows</Dropdown.Item>
+                                    <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(50); setNumPage(1); fetchInvoices(1, 50) }}>50 Rows</Dropdown.Item>
                                     <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(100); setNumPage(1); fetchInvoices(1, 100) }}>100 Rows</Dropdown.Item>
                                     <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(150); setNumPage(1); fetchInvoices(1, 150) }}>150 Rows</Dropdown.Item>
                                 </Dropdown.Menu>
