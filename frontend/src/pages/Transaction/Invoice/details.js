@@ -363,6 +363,34 @@ let revisedHeadersDummy = [
     },
 ]
 
+let storageHeadersDummy = [
+    {
+        "column": "code",
+        "text": "Code",
+        "format": ""
+    },
+    {
+        "column": "name",
+        "text": "Name",
+        "format": ""
+    },
+    {
+        "column": "crr",
+        "text": "Crr",
+        "format": ""
+    },
+    {
+        "column": "payment",
+        "text": "Payment",
+        "format": ""
+    },
+    {
+        "column": "type",
+        "text": "Type",
+        "format": ""
+    },
+]
+
 const CreateInvoicePage = () => {
     const { invId } = useParams()
     const history = useNavigate()
@@ -409,6 +437,10 @@ const CreateInvoicePage = () => {
     const [handleSelectRevised, setHandleSelectRevised] = useState({})
     const [headerRevised, setHeaderRevised] = useState(revisedHeadersDummy)
     const [dataRevised, setDataRevised] = useState({})
+    const [openStorage, setOpenStorage] = useState(false)
+    const [selectedStorage, setSelectedStorage] = useState({})
+    const [headerStorage, setHeaderStorage] = useState(storageHeadersDummy)
+    const [dataStorage, setDataStorage] = useState([])
 
     useEffect(() => {
         getShipmentOrder(50, 1)
@@ -417,11 +449,16 @@ const CreateInvoicePage = () => {
             console.log('mode edit', invId)
             setIsDisabled(true)
             fetchEditData(invId)
+            fetchRevised(50, 1)
         } else {
             console.log('mode create')
             // setInvoiceDetails(templateInvoice.invoiceDetails)
         }
     }, [invId]);
+
+    const fetchStorage = (rowsCount = 50, NumPage = 1) => {
+        console.log('fetch invoice details storage')
+    }
 
     const fetchRevised = (rowsCount = 50, NumPage = 1) => {
         console.log('fetch revised invoice tax number')
@@ -686,6 +723,16 @@ const CreateInvoicePage = () => {
                 headersData={headerRevised}
                 bodyData={dataRevised}
                 fetchData={(r, p) => fetchRevised(r, p)}
+                maxPage={1}
+                />
+
+                <ModalTableInvoice 
+                open={openStorage} 
+                onClose={() => setOpenStorage(false)} 
+                setSelectedData={(e) => setSelectedStorage(e)}
+                headersData={headerStorage}
+                bodyData={dataStorage}
+                fetchData={(r, p) => fetchStorage(r, p)}
                 maxPage={1}
                 />
 
@@ -973,7 +1020,7 @@ const CreateInvoicePage = () => {
                             </Grid>
 
                             <Grid item container flexDirection="row-reverse" xs={2}>
-                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary">
+                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
                                     add storage
                                 </Button>
                             </Grid>
