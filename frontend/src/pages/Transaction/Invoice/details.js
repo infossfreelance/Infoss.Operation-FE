@@ -38,6 +38,7 @@ import ModalTableInvoice from './modalTableInvoice'
 import axios from 'axios'
 import {API_URL, dateFormat} from '../../../helpers/constant';
 import Swal from 'sweetalert2';
+import NestedModal from "./modalInvoiceDetails";
 
 function a11yProps(index) {
     return {
@@ -441,6 +442,7 @@ const CreateInvoicePage = () => {
     const [selectedStorage, setSelectedStorage] = useState({})
     const [headerStorage, setHeaderStorage] = useState(storageHeadersDummy)
     const [dataStorage, setDataStorage] = useState([])
+    const [openModalDetail, setOpenModalDetail] = useState(false)
 
     useEffect(() => {
         getShipmentOrder(50, 1)
@@ -657,7 +659,7 @@ const CreateInvoicePage = () => {
                 'info'
             )
         } else {
-            console.log('show modal add details invoice')
+            setOpenModalDetail(true)
         }
     }
 
@@ -1002,6 +1004,8 @@ const CreateInvoicePage = () => {
                         sx={{ mt: 2 }}
                         >
                             <Grid item container spacing={2} flexDirection="row" xs={10}>
+                                <NestedModal open={openModalDetail} close={() => setOpenModalDetail(false)} />
+
                                 <Grid item>
                                     <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" onClick={() => handleDetailsAdd()}>
                                         add
