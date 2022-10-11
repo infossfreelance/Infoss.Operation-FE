@@ -38,6 +38,7 @@ import ModalTableInvoice from './modalTableInvoice'
 import axios from 'axios'
 import {API_URL, dateFormat} from '../../../helpers/constant';
 import Swal from 'sweetalert2';
+import NestedModal from "./modalInvoiceDetails";
 
 function a11yProps(index) {
     return {
@@ -363,6 +364,34 @@ let revisedHeadersDummy = [
     },
 ]
 
+let storageHeadersDummy = [
+    {
+        "column": "code",
+        "text": "Code",
+        "format": ""
+    },
+    {
+        "column": "name",
+        "text": "Name",
+        "format": ""
+    },
+    {
+        "column": "crr",
+        "text": "Crr",
+        "format": ""
+    },
+    {
+        "column": "payment",
+        "text": "Payment",
+        "format": ""
+    },
+    {
+        "column": "type",
+        "text": "Type",
+        "format": ""
+    },
+]
+
 const CreateInvoicePage = () => {
     const { invId } = useParams()
     const history = useNavigate()
@@ -409,6 +438,11 @@ const CreateInvoicePage = () => {
     const [handleSelectRevised, setHandleSelectRevised] = useState({})
     const [headerRevised, setHeaderRevised] = useState(revisedHeadersDummy)
     const [dataRevised, setDataRevised] = useState({})
+    const [openStorage, setOpenStorage] = useState(false)
+    const [selectedStorage, setSelectedStorage] = useState({})
+    const [headerStorage, setHeaderStorage] = useState(storageHeadersDummy)
+    const [dataStorage, setDataStorage] = useState([])
+    const [openModalDetail, setOpenModalDetail] = useState(false)
 
     useEffect(() => {
         getShipmentOrder(50, 1)
@@ -417,11 +451,16 @@ const CreateInvoicePage = () => {
             console.log('mode edit', invId)
             setIsDisabled(true)
             fetchEditData(invId)
+            fetchRevised(50, 1)
         } else {
             console.log('mode create')
             // setInvoiceDetails(templateInvoice.invoiceDetails)
         }
     }, [invId]);
+
+    const fetchStorage = (rowsCount = 50, NumPage = 1) => {
+        console.log('fetch invoice details storage')
+    }
 
     const fetchRevised = (rowsCount = 50, NumPage = 1) => {
         console.log('fetch revised invoice tax number')
@@ -620,7 +659,7 @@ const CreateInvoicePage = () => {
                 'info'
             )
         } else {
-            console.log('show modal add details invoice')
+            setOpenModalDetail(true)
         }
     }
 
@@ -686,6 +725,16 @@ const CreateInvoicePage = () => {
                 headersData={headerRevised}
                 bodyData={dataRevised}
                 fetchData={(r, p) => fetchRevised(r, p)}
+                maxPage={1}
+                />
+
+                <ModalTableInvoice 
+                open={openStorage} 
+                onClose={() => setOpenStorage(false)} 
+                setSelectedData={(e) => setSelectedStorage(e)}
+                headersData={headerStorage}
+                bodyData={dataStorage}
+                fetchData={(r, p) => fetchStorage(r, p)}
                 maxPage={1}
                 />
 
@@ -955,6 +1004,8 @@ const CreateInvoicePage = () => {
                         sx={{ mt: 2 }}
                         >
                             <Grid item container spacing={2} flexDirection="row" xs={10}>
+                                <NestedModal open={openModalDetail} close={() => setOpenModalDetail(false)} />
+
                                 <Grid item>
                                     <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" onClick={() => handleDetailsAdd()}>
                                         add
@@ -973,7 +1024,7 @@ const CreateInvoicePage = () => {
                             </Grid>
 
                             <Grid item container flexDirection="row-reverse" xs={2}>
-                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary">
+                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
                                     add storage
                                 </Button>
                             </Grid>
