@@ -773,7 +773,6 @@ const CreateInvoicePage = () => {
                 shipperName={customerName}
                 sequence={detailSequence}
                 saveDetail={(e) => saveDetail(e)}
-                detail={invoiceDetails}
                 />
 
                 <Grid container item spacing={3} direction="row">
