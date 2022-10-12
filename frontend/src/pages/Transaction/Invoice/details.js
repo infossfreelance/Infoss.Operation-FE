@@ -443,6 +443,7 @@ const CreateInvoicePage = () => {
     const [headerStorage, setHeaderStorage] = useState(storageHeadersDummy)
     const [dataStorage, setDataStorage] = useState([])
     const [openModalDetail, setOpenModalDetail] = useState(false)
+    const [detailSequence, setDetailSequence] = useState(0)
 
     useEffect(() => {
         getShipmentOrder(50, 1)
@@ -479,6 +480,11 @@ const CreateInvoicePage = () => {
         ).then(response => {
             console.log('data edit', response)
             setInvoiceDetails(response.data.data.invoiceDetails)
+            let tempDetail = response.data.data.invoiceDetails
+            if(tempDetail.length > 0) {
+                setDetailSequence(tempDetail[tempDetail.length-1].sequence)
+            }
+
             setEditInvoice(response.data.data.invoice)
 
             let temp = response.data.data.invoice
@@ -510,7 +516,8 @@ const CreateInvoicePage = () => {
     const getShipmentOrder = (rowsCount = 50, NumPage = 1) => {
         // axios.get(API_URL + `shipmentorder/shipmentorder/${NumPage}/${rowsCount}`)
         axios.post(
-            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=COMBO&pageNumber=${NumPage}&pageSize=${rowsCount}`,
+            // `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=COMBO&pageNumber=${NumPage}&pageSize=${rowsCount}`,
+            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=PAGE&pageNumber=${NumPage}&pageSize=${rowsCount}`,
             {
                 "userCode": "luna",
                 "countryId": 101,
@@ -652,15 +659,31 @@ const CreateInvoicePage = () => {
     }
 
     const handleDetailsAdd = () => {
-        if(!shipmentData.shipmentNo) {
-            Swal.fire(
-                'Information',
-                "Shipment Order Number can't be empty...!!",
-                'info'
-            )
-        } else {
-            setOpenModalDetail(true)
+        // if(!shipmentData.shipmentNo) {
+        //     Swal.fire(
+        //         'Information',
+        //         "Shipment Order Number can't be empty...!!",
+        //         'info'
+        //     )
+        // } else {
+        // }
+        setOpenModalDetail(true)
+    }
+
+    const saveDetail = (payload) => {
+        setDetailSequence(payload.sequence)
+        setInvoiceDetails(arr => [...arr, payload])
+    }
+
+    const handleDetailsEdit = () => {
+        let no = detailSequence +1
+        setDetailSequence(no)
+        let tempObj = {
+            no: no,
+            name: 'aaa'
         }
+        setInvoiceDetails(arr => [...arr, tempObj])
+        console.log('lololo', invoiceDetails)
     }
 
     return (
@@ -705,6 +728,10 @@ const CreateInvoicePage = () => {
                 bodyData={LSOData}
                 fetchData={() => getShipmentOrder()}
                 maxPage={1}
+                type={'shipment'}
+                setName={e => setCustomerName(e)}
+                setId={e => setCustomerId(e)}
+                setAddress={e => setCustomerAddress(e)}
                 />
 
                 <ModalTableInvoice 
@@ -726,6 +753,7 @@ const CreateInvoicePage = () => {
                 bodyData={dataRevised}
                 fetchData={(r, p) => fetchRevised(r, p)}
                 maxPage={1}
+                type={'revised'}
                 />
 
                 <ModalTableInvoice 
@@ -736,6 +764,16 @@ const CreateInvoicePage = () => {
                 bodyData={dataStorage}
                 fetchData={(r, p) => fetchStorage(r, p)}
                 maxPage={1}
+                />
+
+                <NestedModal 
+                open={openModalDetail} 
+                close={() => setOpenModalDetail(false)} 
+                shipperNo={customerId} 
+                shipperName={customerName}
+                sequence={detailSequence}
+                saveDetail={(e) => saveDetail(e)}
+                detail={invoiceDetails}
                 />
 
                 <Grid container item spacing={3} direction="row">
@@ -983,7 +1021,7 @@ const CreateInvoicePage = () => {
                                                     <TableCell>{el.amount}</TableCell>
                                                     <TableCell>{el.amount}</TableCell>
                                                     <TableCell>{el.percentVat}%</TableCell>
-                                                    <TableCell>{el.sign}</TableCell>
+                                                    <TableCell>{el.sign === true ? '+' : '-'}</TableCell>
                                                     <TableCell>{el.isCostToCost === true ? 'Yes' : 'No'}</TableCell>
                                                 </TableRow>
                                             )
@@ -1004,15 +1042,13 @@ const CreateInvoicePage = () => {
                         sx={{ mt: 2 }}
                         >
                             <Grid item container spacing={2} flexDirection="row" xs={10}>
-                                <NestedModal open={openModalDetail} close={() => setOpenModalDetail(false)} />
-
                                 <Grid item>
                                     <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" onClick={() => handleDetailsAdd()}>
                                         add
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="outlined" startIcon={<ModeEditIcon />} color="secondary">
+                                    <Button variant="outlined" startIcon={<ModeEditIcon />} color="secondary" onClick={() => handleDetailsEdit()}>
                                         edit
                                     </Button>
                                 </Grid>
