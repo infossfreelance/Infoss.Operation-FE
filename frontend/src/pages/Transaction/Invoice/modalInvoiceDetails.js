@@ -268,7 +268,7 @@ export default function NestedModal(props) {
     };
 
     const handleSave = () => {
-        let payload = invoiceDetailTemp[0]
+        let payload = {...invoiceDetailTemp[0]}
         
         let tempVat = 0
         if(vat === 11 || vat === 1.1) tempVat = vat
@@ -293,11 +293,6 @@ export default function NestedModal(props) {
         payload.user = 'luna'
         payload.sequence = sequence
         
-        // let temp = props.detail
-        // temp.push(payload)
-        // console.log(temp)
-
-        console.log('before', payload)
         props.saveDetail(payload)
         handleClose()
     }
