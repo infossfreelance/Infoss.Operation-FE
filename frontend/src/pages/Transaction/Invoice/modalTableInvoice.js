@@ -12,6 +12,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { dateFormat } from '../../../helpers/constant';
 import { Dropdown, Pagination } from 'react-bootstrap'
+import axios from 'axios'
 
 // const dummy = [
 //     {
@@ -66,6 +67,24 @@ const ModalListShipmentOrderInvoice = (props) => {
 
     const saveSelectedData = () => {
         props.setSelectedData(selectedData)
+        if(props.type === 'shipment') {
+          let body = {
+            "userCode": "luna",
+            "countryId": 101,
+            "companyId": 32,
+            "branchId": 12
+          }
+          axios.post(
+            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostById?id=1`,
+            body
+          ).then(res => {
+            console.log('SO detail', res)
+            props.setId(res.data.data.shipmentOrder.shipperId)
+            props.setName(res.data.data.shipmentOrder.shipperName)
+            props.setAddress(res.data.data.shipmentOrder.shipperAddress)
+          }).catch(error => console.error(error))
+        }
+
         handleClose()
     }
 
@@ -153,14 +172,14 @@ const ModalListShipmentOrderInvoice = (props) => {
                                               )
                                             })
                                           :
-                                          <div>
+                                          <>
                                             <TableCell>Shipment Order</TableCell>
                                             <TableCell>Principle</TableCell>
                                             <TableCell>ETD</TableCell>
                                             <TableCell>ETA</TableCell>
                                             <TableCell>Shipper</TableCell>
                                             <TableCell>Agent</TableCell>
-                                          </div>
+                                          </>
                                         }
                                     </TableRow>
                                 </TableHead>
