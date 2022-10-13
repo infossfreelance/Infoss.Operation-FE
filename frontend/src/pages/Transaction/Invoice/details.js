@@ -34,9 +34,18 @@ import TableRow from '@mui/material/TableRow';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ModalListSOInvoice from './modalListSOInvoice'
+import ModalTableInvoice from './modalTableInvoice'
 import axios from 'axios'
 import {API_URL, dateFormat} from '../../../helpers/constant';
+import Swal from 'sweetalert2';
+import NestedModal from "./modalInvoiceDetails";
+
+function a11yProps(index) {
+    return {
+      id: `simple-tab-${index}`,
+      'aria-controls': `simple-tabpanel-${index}`,
+    };
+}
 
 function TabPanel(props) {
     const { 
@@ -48,7 +57,9 @@ function TabPanel(props) {
         customerName, 
         setCustomerName,
         customerAddress,
-        setCustomerAddress
+        setCustomerAddress,
+        setOpenContacts,
+        isDisabled
     } = props;
 
     return (
@@ -75,6 +86,7 @@ function TabPanel(props) {
                             value={customerId}
                             onChange={e => setCustomerId(e.target.value)}
                             fullWidth
+                            onClick={() => isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)} 
                             />
                         </Grid>
                         <Grid item xs={8}>
@@ -99,6 +111,8 @@ function TabPanel(props) {
                         style={{ width: 400 }}
                         value={customerAddress}
                         onChange={e => setCustomerAddress(e.target.value)}
+                        variant='filled'
+                        disabled
                         />
                     </Grid>
                 </Grid>
@@ -113,13 +127,6 @@ TabPanel.propTypes = {
     index: PropTypes.number.isRequired,
     value: PropTypes.number.isRequired,
 };
-
-function a11yProps(index) {
-    return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
 
 let templateInvoice = {
     "invoice": {
@@ -344,12 +351,54 @@ let templateInvoice = {
     ]
 }
 
+let revisedHeadersDummy = [
+    {
+        "column": "invoiceNo",
+        "text": "Invoice Number",
+        "format": ""
+    },
+    {
+        "column": "printedOn",
+        "text": "Printed On",
+        "format": ""
+    },
+]
+
+let storageHeadersDummy = [
+    {
+        "column": "code",
+        "text": "Code",
+        "format": ""
+    },
+    {
+        "column": "name",
+        "text": "Name",
+        "format": ""
+    },
+    {
+        "column": "crr",
+        "text": "Crr",
+        "format": ""
+    },
+    {
+        "column": "payment",
+        "text": "Payment",
+        "format": ""
+    },
+    {
+        "column": "type",
+        "text": "Type",
+        "format": ""
+    },
+]
+
 const CreateInvoicePage = () => {
     const { invId } = useParams()
     const history = useNavigate()
     const [tabValue, setTabValue] = useState(0);
     const [shipmentData, setShipmentData] = useState({})
     const [openMLSO, setOpenMLSO] = useState(false)
+    const [LSOHeaders, setLSOHeaders] = useState([])
     const [LSOData, setLSOData] = useState([])
     const [isInvoice, setIsInvoice] = useState(true)
     const [isCTC, setIsCTC] = useState(false)
@@ -380,19 +429,43 @@ const CreateInvoicePage = () => {
     const [kursKMK, setKursKMK] = useState(0)
     const [editInvoice, setEditInvoice] = useState({})
     const [isDisabled, setIsDisabled] = useState(false)
+    const [dataContacts, setDataContacts] = useState([])
+    const [headerContacts, setHeaderContacts] = useState([])
+    const [maxPageContacts, setMaxPageContacts] = useState(0)
+    const [openContacts, setOpenContacts] = useState(false)
+    const [selectedContact, setSelectedContact] = useState({})
+    const [openRevised, setOpenRevised] = useState(false)
+    const [handleSelectRevised, setHandleSelectRevised] = useState({})
+    const [headerRevised, setHeaderRevised] = useState(revisedHeadersDummy)
+    const [dataRevised, setDataRevised] = useState({})
+    const [openStorage, setOpenStorage] = useState(false)
+    const [selectedStorage, setSelectedStorage] = useState({})
+    const [headerStorage, setHeaderStorage] = useState(storageHeadersDummy)
+    const [dataStorage, setDataStorage] = useState([])
+    const [openModalDetail, setOpenModalDetail] = useState(false)
+    const [detailSequence, setDetailSequence] = useState(0)
 
     useEffect(() => {
-        getShipmentOrder(10, 1)
-        fetchContact(5, 1)
+        getShipmentOrder(50, 1)
+        fetchContact(50, 1)
         if(invId) {
             console.log('mode edit', invId)
             setIsDisabled(true)
             fetchEditData(invId)
+            fetchRevised(50, 1)
         } else {
             console.log('mode create')
-            setInvoiceDetails(templateInvoice.invoiceDetails)
+            // setInvoiceDetails(templateInvoice.invoiceDetails)
         }
     }, [invId]);
+
+    const fetchStorage = (rowsCount = 50, NumPage = 1) => {
+        console.log('fetch invoice details storage')
+    }
+
+    const fetchRevised = (rowsCount = 50, NumPage = 1) => {
+        console.log('fetch revised invoice tax number')
+    }
 
     const fetchEditData = (invId) => {
         console.log('invoice id', invId)
@@ -407,6 +480,11 @@ const CreateInvoicePage = () => {
         ).then(response => {
             console.log('data edit', response)
             setInvoiceDetails(response.data.data.invoiceDetails)
+            let tempDetail = response.data.data.invoiceDetails
+            if(tempDetail.length > 0) {
+                setDetailSequence(tempDetail[tempDetail.length-1].sequence)
+            }
+
             setEditInvoice(response.data.data.invoice)
 
             let temp = response.data.data.invoice
@@ -438,7 +516,8 @@ const CreateInvoicePage = () => {
     const getShipmentOrder = (rowsCount = 50, NumPage = 1) => {
         // axios.get(API_URL + `shipmentorder/shipmentorder/${NumPage}/${rowsCount}`)
         axios.post(
-            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=COMBO&pageNumber=1&pageSize=20`,
+            // `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=COMBO&pageNumber=${NumPage}&pageSize=${rowsCount}`,
+            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=PAGE&pageNumber=${NumPage}&pageSize=${rowsCount}`,
             {
                 "userCode": "luna",
                 "countryId": 101,
@@ -447,6 +526,7 @@ const CreateInvoicePage = () => {
             }
         )
         .then((response) => {
+            setLSOHeaders(response.data.data.columns)
             setLSOData(response.data.data.shipmentOrders)
             console.log('data ship list', response)
         })
@@ -455,7 +535,7 @@ const CreateInvoicePage = () => {
         })
     }
 
-    const fetchContact = (rows = 5, page = 1) => {
+    const fetchContact = (rows = 50, page = 1) => {
         axios.post(`http://stage-master.api.infoss.solusisentraldata.com/regcontact/regcontact/PostByPage?contactTypeId=1&pageNumber=${page}&pageSize=${rows}`,
         {
             "userCode": "luna",
@@ -464,6 +544,9 @@ const CreateInvoicePage = () => {
             "branchId": 12
         }).then(response => {
             console.log('response contact', response)
+            setDataContacts(response.data.data.contact)
+            setHeaderContacts(response.data.data.columns)
+            setMaxPageContacts(response.data.totalPage)
         }).catch(error => console.error(error))
     }
 
@@ -493,12 +576,61 @@ const CreateInvoicePage = () => {
                 history('/booking/invoice')
             }).catch(error => console.error(error))
         } else {
+            let payload = {
+                invoice: {
+                    "rowStatus": "ACT",
+                    "countryId": 101,
+                    "companyId": 32,
+                    "branchId": 12,
+                    "debetCredit": debetCredit,
+                    "shipmentId": shipmentData.id,
+                    "customerTypeId": 0,
+                    "customerId": customerId,
+                    "customerName": customerName,
+                    "customerAddress": customerAddress,
+                    "paymentUSD": paymentUSD,
+                    "paymentIDR": paymentIDR,
+                    "totalVatUSD": totalVATUSD,
+                    "totalVatIDR": totalVATIDR,
+                    "rate": rate,
+                    "paid": paid,
+                    "paidOn": paidOn,
+                    "printing": printing,
+                    "printedOn": printedOn,
+                    "deleted": false,
+                    "deletedOn": "",
+                    "invHeader": invHeader,
+                    "rePrintApproved": false,
+                    "rePrintApprovedOn": "",
+                    "rePrintApprovedBy": "",
+                    "isCostToCost": isCTC,
+                    "kursKMK": kursKMK,
+                    "packingListNo": packingListNo,
+                    "siCustomerNo": siCustomerNo,
+                    "isStampDuty": isStampDuty,
+                    "stampDutyAmount": stampDutyAmount,
+                    "user": "luna"
+                },
+                invoiceDetails: []
+            }
+
             axios.post(
                 'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
-                templateInvoice
-            ).then(response => console.log('res create', response))
+                payload
+            ).then(response => {
+                console.log('res create', response)
+                history('/booking/invoice')
+            })
             .catch(error => console.error(error))
         }
+    }
+
+    const handleSelectContact = (value) => {
+        console.log('select contact', value)
+        setCustomerId(value.contactId)
+        setCustomerName(value.pic)
+        setCustomerAddress(value.contactAddress)
+        setSelectedContact(value)
     }
 
     const renderStamp = () => {
@@ -526,12 +658,44 @@ const CreateInvoicePage = () => {
         }
     }
 
-    console.log('ship = ', shipmentData)
+    const handleDetailsAdd = () => {
+        // if(!shipmentData.shipmentNo) {
+        //     Swal.fire(
+        //         'Information',
+        //         "Shipment Order Number can't be empty...!!",
+        //         'info'
+        //     )
+        // } else {
+        // }
+        setOpenModalDetail(true)
+    }
+
+    const saveDetail = (payload) => {
+        setDetailSequence(payload.sequence)
+        setInvoiceDetails(arr => [...arr, payload])
+    }
+
+    const handleDetailsEdit = () => {
+        let no = detailSequence +1
+        setDetailSequence(no)
+        let tempObj = {
+            no: no,
+            name: 'aaa'
+        }
+        setInvoiceDetails(arr => [...arr, tempObj])
+        console.log('lololo', invoiceDetails)
+    }
 
     return (
         <Grid container spacing={2} direction="column">
             <Grid item xs={12}>
-                <h4>Create New Invoice</h4>
+                {
+                    invId 
+                    ?
+                    <h4>Edit Invoice</h4>
+                    :
+                    <h4>Create New Invoice</h4>
+                }
             </Grid>
             <Grid item xs={12}>
                 <Stack direction='row' spacing={1}>
@@ -556,12 +720,59 @@ const CreateInvoicePage = () => {
                 </Stack>
             </Grid>
             <Paper variant="outlined" sx={{ m: 2, p: 2 }}>
-                <ModalListSOInvoice 
+                <ModalTableInvoice 
                 open={openMLSO} 
                 onClose={() => setOpenMLSO(false)} 
                 setSelectedData={(e) => setShipmentData(e)}
-                LSOData={LSOData}
+                headersData={LSOHeaders}
+                bodyData={LSOData}
                 fetchData={() => getShipmentOrder()}
+                maxPage={1}
+                type={'shipment'}
+                setName={e => setCustomerName(e)}
+                setId={e => setCustomerId(e)}
+                setAddress={e => setCustomerAddress(e)}
+                />
+
+                <ModalTableInvoice 
+                open={openContacts} 
+                onClose={() => setOpenContacts(false)} 
+                setSelectedData={(e) => handleSelectContact(e)}
+                headersData={headerContacts}
+                bodyData={dataContacts}
+                fetchData={(r, p) => fetchContact(r, p)}
+                type={'contact'}
+                maxPage={maxPageContacts}
+                />
+
+                <ModalTableInvoice 
+                open={openRevised} 
+                onClose={() => setOpenRevised(false)} 
+                setSelectedData={(e) => setHandleSelectRevised(e)}
+                headersData={headerRevised}
+                bodyData={dataRevised}
+                fetchData={(r, p) => fetchRevised(r, p)}
+                maxPage={1}
+                type={'revised'}
+                />
+
+                <ModalTableInvoice 
+                open={openStorage} 
+                onClose={() => setOpenStorage(false)} 
+                setSelectedData={(e) => setSelectedStorage(e)}
+                headersData={headerStorage}
+                bodyData={dataStorage}
+                fetchData={(r, p) => fetchStorage(r, p)}
+                maxPage={1}
+                />
+
+                <NestedModal 
+                open={openModalDetail} 
+                close={() => setOpenModalDetail(false)} 
+                shipperNo={customerId} 
+                shipperName={customerName}
+                sequence={detailSequence}
+                saveDetail={(e) => saveDetail(e)}
                 />
 
                 <Grid container item spacing={3} direction="row">
@@ -710,6 +921,8 @@ const CreateInvoicePage = () => {
                                 setCustomerName={e => setCustomerName(e)}
                                 customerAddress={customerAddress}
                                 setCustomerAddress={e => setCustomerAddress(e)}
+                                setOpenContacts={e => setOpenContacts(e)}
+                                isDisabled={isDisabled}
                                 >
                                     Shipper
                                 </TabPanel>
@@ -734,7 +947,9 @@ const CreateInvoicePage = () => {
                                 variant="filled" 
                                 label="Revised Tax Inv. No" 
                                 id="invoice-tax" 
-                                margin="normal" 
+                                margin="normal"
+                                onClick={() => isDisabled === false ? setOpenRevised(true) : setOpenRevised(false)}
+                                disabled
                                 />
                             </Grid>
                             <Grid item xs={6}>
@@ -805,7 +1020,7 @@ const CreateInvoicePage = () => {
                                                     <TableCell>{el.amount}</TableCell>
                                                     <TableCell>{el.amount}</TableCell>
                                                     <TableCell>{el.percentVat}%</TableCell>
-                                                    <TableCell>{el.sign}</TableCell>
+                                                    <TableCell>{el.sign === true ? '+' : '-'}</TableCell>
                                                     <TableCell>{el.isCostToCost === true ? 'Yes' : 'No'}</TableCell>
                                                 </TableRow>
                                             )
@@ -827,12 +1042,12 @@ const CreateInvoicePage = () => {
                         >
                             <Grid item container spacing={2} flexDirection="row" xs={10}>
                                 <Grid item>
-                                    <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary">
+                                    <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" onClick={() => handleDetailsAdd()}>
                                         add
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="outlined" startIcon={<ModeEditIcon />} color="secondary">
+                                    <Button variant="outlined" startIcon={<ModeEditIcon />} color="secondary" onClick={() => handleDetailsEdit()}>
                                         edit
                                     </Button>
                                 </Grid>
@@ -844,7 +1059,7 @@ const CreateInvoicePage = () => {
                             </Grid>
 
                             <Grid item container flexDirection="row-reverse" xs={2}>
-                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary">
+                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
                                     add storage
                                 </Button>
                             </Grid>

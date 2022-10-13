@@ -12,6 +12,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { dateFormat } from '../../../helpers/constant';
 import { Dropdown, Pagination } from 'react-bootstrap'
+import axios from 'axios'
 
 // const dummy = [
 //     {
@@ -51,6 +52,8 @@ const ModalListShipmentOrderInvoice = (props) => {
     const [selectedData, setSelectedData] = useState({})
     const [rowsCount, setRowsCount] = useState(50)
     const [numPage, setNumPage] = useState(1)
+    let identifier = 'id'
+    if(props.type === 'contact') identifier = 'contactId'
 
     const handleSelect = (rowValue) => {
         console.log(rowValue)
@@ -64,13 +67,32 @@ const ModalListShipmentOrderInvoice = (props) => {
 
     const saveSelectedData = () => {
         props.setSelectedData(selectedData)
+        if(props.type === 'shipment') {
+          let body = {
+            "userCode": "luna",
+            "countryId": 101,
+            "companyId": 32,
+            "branchId": 12
+          }
+          axios.post(
+            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostById?id=1`,
+            body
+          ).then(res => {
+            console.log('SO detail', res)
+            props.setId(res.data.data.shipmentOrder.shipperId)
+            props.setName(res.data.data.shipmentOrder.shipperName)
+            props.setAddress(res.data.data.shipmentOrder.shipperAddress)
+          }).catch(error => console.error(error))
+        }
+
         handleClose()
     }
 
     const renderPagination = () => {
         let MaxPage = 1
-        if(props.LSOData.length > 0) {
-            MaxPage = Math.ceil( props.LSOData.length / rowsCount )
+        if(props.bodyData.length > 0) {
+            // MaxPage = Math.ceil( props.bodyData.length / rowsCount )
+            MaxPage = props.maxPage
         }
         if (numPage === 1 && numPage !== MaxPage) {
           return (
@@ -141,27 +163,51 @@ const ModalListShipmentOrderInvoice = (props) => {
                             <Table sx={{ minWidth: 650 }} aria-label="sticky table" stickyHeader>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Shipment Order</TableCell>
-                                        <TableCell>Principle</TableCell>
-                                        <TableCell>ETD</TableCell>
-                                        <TableCell>ETA</TableCell>
-                                        <TableCell>Shipper</TableCell>
-                                        <TableCell>Agent</TableCell>
+                                        {
+                                          props.headersData.length > 0
+                                          ?
+                                            props.headersData.map((el, index) => {
+                                              return (
+                                                <TableCell key={index}>{el.text}</TableCell>
+                                              )
+                                            })
+                                          :
+                                          <>
+                                            <TableCell>Shipment Order</TableCell>
+                                            <TableCell>Principle</TableCell>
+                                            <TableCell>ETD</TableCell>
+                                            <TableCell>ETA</TableCell>
+                                            <TableCell>Shipper</TableCell>
+                                            <TableCell>Agent</TableCell>
+                                          </>
+                                        }
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
+                                  <TableRow>
+                                    {
+                                      props.headersData.map((el, index) => {
+                                        return (
+                                          <TableCell key={index}>
+                                            <input  className="form-control col-search-form border-infoss" />
+                                          </TableCell>
+                                        )
+                                      })
+                                    }
+                                  </TableRow>
                                     {   
-                                        props.LSOData.length > 0
+                                        props.bodyData.length > 0
                                         ?
-                                        props.LSOData.map(el => {
+                                        props.bodyData.map(el => {
                                             return (
-                                                <TableRow key={el.id} onClick={() => handleSelect(el)} sx={selectedData.id === el.id ? selectedStyle : {} }>
-                                                    <TableCell>{el.shipmentNo}</TableCell>
-                                                    <TableCell>{el.jobOwnerId}</TableCell>
-                                                    <TableCell>{dateFormat(el.etd)}</TableCell>
-                                                    <TableCell>{dateFormat(el.eta)}</TableCell>
-                                                    <TableCell>{el.shipperId}</TableCell>
-                                                    <TableCell>{el.agentId}</TableCell>
+                                                <TableRow key={el[identifier]} onClick={() => handleSelect(el)} sx={selectedData[identifier] === el[identifier] ? selectedStyle : {} }>
+                                                    {
+                                                      props.headersData.map((elHeaders, index) => {
+                                                        return (
+                                                          <TableCell key={index}>{el[elHeaders.column]}</TableCell>
+                                                        )
+                                                      })
+                                                    }
                                                 </TableRow>
                                             )
                                         })

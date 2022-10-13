@@ -20,9 +20,141 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import { useNavigate } from "react-router-dom";
 import { API_URL, dateFormat } from '../../../helpers/constant';
 import Swal from 'sweetalert2';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
+import {DesktopDatePicker} from '@mui/x-date-pickers/DesktopDatePicker';
+import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
+import TextField from '@mui/material/TextField';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormLabel from '@mui/material/FormLabel';
+
+const modalStyle = {
+    position: 'absolute',
+    top: '20%',
+    left: '35%',
+    bgcolor: 'background.paper', 
+    p: 1,
+    maxWidth: 400,
+    maxHeight: 600,
+    boxShadow: 24,
+    borderRadius: 1,
+}
+
+const ModalInvoice = (props) => {
+    const [remarks, setRemarks] = useState('')
+    const [deliveredDate, setDeliveredDate] = useState(new Date())
+    const [isDelivered, setIsDelivered] = useState(false)
+
+    const handleSave = () => {
+        if(props.type === 'credit') {
+            props.handleSave(remarks)
+        } else {
+            let payload = {
+                remarks,
+                deliveredDate,
+                isDelivered
+            }
+            props.handleSave(payload)
+        }
+        setRemarks('')
+        props.close()
+    }
+
+    const handleClose = () => {
+        setRemarks('')
+        props.resetType()
+        props.close()
+    }
+
+    return (
+        <Modal open={props.open} onClose={handleClose}>
+            <Grid container spacing={1} flexDirection='column' sx={ modalStyle }>
+                <Grid item>
+                    {
+                        props.type === 'credit'
+                        ?
+                        <h5>Approval Credit</h5>
+                        :
+                        <h5>Delivered Status</h5>
+                    }
+                </Grid>
+                <Grid item>
+                    <Box sx={{ border: 1, borderRadius: 1, p: 1, maxHeight: 400, 'borderStyle': 'groove' }}>
+                        {
+                            props.type === 'credit' 
+                            ?
+                            <FormControl fullWidth margin='normal'> 
+                                <TextareaAutosize
+                                maxRows={5}
+                                aria-label="maximum height"
+                                placeholder="Remarks"
+                                minRows={4}
+                                value={remarks}
+                                onChange={e => setRemarks(e.target.value)}
+                                />
+                            </FormControl>
+                            :
+                            <FormControl fullWidth>
+                                <FormLabel id="delivered-label">Delivered</FormLabel>
+                                <RadioGroup 
+                                row 
+                                name="delivered-label"
+                                aria-labelledby="delivered-label"
+                                value={isDelivered}
+                                onChange={e => setIsDelivered(e.target.value)}
+                                >
+                                    <FormControlLabel value={true} control={<Radio />} label="Yes" />
+                                    <FormControlLabel value={false} control={<Radio />} label="No" />
+                                </RadioGroup>
+
+                                <LocalizationProvider dateAdapter={AdapterDateFns}>      
+                                    <DesktopDatePicker
+                                        label="Date Delivered"
+                                        minDate={new Date('2017-01-01')}
+                                        inputFormat="dd-MM-yyyy"
+                                        disabled={false}
+                                        value={deliveredDate}
+                                        onChange={e => setDeliveredDate(e)}
+                                        renderInput={(params) => <TextField {...params} />}
+                                    />
+                                </LocalizationProvider>
+
+                                <TextareaAutosize
+                                style={{ marginTop: 10 }}
+                                maxRows={5}
+                                aria-label="maximum height"
+                                placeholder="Remarks"
+                                minRows={4}
+                                value={remarks}
+                                onChange={e => setRemarks(e.target.value)}
+                                />
+                            </FormControl>
+                        }
+                    </Box>
+                </Grid>
+                <Grid item container spacing={2} flexDirection='row-reverse'>
+                    <Grid item>
+                        <Button variant="danger" className='btn-sm' onClick={() => handleClose()}>
+                            Cancel
+                        </Button>
+                    </Grid>
+                    <Grid item>
+                        <Button variant="primary" className='btn-sm' onClick={() => handleSave()}>
+                            Save
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Modal>
+    )
+}
 
 const InvoicePage = () => {
-
+    const [openModal, setOpenModal] = useState(false)
     const [numPage, setNumPage] = useState(1)
     const [rowsCount, setRowsCount] = useState(5)
     const [totalRows, setTotalRows] = useState(5)
@@ -32,6 +164,7 @@ const InvoicePage = () => {
     const [invoices, setInvoices] = useState([])
     const [invoicesMap, setInvoicesMap] = useState([])
     const [columnData, setColumnData] = useState([])
+    const [modalType, setModalType] = useState('')
     const history = useNavigate();
 
     const ErrorAlert = (string, isError = false) => {
@@ -86,8 +219,8 @@ const InvoicePage = () => {
                 setColumnData(
                     [
                         {
-                            "column": "deleted",
-                            "text": "Delete",
+                            "column": "rowStatus",
+                            "text": "Deleted",
                             "format": ""
                         },
                         {
@@ -406,6 +539,32 @@ const InvoicePage = () => {
         }
     }
 
+    const handleSaveModal = (payload) => {
+        if(modalType === 'credit') {
+            console.log('save approval credit', payload)
+        } else {
+            console.log('save delivered', payload)
+        }
+    }
+
+    const handleOpenModalCredit = () => {
+        if(!SelectedData.id) {
+            ErrorAlert("Please Select Data!")
+        } else {
+            setModalType('credit')
+            setOpenModal(true)
+        }
+    }
+
+    const handleOpenModalDelivered = () => {
+        if(!SelectedData.id) {
+            ErrorAlert("Please Select Data!")
+        } else {
+            setModalType('delivered')
+            setOpenModal(true)
+        }
+    }
+
     return (
         <Grid container spacing={0} direction="column">
             <Grid item xs={12}>
@@ -432,10 +591,10 @@ const InvoicePage = () => {
                         <Button variant="outline-infoss" className='btn-sm' onClick={() => handleRePrint()}>
                             <ApprovalIcon /> RePrint Approval
                         </Button>
-                        <Button variant="outline-infoss" className='btn-sm'>
+                        <Button variant="outline-infoss" className='btn-sm' onClick={() => handleOpenModalDelivered()}>
                             <LocalShippingIcon /> Delivered
                         </Button>
-                        <Button variant="outline-infoss" className='btn-sm'>
+                        <Button variant="outline-infoss" className='btn-sm' onClick={() => handleOpenModalCredit()}>
                             <DoneOutlineIcon /> Approval Credit
                         </Button>
                         <Button variant="outline-infoss" className='btn-sm'>
@@ -476,6 +635,14 @@ const InvoicePage = () => {
                         :
                         <>
                             <Table hover className='table table-sm'>
+                                <ModalInvoice 
+                                open={openModal} 
+                                close={() => setOpenModal(false)} 
+                                handleSave={e => handleSaveModal(e)} 
+                                type={modalType} 
+                                resetType={() => setModalType('')}
+                                />
+
                                 <thead className='text-center text-infoss'>
                                     <tr>
                                         {
@@ -521,7 +688,7 @@ const InvoicePage = () => {
                                             let tempStyle = 'text-dark'
                                             if(SelectedData.id === el.id) {
                                                 tempStyle = "bg-infoss text-white"
-                                            } else if(el.deleted === true) {
+                                            } else if(el.rowStatus === 'DEL') {
                                                 tempStyle = "text-danger"
                                             } else if(el.printing > 0) {
                                                 tempStyle = "text-secondary"
@@ -547,6 +714,14 @@ const InvoicePage = () => {
                                                                 temp = 'Yes'
                                                             } else if(el[headersEl.column] === false) {
                                                                 temp = 'No'
+                                                            }
+
+                                                            if(headersEl.column === 'rowStatus') {
+                                                                if(el.rowStatus === 'DEL') {
+                                                                    temp = "Yes"
+                                                                } else {
+                                                                    temp = 'No'
+                                                                }
                                                             }
                                                             return (
                                                                 <td key={indexHeaders}>{temp}</td> 
@@ -579,8 +754,8 @@ const InvoicePage = () => {
                                     {rowsCount} Rows
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
-                                    <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(2); setNumPage(1); fetchInvoices(1, 2) }}>2 Rows</Dropdown.Item>
                                     <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(5); setNumPage(1); fetchInvoices(1, 5) }}>5 Rows</Dropdown.Item>
+                                    <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(50); setNumPage(1); fetchInvoices(1, 50) }}>50 Rows</Dropdown.Item>
                                     <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(100); setNumPage(1); fetchInvoices(1, 100) }}>100 Rows</Dropdown.Item>
                                     <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(150); setNumPage(1); fetchInvoices(1, 150) }}>150 Rows</Dropdown.Item>
                                 </Dropdown.Menu>
