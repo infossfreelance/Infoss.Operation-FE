@@ -13,37 +13,28 @@ import AddCustomerRow from './AddCustomerRow'
 export default function AddCustomer(props) {
 
   const [selectedId, setSelectedId] = useState('');
-  const [ShipperList, setShipperList] = useState([]);
+  const [CustomerData, setCustomerData] = useState({});
   const [selectedData, setSelectedData] = useState({});
 
   useEffect(() => {
-    getShipperList()
+    getCustomer()
   }, []);
 
-const getShipperList = () => {
-  const payload = {
-    rowStatus: "ACT",
-    countryId: 101,
-    companyId: 32,
-    branchId: 12,
-    contactTypeId: 2
+  const getCustomer = () => {
+    const payload = {
+        "userCode": "luna",
+        "countryId": 101,
+        "companyId": 32,
+        "branchId": 12
+    }
+    axios.post(`http://stage-master.api.infoss.solusisentraldata.com/regContact/regcontact/PostById?id=3019`, payload)
+    .then((response) => {
+        console.log('CUSTOMER DATA ON MODAL', response)
+    })
+    .catch(function (error) {
+      console.error(error)
+    })
   }
-  axios.post(API_URL_MASTER + 'regContact/regcontact/PostByPage?pageNo=1&pageSize=5', payload)
-  .then((response) => {
-    setShipperList(response.data)
-  })
-  .catch(function (error) {
-    Swal.fire({
-        icon: 'error',
-        title: 'Something Went Wrong!',
-        text: error,
-        customClass: {
-            confirmButton: 'btn-infoss px-4'
-        }
-    });
-  })
-}
-
 
   const saveData = () => {
     selectedData.contactId === undefined ?
@@ -89,8 +80,8 @@ const getShipperList = () => {
           </thead>
           <tbody>
             {
-              ShipperList.length > 0 ?
-              ShipperList.map((v, k) => {
+              CustomerData.length > 0 ?
+              CustomerData.map((v, k) => {
                 return (
                   <AddCustomerRow
                     v={v}

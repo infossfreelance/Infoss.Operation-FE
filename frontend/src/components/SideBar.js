@@ -42,10 +42,11 @@ import EstimateProfitLossDetailPage from '../pages/Report/EstimateProfitLoss/det
 import EstimateProfitLossEditPage from '../pages/Report/EstimateProfitLoss/edit';
 import InvoicePage from '../pages/Transaction/Invoice';
 import InvoiceDetailsPage from '../pages/Transaction/Invoice/details';
-import CreateInvoicePage from '../pages/Transaction/Invoice/create';
+// import CreateInvoicePage from '../pages/Transaction/Invoice/create';
 import PaymentRequestPage from '../pages/Transaction/PaymentRequest';
 import PaymentRequestDetailPage from '../pages/Transaction/PaymentRequest/detail';
 import PaymentRequestEditPage from '../pages/Transaction/PaymentRequest/edit';
+import PaymentRequestViewPage from '../pages/Transaction/PaymentRequest/view';
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     color: theme.palette.text.secondary,
@@ -580,6 +581,7 @@ export default function MiniDrawer() {
                     <Route path="/payment-request" element={<><PaymentRequestPage /></>} />
                     <Route path="/payment-request/detail" element={<><PaymentRequestDetailPage /></>} />
                     <Route path="/payment-request/edit/:SOId" element={<><PaymentRequestEditPage /></>} />
+                    <Route path="/payment-request/view/:SOId" element={<><PaymentRequestViewPage /></>} />
                     <Route path="/invoice" element={<><InvoicePage /></>} />
                     <Route path='/invoice/create' element={<><InvoiceDetailsPage /></>} />
                     <Route path='/invoice/edit/:invId' element={<><InvoiceDetailsPage /></>} />

@@ -21,7 +21,6 @@ import axios from 'axios';
 import ReplyIcon from '@mui/icons-material/Reply';
 import SaveIcon from '@mui/icons-material/Save';
 import PrintIcon from '@mui/icons-material/Print';
-import {DesktopDatePicker} from '@mui/x-date-pickers/DesktopDatePicker';
 import {useNavigate} from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
 import { Alert } from '@mui/material';
@@ -32,7 +31,8 @@ import AddPersonal from '../../../components/pagePaymentRequest/AddPersonal';
 import ListTab1 from "../../../components/pagePaymentRequest/ListTab1"
 
 const PaymentRequestAddPage = () => {
-    const [LSOData, setLSOData] = useState([]);
+    const [LSOData, setLSOData] = useState({});
+    const [CustomerData, setCustomerData] = useState([]);
     const [IsLoading, setIsLoading] = useState(false);
     const [key, setKey] = useState('inc-shipper');
     const [showMLSO, setShowMLSO] = useState(false)
@@ -40,12 +40,10 @@ const PaymentRequestAddPage = () => {
     const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [showAddPersonal, setShowAddPersonal] = useState(false);
     const [SelectedData, setSelectedData] = useState({});
+    console.log("SELECTED", SelectedData)
     const [AccountName, setAccountName] = useState('');
     const ref = useRef();
     const [defShipNo, setdefShipNo] = useState('');
-    const [SORate, setSORate] = useState('');
-    const [SOExRate, setSOExRate] = useState('2001-08-01');
-    const [SOEntryDate, setSOEntryDate] = useState(new Date());
     const history = useNavigate();
     const staticId = localStorage.getItem("id");
     const [IsAdd, setIsAdd] = useState(true);
@@ -59,52 +57,302 @@ const PaymentRequestAddPage = () => {
     const vertical = 'top'
     const horizontal = 'right'
 
-    let [GetIDRTotIncShipper, setSOIDRTotIncShipper] = useState(0);
-    let [GetUSDTotIncShipper, setUSDTotIncShipper] = useState(0);
-    let [GetIDRTotIncAgent, SetIDRTotIncAgent] = useState(0);
-    let [GetUSDTotIncAgent, SetUSDTotIncAgent] = useState(0);
-    let [GetIDRTotCostSSLINE, SetIDRTotCostSSLINE] = useState(0);
-    let [GetUSDTotCostSSLINE, SetUSDTotCostSSLINE] = useState(0);
-    let [GetIDRTotCostEMKL, SetIDRTotCostEMKL] = useState(0);
-    let [GetUSDTotCostEMKL, SetUSDTotCostEMKL] = useState(0);
-    let [GetIDRTotCostReBate, SetIDRTotCostReBate] = useState(0);
-    let [GetUSDTotCostReBate, SetUSDTotCostReBate] = useState(0);
-    let [GetIDRTotCostAgent, SetIDRTotCostAgent] = useState(0);
-    let [GetUSDTotCostAgent, SetUSDTotCostAgent] = useState(0);
-    let [GetIDRTotCostDepo, SetIDRTotCostDepo] = useState(0);
-    let [GetUSDTotCostDepo, SetUSDTotCostDepo] = useState(0);
-
-    let [GetTotalCostCTCIDR, SetTotalCostCTCIDR] = useState(0);
-    let [GetTotalCostCTCUSD, SetTotalCostCTCUSD] = useState(0);
-    let [GetTotalIncomeCTCIDR, SetTotalIncomeCTCIDR] = useState(0);
-    let [GetTotalIncomeCTCUSD, SetTotalIncomeCTCUSD] = useState(0);
-
-    let [GetTotalIDR, SetTotalIDR] = useState(0);
-    let [GetTotalUSD, SetTotalUSD] = useState(0);
-
     const [SecondEP, setSecondEP] = useState(false);
+    const [IncShipperList, setIncShipperList] = useState([]);    
+    const [SelectedShipperList, setSelectedShipperList] = useState({});
 
-    const [IncShipperList, setIncShipperList] = useState([]);
-    const [IncAgentList, setIncAgentList] = useState([]);  
+    const [PaymentForm, setPaymentForm] = useState('');
+    const [ShipmentOrder, setShipmentOrder] = useState('');
+    const [PrincipleBy, setPrincipleBy] = useState('');
+    const [CTCType, setCTCType] = useState('');
+    const [ETSETA, setETSETA] = useState('');
+    const [PaymentRequestNumber, setPaymentRequestNumber] = useState('');
+    const [Reference, setReference] = useState('');
+    const [PaymentTo, setPaymentTo] = useState('');
+    const [Rate, setRate] = useState('');
+    const [SubRate, setSubRate] = useState('');
+    const [Printing, setPrinting] = useState('');
+    const [SubPrinting, setSubPrinting] = useState('');
+    const [Customer, setCustomer] = useState('');
+    const [SubCustomer, setSubCustomer] = useState('');
+    const [DNVendor, setDNVendor] = useState('');
+    const [Personal, setPersonal] = useState('');
+    const [SubPersonal, setSubPersonal] = useState('');
+
     
-    const [SelectedShipperList, setSelectedShipperList] = useState({})
-
-    const [TabType, setTabType] = useState('')
+    const [TotalUSD, setTotalUSD] = useState('');
+    const [TotalIDR, setTotalIDR] = useState('');
 
     useEffect(() => {
-        getShipmentOrder(10, 1)        
+        getShipmentOrder()     
+        // getCustomer()   
     }, []);
 
-    const getShipmentOrder = (rowsCount = 10, NumPage = 1) => {        
-        axios.get(API_URL + `shipmentorder/shipmentorder/${NumPage}/${rowsCount}`)
+    const getShipmentOrder = () => {    
+      const payload = {
+        "userCode": "luna",
+        "countryId": 101,
+        "companyId": 32,
+        "branchId": 12
+      }
+      axios.post(`http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=COMBO&pageNumber=1&pageSize=20`, payload)
+      .then((response) => {
+          setIsLoading(false);
+          response.data.data !== null && setLSOData(response.data.data)
+      })
+      .catch(function (error) {
+        setIsLoading(false);
+        NotifAlert('Something Went Wrong!', 'error')
+      })
+    }
+    
+    const getCustomer = () => {
+      const payload = {
+          "userCode": "luna",
+          "countryId": 101,
+          "companyId": 32,
+          "branchId": 12
+      }
+      axios.post(`http://stage-master.api.infoss.solusisentraldata.com/regContact/regcontact/PostById?id=3019`, payload)
+      .then((response) => {
+          console.log('CUSTOMER', response)
+          // setCustomerData(response.data.data)
+      })
+      .catch(function (error) {
+        console.error(error)
+      })
+  }
+
+    const handleSave = () => {
+      // console.log("PaymentForm", PaymentForm)
+      // console.log("ShipmentOrder", ShipmentOrder)
+      // console.log("PrincipleBy", PrincipleBy)
+      // console.log("CTCType", CTCType)
+      // console.log("ETSETA", ETSETA)
+      // console.log("PaymentRequestNumber", PaymentRequestNumber)
+      // console.log("Reference", Reference)
+      // console.log("PaymentTo", PaymentTo)
+      // console.log("Rate", Rate)
+      // console.log("SubRate", SubRate)
+      // console.log("Printing", Printing)
+      // console.log("SubPrinting", SubPrinting)
+      // console.log("Customer", Customer)
+      // console.log("SubCustomer", SubCustomer)
+      // console.log("DNVendor", DNVendor)
+      // console.log("Personal", Personal)
+      // console.log("SubPersonal", SubPersonal)
+      
+      const payload = {        
+          "paymentRequest": {
+            "rowStatus": "string",
+            "countryId": 101,
+            "companyId": 32,
+            "branchId": 12,
+            "id": 0,
+            "ticketId": 0,
+            "prNo": 0,
+            // "prNo": PaymentRequestNumber,
+            "debetCredit": "string",
+            "shipmentId": 0,
+            "reference": "string",
+            "prStatus": 0,
+            "isGeneralPR": true,
+            "customerId": 0,
+            "customerTypeId": 0,
+            "personalId": 0,
+            "paymentUSD": 0,
+            "paymentIDR": 0,
+            "prContraStatus": "string",
+            "prContraNo": 0,
+            "paidUSD": true,
+            "datePaidUSD": "2022-10-09T01:25:44.400Z",
+            "paidIDR": true,
+            "datePaidIDR": "2022-10-09T01:25:44.400Z",
+            "deleted": true,
+            "deletedOn": "2022-10-09T01:25:44.400Z",
+            "approveOpr": true,
+            "approveOprOn": "2022-10-09T01:25:44.400Z",
+            "approveAcc": true,
+            "approveAccOn": "2022-10-09T01:25:44.400Z",
+            "rate": 0,
+            "exRateDate": "2022-10-09T01:25:44.400Z",
+            "printing": 0,
+            "printedOn": "2022-10-09T01:25:44.400Z",
+            "prNo2": "string",
+            "exRateId": 0,
+            "deletedRemarks": "string",
+            "idLama": 0,
+            "isCostToCost": true,
+            "totalPpnUSD": 0,
+            "totalPpnIDR": 0,
+            "uniqueKeyPR": "string",
+            "packingListNo": "string",
+            "siCustomerNo": "string",
+            "vendorDN": "string",
+            "approved": true,
+            "approvedOn": "2022-10-09T01:25:44.400Z",
+            "approvedBy": "string",
+            "approvedRemarks": "string",
+            "approvedMarketing": true,
+            "approvedMarketingOn": "2022-10-09T01:25:44.400Z",
+            "approvedMarketingBy": "string",
+            "user": "string"
+          },
+          "paymentRequestDetails": [
+            {
+              "rowStatus": "string",
+              "countryId": 0,
+              "companyId": 0,
+              "branchId": 0,
+              "paymentRequestId": 0,
+              "sequence": 0,
+              "debetCredit": "string",
+              "accountId": 0,
+              "description": "string",
+              "type": 0,
+              "codingQuantity": true,
+              "quantity": 0,
+              "perQty": 0,
+              "amount": 0,
+              "amountCrr": 0,
+              "paid": true,
+              "paidOn": "2022-10-09T01:25:44.400Z",
+              "paidPV": true,
+              "eplDetailId": 0,
+              "statusMemo": true,
+              "memoNo": 0,
+              "idLama": 0,
+              "isCostToCost": true,
+              "isPpn": true,
+              "persenPpn": 0,
+              "fakturNo": "string",
+              "fakturDate": "2022-10-09T01:25:44.401Z",
+              "isCostTrucking": true,
+              "kendaraanId": 0,
+              "kendaraanNopol": "string",
+              "employeeId": 0,
+              "employeeName": "string",
+              "mrgId": 0,
+              "deliveryDate": "2022-10-09T01:25:44.401Z",
+              "originalUsd": 0,
+              "originalRate": 0,
+              "user": "string"
+            }
+          ]
+      }
+
+      console.log("PAYLOAD", payload)
+      // return false
+      
+      // const payload = {        
+      //     "paymentRequest": {
+      //       "rowStatus": "string",
+      //       "countryId": 0,
+      //       "companyId": 0,
+      //       "branchId": 0,
+      //       "id": 0,
+      //       "ticketId": 0,
+      //       "prNo": 0,
+      //       "debetCredit": "string",
+      //       "shipmentId": 0,
+      //       "reference": "string",
+      //       "prStatus": 0,
+      //       "isGeneralPR": true,
+      //       "customerId": 0,
+      //       "customerTypeId": 0,
+      //       "personalId": 0,
+      //       "paymentUSD": 0,
+      //       "paymentIDR": 0,
+      //       "prContraStatus": "string",
+      //       "prContraNo": 0,
+      //       "paidUSD": true,
+      //       "datePaidUSD": "2022-10-09T01:25:44.400Z",
+      //       "paidIDR": true,
+      //       "datePaidIDR": "2022-10-09T01:25:44.400Z",
+      //       "deleted": true,
+      //       "deletedOn": "2022-10-09T01:25:44.400Z",
+      //       "approveOpr": true,
+      //       "approveOprOn": "2022-10-09T01:25:44.400Z",
+      //       "approveAcc": true,
+      //       "approveAccOn": "2022-10-09T01:25:44.400Z",
+      //       "rate": 0,
+      //       "exRateDate": "2022-10-09T01:25:44.400Z",
+      //       "printing": 0,
+      //       "printedOn": "2022-10-09T01:25:44.400Z",
+      //       "prNo2": "string",
+      //       "exRateId": 0,
+      //       "deletedRemarks": "string",
+      //       "idLama": 0,
+      //       "isCostToCost": true,
+      //       "totalPpnUSD": 0,
+      //       "totalPpnIDR": 0,
+      //       "uniqueKeyPR": "string",
+      //       "packingListNo": "string",
+      //       "siCustomerNo": "string",
+      //       "vendorDN": "string",
+      //       "approved": true,
+      //       "approvedOn": "2022-10-09T01:25:44.400Z",
+      //       "approvedBy": "string",
+      //       "approvedRemarks": "string",
+      //       "approvedMarketing": true,
+      //       "approvedMarketingOn": "2022-10-09T01:25:44.400Z",
+      //       "approvedMarketingBy": "string",
+      //       "user": "string"
+      //     },
+      //     "paymentRequestDetails": [
+      //       {
+      //         "rowStatus": "string",
+      //         "countryId": 0,
+      //         "companyId": 0,
+      //         "branchId": 0,
+      //         "paymentRequestId": 0,
+      //         "sequence": 0,
+      //         "debetCredit": "string",
+      //         "accountId": 0,
+      //         "description": "string",
+      //         "type": 0,
+      //         "codingQuantity": true,
+      //         "quantity": 0,
+      //         "perQty": 0,
+      //         "amount": 0,
+      //         "amountCrr": 0,
+      //         "paid": true,
+      //         "paidOn": "2022-10-09T01:25:44.400Z",
+      //         "paidPV": true,
+      //         "eplDetailId": 0,
+      //         "statusMemo": true,
+      //         "memoNo": 0,
+      //         "idLama": 0,
+      //         "isCostToCost": true,
+      //         "isPpn": true,
+      //         "persenPpn": 0,
+      //         "fakturNo": "string",
+      //         "fakturDate": "2022-10-09T01:25:44.401Z",
+      //         "isCostTrucking": true,
+      //         "kendaraanId": 0,
+      //         "kendaraanNopol": "string",
+      //         "employeeId": 0,
+      //         "employeeName": "string",
+      //         "mrgId": 0,
+      //         "deliveryDate": "2022-10-09T01:25:44.401Z",
+      //         "originalUsd": 0,
+      //         "originalRate": 0,
+      //         "user": "string"
+      //       }
+      //     ]
+      // }
+
+      axios.post(API_URL + 'PaymentRequest/Create', payload)
         .then((response) => {
+            NotifAlert('Data Saved!', 'success')
             setIsLoading(false);
-            setLSOData(response.data)
+            history('/booking/payment-request')
         })
         .catch(function (error) {
-          setIsLoading(false);
-          NotifAlert('Something Went Wrong!', 'error')
+            setIsLoading(false);
+            NotifAlert('Something Went Wrong!', 'error')
         })
+
     }
 
     const handleAddNew = () => {
@@ -164,7 +412,6 @@ const PaymentRequestAddPage = () => {
             return false;
         }
         setIsAdd(true)
-        setTabType(type)
         setShowAddbeingForPayment(true)
     }
 
@@ -215,7 +462,7 @@ const PaymentRequestAddPage = () => {
                                 defaultChecked={true}
                                 control={
                                     <Radio
-                                        // onChange={(e) => setCurrency("USD")}
+                                        onChange={(e) => setPaymentForm("PaymentRequest")}
                                     />
                                 }
                                 label="Payment Request"
@@ -224,7 +471,7 @@ const PaymentRequestAddPage = () => {
                                 defaultChecked={false}
                                 control={
                                     <Radio
-                                    // onChange={(e) => setCurrency("IDR")}
+                                    onChange={(e) => setPaymentForm("General PaymentRequest")}
                                     />
                                 }
                                 label="General Payment Request"
@@ -235,14 +482,14 @@ const PaymentRequestAddPage = () => {
                         </div>
                         <div className='col-4 pe-3 row'>
                             <div className="col-8">
-                                <TextField id="filled-basic" label="Shipment Order" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="Shipment Order" onChange={(e) => setShipmentOrder(e.target.value)} value={ SelectedData.shipperId ? SelectedData.shipperId : "" } className='block' variant="standard" size='small' disabled />
                             </div>
                             <div className="col-2 text-center pt-3">
                                 <FindInPageIcon className='text-infoss' onClick={() => setShowMLSO(true)} />                                
                             </div>
                         </div>
                         <div className='col-3 pe-3'>
-                            <TextField id="filled-basic" label="Principle By" className='block' variant="standard" size='small' />
+                            <TextField id="filled-basic" label="Principle By" onChange={(e) => setPrincipleBy(e.target.value)} value={ SelectedData.shipperId ? 1 : "" } className='block' variant="standard" size='small' disabled />
                         </div>
                     </div>
 
@@ -261,7 +508,7 @@ const PaymentRequestAddPage = () => {
                                 defaultChecked={true}
                                 control={
                                   <Radio
-                                      // onChange={(e) => setCurrency("USD")}
+                                      onChange={(e) => setCTCType("Non CTC")}
                                   />
                                 }
                                 label="Non - Cost To Cost"
@@ -270,7 +517,7 @@ const PaymentRequestAddPage = () => {
                                 defaultChecked={false}
                                 control={
                                   <Radio
-                                  // onChange={(e) => setCurrency("IDR")}
+                                  onChange={(e) => setCTCType("CTC")}
                                   />
                                 }
                                 label="Cost To Cost"
@@ -280,7 +527,7 @@ const PaymentRequestAddPage = () => {
                             </div>
                         </div>
                         <div className='col-3 pe-3'>
-                            <TextField id="filled-basic" label="ETD/ETA" className='block' variant="standard" size='small' />
+                            <TextField id="filled-basic" label="ETD/ETA" onChange={(e) => setETSETA(e.target.value)} value={ SelectedData.shipperId ? dateFormat(SelectedData.etd) : "" } className='block' variant="standard" size='small' disabled />
                         </div>
                     </div>
 
@@ -288,12 +535,12 @@ const PaymentRequestAddPage = () => {
                         <div className='col-3 pe-5 py-3'>
                             <div className='row'>
                                 <div className='col'>
-                                    <TextField id="filled-basic" label="Payment Request Number" className='block' variant="standard" size='small' />
+                                    <TextField id="filled-basic" label="Payment Request Number" onChange={(e) => setPaymentRequestNumber(e.target.value)} className='block' variant="standard" size='small' disabled />
                                 </div>
                             </div>
                             <div className='row mt-3'>
                                 <div className='col'>
-                                    <TextField id="filled-basic" label="Reference" className='block' variant="standard" size='small' />
+                                    <TextField id="filled-basic" label="Reference" onChange={(e) => setReference(e.target.value)} className='block' variant="standard" size='small' disabled />
                                 </div>
                             </div>
                         </div>
@@ -311,7 +558,7 @@ const PaymentRequestAddPage = () => {
                                     defaultChecked={true}
                                     control={
                                       <Radio
-                                          // onChange={(e) => setCurrency("USD")}
+                                          onChange={(e) => setPaymentTo("SSLine")}
                                       />
                                     }
                                     label="SSLine"
@@ -322,7 +569,7 @@ const PaymentRequestAddPage = () => {
                                     defaultChecked={false}
                                     control={
                                       <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
+                                      onChange={(e) => setPaymentTo("EMKL")}
                                       />
                                     }
                                     label="EMKL"
@@ -333,7 +580,7 @@ const PaymentRequestAddPage = () => {
                                     defaultChecked={false}
                                     control={
                                       <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
+                                      onChange={(e) => setPaymentTo("Rebate")}
                                       />
                                     }
                                     label="Rebate"
@@ -344,7 +591,7 @@ const PaymentRequestAddPage = () => {
                                     defaultChecked={false}
                                     control={
                                       <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
+                                      onChange={(e) => setPaymentTo("Depo")}
                                       />
                                     }
                                     label="Depo"
@@ -359,10 +606,10 @@ const PaymentRequestAddPage = () => {
                                 <hr />
                                 <div className='row'>
                                     <div className='col-6'>
-                                        <TextField id="filled-basic" label="Rate" className='block' variant="standard" size='small' />
+                                        <TextField id="filled-basic" label="Rate" onChange={(e) => setRate(e.target.value)} className='block' variant="standard" size='small' disabled />
                                     </div>
                                     <div className='col-6'>
-                                        <TextField id="filled-basic" label="-" className='block' variant="standard" size='small' />
+                                        <TextField id="filled-basic" label="-" onChange={(e) => setSubRate(e.target.value)} className='block' variant="standard" size='small' disabled />
                                     </div>
                                 </div>
                             </div>
@@ -372,38 +619,38 @@ const PaymentRequestAddPage = () => {
                     <div className='row mt-3'>
                         <div className='col-3 pe-4 row'>
                             <div className='col-5'>
-                                <TextField id="filled-basic" label="Printing" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="Printing" onChange={(e) => setPrinting(e.target.value)} className='block' variant="standard" size='small' disabled />
                             </div>
                             <div className='col-7'>
-                                <TextField id="filled-basic" label="-" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="-" onChange={(e) => setSubPrinting(e.target.value)} className='block' variant="standard" size='small' disabled />
                             </div>
                         </div>
                         <div className='col-7 pe-5 row ms-2'>
                             <div className="col-4">
-                                <TextField id="filled-basic" label="Customer" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="Customer" onChange={(e) => setCustomer(e.target.value)} className='block' variant="standard" size='small' disabled />
                             </div>
                             <div className="col-1 text-center pt-3">
                                 <FindInPageIcon className='text-infoss' onClick={() => setShowAddCustomer(true)} />                                
                             </div>
                             <div className="col-7">
-                                <TextField id="filled-basic" label="-" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="Customer Name" onChange={(e) => setSubCustomer(e.target.value)} className='block' variant="standard" size='small' disabled />
                             </div>
                         </div>
                     </div>
 
                     <div className='row mt-3'>
                         <div className='col-3 pe-5'>
-                            <TextField id="filled-basic" label="DN Vendor" className='block' variant="standard" size='small' />
+                            <TextField id="filled-basic" label="DN Vendor" onChange={(e) => setDNVendor(e.target.value)} className='block' variant="standard" size='small' />
                         </div>
                         <div className='col-7 pe-5 row'>
                             <div className="col-4">
-                                <TextField id="filled-basic" label="Personal" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="Personal" onChange={(e) => setPersonal(e.target.value)} className='block' variant="standard" size='small' disabled />
                             </div>
                             <div className="col-1 text-center pt-3">
                                 <FindInPageIcon className='text-infoss'  onClick={() => setShowAddPersonal(true)} />                                
                             </div>
                             <div className="col-7">
-                                <TextField id="filled-basic" label="-" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="Personal Name" onChange={(e) => setSubPersonal(e.target.value)} className='block' variant="standard" size='small' disabled />
                             </div>
                         </div>
                     </div>
@@ -413,7 +660,7 @@ const PaymentRequestAddPage = () => {
                             <Button variant='outline-infoss me-3' onClick={() => history('/booking/payment-request')}>
                                 <ReplyIcon /> Back
                             </Button>
-                            <Button variant='outline-infoss me-3' disabled={SecondEP}>
+                            <Button variant='outline-infoss me-3' onClick={() => handleSave()}>
                                 <SaveIcon /> Save
                             </Button>
                             <Button variant='outline-infoss me-3' onClick={() => handlePrintSO()}>
@@ -522,23 +769,23 @@ const PaymentRequestAddPage = () => {
                                 aria-labelledby="demo-row-radio-buttons-group-label"
                                 name="row-radio-buttons-group"
                               >    
-                                <div className='col-5'>
+                                <div className='col-xl-5'>
                                   <FormControlLabel value="Paid"
                                     defaultChecked={true}
                                     control={
                                       <Radio
-                                          // onChange={(e) => setCurrency("USD")}
+                                          onChange={(e) => setTotalUSD("Paid")}
                                       />
                                     }
                                     label="Paid"
                                   />  
                                 </div>
-                                <div className='col-7'>
+                                <div className='col-xl-7'>
                                   <FormControlLabel value="Not Paid"
                                     defaultChecked={false}
                                     control={
                                       <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
+                                        onChange={(e) => setTotalUSD("Not Paid")}
                                       />
                                     }
                                     label="Not Paid"
@@ -558,23 +805,23 @@ const PaymentRequestAddPage = () => {
                                 aria-labelledby="demo-row-radio-buttons-group-label"
                                 name="row-radio-buttons-group"
                               >    
-                                <div className='col-5'>
+                                <div className='col-xl-5'>
                                   <FormControlLabel value="Paid"
                                     defaultChecked={true}
                                     control={
                                       <Radio
-                                          // onChange={(e) => setCurrency("USD")}
+                                        onChange={(e) => setTotalIDR("Paid")}
                                       />
                                     }
                                     label="Paid"
                                   />  
                                 </div>
-                                <div className='col-7'>
+                                <div className='col-xl-7'>
                                   <FormControlLabel value="Not Paid"
                                     defaultChecked={false}
                                     control={
                                       <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
+                                        onChange={(e) => setTotalIDR("Not Paid")}
                                       />
                                     }
                                     label="Not Paid"
@@ -645,8 +892,9 @@ const PaymentRequestAddPage = () => {
             staticId={staticId}
             AccountName={AccountName}
             IsAdd={IsAdd}
-            TabType={TabType}  
-            data={IsAdd ? '' : SelectedShipperList}          
+            data={IsAdd ? '' : SelectedShipperList}    
+            IncShipperList={IncShipperList}     
+            setIncShipperList={(e) => setIncShipperList(e)}      
         />
 
         <AddCustomer
@@ -655,8 +903,6 @@ const PaymentRequestAddPage = () => {
             NotifAlert={(e, d) => NotifAlert(e, d)}
             staticId={staticId}
             AccountName={AccountName}
-            IsAdd={IsAdd}
-            TabType={TabType}  
             data={IsAdd ? '' : SelectedShipperList}          
         />
 
@@ -666,8 +912,7 @@ const PaymentRequestAddPage = () => {
             NotifAlert={(e, d) => NotifAlert(e, d)}
             staticId={staticId}
             AccountName={AccountName}
-            IsAdd={IsAdd}
-            TabType={TabType}  
+            IsAdd={IsAdd} 
             data={IsAdd ? '' : SelectedShipperList}          
         />
     </>  

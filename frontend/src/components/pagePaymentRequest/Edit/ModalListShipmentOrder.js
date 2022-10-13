@@ -9,6 +9,8 @@ import Swal from 'sweetalert2';
 import LSORow from './LSORow';
 
 export default function ModalListShipmentOrder(props) {
+  const column = props.LSOData.columns !== undefined ? props.LSOData.columns : '';
+  const row = props.LSOData.shipmentOrders !== undefined ? props.LSOData.shipmentOrders : '';
 
   const [selectedId, setSelectedId] = useState('')
   const [selectedData, setSelectedData] = useState({})
@@ -102,46 +104,51 @@ export default function ModalListShipmentOrder(props) {
         <Table className='table-borderless text-muted table-responsive'>
           <thead>
             <tr>
-              <th>Shipment Order</th>
+              {
+                column.length > 0 &&
+                column.map((v, k) => {
+                  return (
+                    <th key={k}>
+                      {v.text}
+                    </th>
+                  )
+                })
+              }
+              {/* <th>Shipment Order</th>
               <th>Principle</th>
               <th>ETD / ETA</th>
               <th>Shipper</th>
-              <th>Agent</th>
+              <th>Agent</th> */}
             </tr>
             <tr>
-              <td>
-                <input className='form-control' />
-              </td>
-              <td>
-                <input className='form-control' />
-              </td>
-              <td>
-                <input className='form-control' />
-              </td>
-              <td>
-                <input className='form-control' />
-              </td>
-              <td>
-                <input className='form-control' />
-              </td>
+              {
+                column.length > 0 &&
+                column.map((v, k) => {
+                  return (
+                    <td key={k}><input className='form-control' /></td>
+                  )
+                })
+              }
             </tr>
           </thead>
           <tbody>
+            
             {
-              props.LSOData.length > 0 ?
-                props.LSOData.map((v, k) => {
+              row.length > 0 ?
+                row.map((v, k) => {
                   return (
                     <LSORow
                       v={v}
                       k={k}
                       setSelectedData={(e) => setSelectedData(e)}
-                      selectedId={selectedData.id === v.id ? true : false}
+                      selectedId={selectedData.shipperId === v.shipperId ? true : false}
+                      column={column}
                     />
                   )
                 })
                : (
                   <tr>
-                    <td colSpan={6} className="py-3 text-muted text-center">Data Empty</td>
+                    <td colSpan={column.length} className="py-3 text-muted text-center">Data Empty</td>
                   </tr>
                 )
               }

@@ -16,28 +16,17 @@ import SearchIcon from '@mui/icons-material/Search';
 
 export default function AddbeingForPayment(props) {
 
+  console.log("IncShipperList", props.IncShipperList)
+  // console.log("setIncShipperList", props.setIncShipperList)
+
   useEffect(() => {
-    props.data && handleChecked(props.data.amountIDR, props.data.amountUSD)
+    
   }, []);
 
   const [showAddAccountList, setShowAddAccountList] = useState(false)
   const [showMarginRateList, setShowMarginRateList] = useState(false)
   const [showSOCRateList, setShowSOCRateList] = useState(false)
-  const [SelectedShipper, setSelectedShipper] = useState({})
   const [SelectedAccount, setSelectedAccount] = useState({})
-
-  const [SplitAccount, setSplitAccount] = useState(false);
-  const [Desc, setDesc] = useState('');
-  const [Currency, setCurrency] = useState('');
-  const [UpDown, setUpDown] = useState('');
-  const [CostTrucking, setCostTrucking] = useState(false);
-  const [CostToCost, setCostToCost] = useState(false);
-  const [QtyUnit, setQtyUnit] = useState(0);
-  const [PerUnitCost, setPerUnitCost] = useState(0);
-  const [Amount, setAmount] = useState(0);
-  const [OriginalRate, setOriginalRate] = useState(0);
-  const [OriginalUSD, setOriginalUSD] = useState(0);
-  const [DifferentCost, setDifferentCost] = useState(0);
 
   const [OpenAlert, setOpenAlert] = useState(false);
   const [TextAlert, setTextAlert] = useState("");
@@ -45,158 +34,58 @@ export default function AddbeingForPayment(props) {
   const vertical = 'top'
   const horizontal = 'right'
 
+  const [Account, setAccountName] = useState('')
+  const [Desc, setDesc] = useState('')
+  const [Amount, setAmount] = useState('')
+  const [CostToCost, setCostToCost] = useState('')
+  const [CostTrucking, setCostTrucking] = useState('')
+  const [CTCType, setCTCType] = useState('')
+  const [Currency, setCurrency] = useState('')
+  const [DefShipNo, setDefShipNo] = useState('')
+  const [QtyUnit, setQtyUnit] = useState('')
+  const [DifferentCost, setDifferentCost] = useState('')
+  const [OriginalRate, setOriginalRate] = useState('')
+  const [PerUnitCost, setPerUnitCost] = useState('')
+  const [OriginalUSD, setOriginalUSD] = useState('')
+  const [SubjectVAT, setSubjectVAT] = useState(false)
+  const [FakturNo, setFakturNo] = useState('')
+
   const clearForm = () => {
     setSelectedAccount({})
-    setSelectedShipper({})
-    setSplitAccount(false);
-    setDesc('');
-    setCurrency('');
-    setUpDown('');
-    setCostTrucking(false);
-    setCostToCost(false);
-    setQtyUnit(0);
-    setPerUnitCost(0);
-    setAmount(0);
-    setOriginalRate(0);
-    setOriginalUSD(0);
-    setDifferentCost(0);
   }
 
   const saveData = () => {
+    // alert("SAVED!")
 
-    let amount_IDR = 0
-    let amount_USD = 0
+    const data = {
+      Account: Account,
+      Desc: Desc,
+      Amount: Amount,
+      CostToCost: CostToCost,
+      CostTrucking: CostTrucking,
+      CTCType: CTCType,
+      Currency: Currency,
+      DefShipNo: DefShipNo,
+      QtyUnit: QtyUnit,
+      DifferentCost: DifferentCost,
+      OriginalRate: OriginalRate,
+      PerUnitCost: PerUnitCost,
+      OriginalUSD: OriginalUSD,
+      SubjectVAT: SubjectVAT,
+      FakturNo: FakturNo,
+    }
+
+    console.log("Data", data)
+    let old = props.IncShipperList
+    let temp = []
     
-    if (Currency === 'IDR') {
-      amount_IDR = Amount ? Amount : (props.data.amountIDR === 0 ? props.data.amountUSD : props.data.amountIDR)
-      amount_USD = 0
-    }
+    temp = old.push(data)
     
-    if (Currency === 'USD') {
-      amount_USD = Amount ? Amount : (props.data.amountUSD === 0 ? props.data.amountIDR : props.data.amountUSD)  
-      amount_IDR = 0    
-    }
+    console.log("first", temp)
+    props.setIncShipperList(temp)
 
-    let CTI = ''
-    let II = ''
-    if (props.TabType === 'Inc Shipper') {
-      CTI = 2
-      II = true
-    } else if (props.TabType === 'Inc Agent') {
-      CTI = 5
-      II = true
-    } else if (props.TabType === 'Cost SSLine') {
-      CTI = 11
-      II = false
-    } else if (props.TabType === 'Cost EMKL') {
-      CTI = 6
-      II = false
-    } else if (props.TabType === 'Cost Rebate') {
-      CTI = 2
-      II = false
-    } else if (props.TabType === 'Cost Agent') {
-      CTI = 5
-      II = false
-    } else {
-      CTI = 7
-      II = false
-    }
-
-    const payload = {
-      EplId: props.staticId,
-      Sequence: props.IsAdd ? ((localStorage.getItem("totalSquance") != "NaN") ? localStorage.getItem("totalSquance") : 1) : props.data.sequence,
-      CustomerId: props.IsAdd ? SelectedShipper.contactId : SelectedShipper.contactId ? SelectedShipper.contactId : props.data.customerId,
-      CountryId: 101,
-      CompanyId: 32,
-      BranchId: 12,
-      CustomerTypeId: CTI,
-      AccountId: props.IsAdd ? SelectedAccount.id : SelectedAccount.id ? SelectedAccount.id : props.data.accountId,
-      Description: Desc !== '' ? Desc : props.IsAdd ? SelectedAccount.name : SelectedAccount.name ? SelectedAccount.name : props.data.description,
-      Quantity: parseInt(props.IsAdd ? QtyUnit : QtyUnit ? QtyUnit : props.data.quantity),
-      PerQty: parseFloat(props.IsAdd ? PerUnitCost : PerUnitCost ? PerUnitCost : props.data.perQty),
-      AmountUSD: parseFloat(amount_USD),
-      AmountIDR: parseFloat(amount_IDR),
-      OriginalUsd: parseFloat(props.IsAdd ? OriginalUSD : OriginalUSD ? OriginalUSD : props.data.originalUsd),
-      OriginalRate: parseFloat(props.IsAdd ? OriginalRate : OriginalRate ? OriginalRate : props.data.originalRate),
-      IsSplitIncCost: SplitAccount,
-      IsCostToCost: CostToCost,
-      IsCostTrucking: CostTrucking,
-      IsAdditional: false,
-      IsIncome: II,
-      User: "testing"
-    }
-    
-    // console.log("payload", payload)
-    // return false
-
-    props.IsAdd ? (
-      axios.post(API_URL + 'estimateprofitloss/Estimateprofitloss/ApiV1/Detail', payload)
-      .then((response) => {
-          props.NotifAlert('Data Saved!', 'success')
-          clearForm()
-          props.onHide()
-      })
-      .catch(function (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Something Went Wrong!',
-          text: error,
-          customClass: {
-              confirmButton: 'btn-infoss px-4'
-          }
-        });
-      })
-    ) : (
-      axios.put(API_URL + 'estimateprofitloss/Estimateprofitloss/ApiV1/Detail', payload)
-      .then((response) => {
-          props.NotifAlert('Data Updated!', 'success')
-          clearForm()
-          props.onHide()
-      })
-      .catch(function (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Something Went Wrong!',
-          text: error,
-          customClass: {
-              confirmButton: 'btn-infoss px-4'
-          }
-        });
-      })
-    )
   }
 
-  const [checkUSD, setCheckUSD] = useState(false)
-  const [checkIDR, setCheckIDR] = useState(false)
-
-  const handleChecked = (idr, usd) => {
-    // console.log("idr", idr)
-    // console.log("usd", usd)
-    if (idr === 0) {
-      setCheckIDR(false)
-      setCheckUSD(true)
-    } else {
-      setCheckIDR(true)
-      setCheckUSD(false)
-    }
-    // if (props.data.amountIDR === 0) {
-    //   setCheckIDR(false)
-    //   setCheckUSD(true)
-    // } else {
-    //   setCheckIDR(true)
-    //   setCheckUSD(false)
-    // }
-    
-  }
-
-  // const handleChecked = (val) => {
-  //   if (val === 0) {
-  //     return false
-  //   } else {
-  //     // setCurrency('USD')
-  //     return true
-  //   }
-  // }
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -238,7 +127,7 @@ export default function AddbeingForPayment(props) {
           <div className='col-10 row'>
             <div className='col-2'>
               <input className='form-control' disabled
-                value={ props.IsAdd ? SelectedAccount.id : SelectedAccount.id ? SelectedAccount.id : props.data.accountId }
+                value={ SelectedAccount.id }
               />
             </div>
             <div className='col-1'>
@@ -265,7 +154,7 @@ export default function AddbeingForPayment(props) {
           <div className='col-7'>
             <input
               className='form-control' disabled
-              value={ props.IsAdd ? (SelectedAccount.name ? SelectedAccount.name : '' ) : SelectedAccount.name ? SelectedAccount.name : props.AccountName }
+              value={ SelectedAccount.name ? SelectedAccount.name : '' }
               onChange={(e) => setDesc(e.target.value)}
             />
           </div>
@@ -277,7 +166,7 @@ export default function AddbeingForPayment(props) {
           </div>
           <div className='col-7'>
             <textarea className='form-control'
-              defaultValue={ props.IsAdd ? (SelectedAccount.name ? SelectedAccount.name : '' ) : SelectedAccount.name ? SelectedAccount.name : props.data.description }
+              defaultValue={ SelectedAccount.name ? SelectedAccount.name : '' }
               onChange={(e) => setDesc(e.target.value)}
             />
           </div>
@@ -355,7 +244,6 @@ export default function AddbeingForPayment(props) {
             </div>
             <div className='col-6 ms-1'>
               <input min={0} type="number" className='form-control ms-1'
-                defaultValue={ props.IsAdd ? 0 : props.data.perQty }
                 onChange={(e) => setQtyUnit(e.target.value)}
               />
             </div>
@@ -366,7 +254,6 @@ export default function AddbeingForPayment(props) {
             </div>
             <div className='col-6'>
               <input min={0} type="number" className='form-control'
-                defaultValue={ props.IsAdd ? 0 : props.data.originalRate }
                 onChange={(e) => setOriginalRate(e.target.value)}
               />
             </div>
@@ -380,7 +267,6 @@ export default function AddbeingForPayment(props) {
             </div>
             <div className='col-6 ms-1'>
               <input min={0} type="number" className='form-control ms-1'
-                defaultValue={ props.IsAdd ? 0 : props.data.perQty }
                 onChange={(e) => setPerUnitCost(e.target.value)}
               />
             </div>
@@ -391,7 +277,6 @@ export default function AddbeingForPayment(props) {
             </div>
             <div className='col-6'>
               <input type="number" className='form-control'
-                defaultValue={ props.IsAdd ? 0 : props.data.originalUsd }
                 onChange={(e) => setOriginalUSD(e.target.value)}
               />
             </div>
@@ -405,7 +290,6 @@ export default function AddbeingForPayment(props) {
             </div>
             <div className='col-6 ms-1'>
               <input min={0} type="number" className='form-control ms-1'                  
-                defaultValue={ props.IsAdd ? 0 : (props.data.amountUSD == 0 ? props.data.amountIDR : props.data.amountUSD ) }
                 onChange={(e) => setAmount(e.target.value)}
               />
             </div>
@@ -416,7 +300,6 @@ export default function AddbeingForPayment(props) {
             </div>
             <div className='col-6'>
               <input type="number" disabled className='form-control'
-                defaultValue={ props.IsAdd ? 0 : props.data.originalUsd }
                 onChange={(e) => setDifferentCost(e.target.value)}
               />
             </div>
@@ -427,7 +310,7 @@ export default function AddbeingForPayment(props) {
         <div className='row mt-3'>
           <div className='col-5 row'>
             <div className='col-7 ms-1'>
-              <input type='checkbox' className='me-3' />
+              <input type='checkbox' className='me-3' onChange={(e) => setSubjectVAT(!SubjectVAT)} />
               Subject VAT 10%
             </div>
           </div>
@@ -437,8 +320,7 @@ export default function AddbeingForPayment(props) {
             </div>
             <div className='col-8'>
               <input type="number" disabled className='form-control'
-                defaultValue={ props.IsAdd ? 0 : props.data.originalUsd }
-                onChange={(e) => setDifferentCost(e.target.value)}
+                onChange={(e) => setFakturNo(e.target.value)}
               />
             </div>
           </div>

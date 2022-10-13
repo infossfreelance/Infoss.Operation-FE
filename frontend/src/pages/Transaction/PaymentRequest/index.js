@@ -38,9 +38,9 @@ const EstimateProfitLossPage = () => {
   const [NumPage, setNumPage] = useState(1);
   const [rowsCount, setRowsCount] = useState(50);
   const [SelectedData, setSelectedData] = useState({});
+  const [noJob, setNoJob] = useState(true)
 
-  // console.log("EPLData", EPLData[0])
-  // console.log("EPLDataMap", EPLDataMap)
+  console.log("EPLData", EPLData)
 
   useEffect(() => {
     getData();
@@ -58,8 +58,9 @@ const EstimateProfitLossPage = () => {
     .then((response) => {
       setIsLoading(false);
       setMaxPage(response.data.totalPage)
-      setEPLData(response.data.data);
-      response.data.data.length > 0 && setEPLDataMap(response.data.data)
+      response.data.data.length > 0 &&
+        setEPLDataMap(response.data.data)
+        setEPLData(response.data.data);
     })
     .catch(function (error) {
       setIsLoading(false);
@@ -72,12 +73,46 @@ const EstimateProfitLossPage = () => {
     NotifAlert('Reload Success!', 'success')
   }
 
+  const handleAddPage = () => {
+    if (noJob === false) {
+      NotifAlert("Please Complete Other Payment First!", "warning")
+    } else {
+      history('/booking/payment-request/detail')
+    }
+  }  
+
   const handleEdit = () => {
     if (SelectedData.id === undefined) {
       NotifAlert("Please Select Data!", "warning")
-    } else {
-      history('/booking/payment-request/edit/'+ SelectedData.id)
     }
+
+    if (SelectedData.printing === 0) {
+      history('/booking/payment-request/edit/'+ SelectedData.id)      
+    } else {
+      Swal.fire({
+        icon: 'question',
+        title: 'Payment Request has been printed!',
+        text: 'Edit will make contra and new Payment Request automatically!',
+        showCancelButton: true,
+        showDenyButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonText: 'Ok',
+        denyButtonText: `View Only`,
+        customClass: {
+            confirmButton: 'btn btn-infoss px-4',
+            cancelButton: 'btn btn-outline-infoss px-4',
+            denyButton: 'btn btn-infoss px-4'
+        }
+      })
+      .then((result) => {
+        if (result.isConfirmed === true) {
+          history('/booking/payment-request/detail')  
+        } else if (result.isDenied === true) {
+          history('/booking/payment-request/view/' + SelectedData.id)  
+        }
+      })
+    }
+    
   }  
 
   const handleDelete = () => {
@@ -106,9 +141,9 @@ const EstimateProfitLossPage = () => {
       if (result.value) {
         const payload = {
           userCode: "string",
-          countryId: 0,
-          companyId: 0,
-          branchId: 0
+          countryId: 101,
+          companyId: 32,
+          branchId: 12
         }
         axios.put(API_URL + `PaymentRequest/Delete?id=${SelectedData.id}`, payload)
         .then((response) => {
@@ -395,7 +430,7 @@ const EstimateProfitLossPage = () => {
                 <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleReload()}>
                     <CachedIcon /> Reload Data
                 </Button>
-                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => history('/booking/payment-request/detail')}>
+                <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleAddPage()}>
                     <AddToPhotosIcon /> Add New
                 </Button>
                 <Button variant="outline-infoss" className='me-2 mb-2' onClick={() => handleEdit()}>
