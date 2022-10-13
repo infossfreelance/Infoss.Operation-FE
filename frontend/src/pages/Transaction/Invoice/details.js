@@ -392,6 +392,8 @@ let storageHeadersDummy = [
     },
 ]
 
+const selectedStyle = { bgcolor: (theme) => theme.palette.primary.main }
+
 const CreateInvoicePage = () => {
     const { invId } = useParams()
     const history = useNavigate()
@@ -444,6 +446,8 @@ const CreateInvoicePage = () => {
     const [dataStorage, setDataStorage] = useState([])
     const [openModalDetail, setOpenModalDetail] = useState(false)
     const [detailSequence, setDetailSequence] = useState(0)
+    const [selectedDetail, setSelectedDetail] = useState({})
+    const [detailEdit, setDetailEdit] = useState(false)
 
     useEffect(() => {
         getShipmentOrder(50, 1)
@@ -458,6 +462,11 @@ const CreateInvoicePage = () => {
             // setInvoiceDetails(templateInvoice.invoiceDetails)
         }
     }, [invId]);
+
+    const handleSelectedDetail = (rowValue) => {
+        console.log(rowValue)
+        setSelectedDetail(rowValue)
+    }
 
     const fetchStorage = (rowsCount = 50, NumPage = 1) => {
         console.log('fetch invoice details storage')
@@ -658,32 +667,77 @@ const CreateInvoicePage = () => {
         }
     }
 
-    const handleDetailsAdd = () => {
-        // if(!shipmentData.shipmentNo) {
-        //     Swal.fire(
-        //         'Information',
-        //         "Shipment Order Number can't be empty...!!",
-        //         'info'
-        //     )
-        // } else {
-        // }
-        setOpenModalDetail(true)
+    const handleDetailAdd = () => {
+        if(!shipmentData.shipmentNo) {
+            Swal.fire(
+                'Information',
+                "Shipment Order Number can't be empty...!!",
+                'info'
+            )
+        } else {
+            setOpenModalDetail(true)
+        }
     }
 
     const saveDetail = (payload) => {
-        setDetailSequence(payload.sequence)
-        setInvoiceDetails(arr => [...arr, payload])
+        if(detailEdit === true) {
+            const newArr = invoiceDetails.slice()
+            console.log('new arr', newArr)
+            newArr.forEach(el =>  {
+                if(el.sequence === payload.sequence) {
+                    el.accountId = payload.accountId
+                    el.accountName = payload.accountName
+                    el.description = payload.description
+                    el.type = payload.type
+                    el.isCostToCost = payload.isCostToCost
+                    el.sign = payload.sign
+                    el.percentVat = payload.percentVat
+                    el.quantity = payload.quantity
+                    el.perQty = payload.perQty
+                    el.originalRate = payload.originalRate
+                    el.amount = payload.amount
+                    el.originalUsd = payload.originalUsd
+                }
+            })
+            setInvoiceDetails(newArr)
+            setDetailEdit(false)
+            setSelectedDetail({})
+        } else {
+            setDetailSequence(payload.sequence)
+            setInvoiceDetails(arr => [...arr, payload])
+        }
     }
 
-    const handleDetailsEdit = () => {
-        let no = detailSequence +1
-        setDetailSequence(no)
-        let tempObj = {
-            no: no,
-            name: 'aaa'
+    const handleDetailEdit = () => {
+        if(!selectedDetail.sequence) {
+            Swal.fire(
+                'Information',
+                "Please select detail data...!!",
+                'info'
+            )
+        } else {
+            setDetailEdit(true)
+            setOpenModalDetail(true)
         }
-        setInvoiceDetails(arr => [...arr, tempObj])
-        console.log('lololo', invoiceDetails)
+    }
+
+    const handleDetailDelete = () => {
+        if(!selectedDetail.sequence) {
+            Swal.fire(
+                'Information',
+                "Please select detail data...!!",
+                'info'
+            )
+        } else {
+            let tempSequence = selectedDetail.sequence
+            setSelectedDetail({})
+            
+            const deleteFunction = (invoices) => {
+                return invoices.sequence !== tempSequence
+            }
+            const result = invoiceDetails.filter(deleteFunction)
+            setInvoiceDetails(result)
+        }
     }
 
     return (
@@ -773,6 +827,8 @@ const CreateInvoicePage = () => {
                 shipperName={customerName}
                 sequence={detailSequence}
                 saveDetail={(e) => saveDetail(e)}
+                edit={detailEdit}
+                selected={selectedDetail}
                 />
 
                 <Grid container item spacing={3} direction="row">
@@ -1014,7 +1070,10 @@ const CreateInvoicePage = () => {
                                         ?
                                         invoiceDetails.map((el, index) => {
                                             return (
-                                                <TableRow key={index}>
+                                                <TableRow 
+                                                key={el.sequence} 
+                                                onClick={() => handleSelectedDetail(el)} 
+                                                sx={selectedDetail.sequence === el.sequence ? selectedStyle : {}}>
                                                     <TableCell>{el.sequence}</TableCell>
                                                     <TableCell>{el.description}</TableCell>
                                                     <TableCell>{el.amount}</TableCell>
@@ -1042,17 +1101,17 @@ const CreateInvoicePage = () => {
                         >
                             <Grid item container spacing={2} flexDirection="row" xs={10}>
                                 <Grid item>
-                                    <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" onClick={() => handleDetailsAdd()}>
+                                    <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" onClick={() => handleDetailAdd()}>
                                         add
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="outlined" startIcon={<ModeEditIcon />} color="secondary" onClick={() => handleDetailsEdit()}>
+                                    <Button variant="outlined" startIcon={<ModeEditIcon />} color="secondary" onClick={() => handleDetailEdit()}>
                                         edit
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="outlined" startIcon={<DeleteIcon />} color="secondary">
+                                    <Button variant="outlined" startIcon={<DeleteIcon />} color="secondary" onClick={() => handleDetailDelete()}>
                                         Delete
                                     </Button>
                                 </Grid>
