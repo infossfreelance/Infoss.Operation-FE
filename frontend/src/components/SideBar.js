@@ -42,6 +42,7 @@ import EstimateProfitLossDetailPage from '../pages/Report/EstimateProfitLoss/det
 import EstimateProfitLossEditPage from '../pages/Report/EstimateProfitLoss/edit';
 import InvoicePage from '../pages/Transaction/Invoice';
 import InvoiceDetailsPage from '../pages/Transaction/Invoice/details';
+import ViewInvoicePage from '../pages/Transaction/Invoice/viewOnly';
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     color: theme.palette.text.secondary,
@@ -563,6 +564,7 @@ export default function MiniDrawer() {
                     <Route path="/invoice" element={<><InvoicePage /></>} />
                     <Route path='/invoice/create' element={<><InvoiceDetailsPage /></>} />
                     <Route path='/invoice/edit/:invId' element={<><InvoiceDetailsPage /></>} />
+                    <Route path='/invoice/view/:invId' element={<><ViewInvoicePage /></>} />
                 </Routes>
 
                 <Footer />

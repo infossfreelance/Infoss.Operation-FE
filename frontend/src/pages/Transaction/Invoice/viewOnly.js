@@ -34,11 +34,8 @@ import TableRow from '@mui/material/TableRow';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import ModalTableInvoice from './modalTableInvoice'
 import axios from 'axios'
 import {API_URL, dateFormat} from '../../../helpers/constant';
-import Swal from 'sweetalert2';
-import NestedModal from "./modalInvoiceDetails";
 
 function a11yProps(index) {
     return {
@@ -58,8 +55,6 @@ function TabPanel(props) {
         setCustomerName,
         customerAddress,
         setCustomerAddress,
-        setOpenContacts,
-        isDisabled
     } = props;
 
     return (
@@ -86,7 +81,6 @@ function TabPanel(props) {
                             value={customerId}
                             onChange={e => setCustomerId(e.target.value)}
                             fullWidth
-                            onClick={() => isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)} 
                             />
                         </Grid>
                         <Grid item xs={8}>
@@ -128,280 +122,13 @@ TabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-let templateInvoice = {
-    "invoice": {
-      "rowStatus": "ACT",
-      "countryId": 101,
-      "companyId": 32,
-      "branchId": 12,
-      "id": 0,
-      "ticketId": 0,
-      "invoiceNo": 456,
-      "debetCredit": "D",
-      "shipmentId": 123,
-      "customerTypeId": 0,
-      "customerId": 0,
-      "customerName": "s",
-      "customerAddress": "s",
-      "billId": 0,
-      "billName": "s",
-      "billAddress": "s",
-      "invoicesTo": "s",
-      "invoiceStatus": 0,
-      "paymentUSD": 0,
-      "paymentIDR": 0,
-      "totalVatUSD": 0,
-      "totalVatIDR": 0,
-      "rate": 0,
-      "exRateDate": "2022-09-26T04:48:42.216Z",
-      "period": 0,
-      "yearPeriod": 0,
-      "invoicesAgent": "s",
-      "invoicesEdit": "s",
-      "jenisInvoices": "s",
-      "linkTo": "s",
-      "dueDate": 0,
-      "paid": false,
-      "paidOn": "",
-      "saveOR": true,
-      "badDebt": true,
-      "badDebtOn": "2022-09-26T04:48:42.216Z",
-      "reBadDebt": true,
-      "dateReBadDebt": "2022-09-26T04:48:42.216Z",
-      "printing": 0,
-      "printedOn": "",
-      "deleted": false,
-      "deletedOn": "",
-      "invoiceNo2": "s",
-      "invHeader": 0,
-      "exRateId": 0,
-      "rePrintApproved": false,
-      "rePrintApprovedOn": "2022-09-26T04:48:42.216Z",
-      "rePrintApprovedBy": "s",
-      "deletedRemarks": "s",
-      "idLama": 0,
-      "isCostToCost": true,
-      "sfpId": 0,
-      "sfpNoFormat": "s",
-      "sfpDetailId": 0,
-      "uniqueKeySFP": "s",
-      "uniqueKeyInvoice": "s",
-      "deleteType": 0,
-      "deleteTypeRefInvId": 0,
-      "kursKMK": 0,
-      "kursKMKId": 0,
-      "isDelivered": true,
-      "deliveredOn": "2022-09-26T04:48:42.216Z",
-      "deliveredRemarks": "s",
-      "sfpReference": "s",
-      "approvedCredit": true,
-      "approvedCreditBy": 0,
-      "approvedCreditOn": "2022-09-26T04:48:42.216Z",
-      "approvedCreditRemarks": "s",
-      "packingListNo": "s",
-      "siCustomerNo": "s",
-      "reference": "s",
-      "isStampDuty": true,
-      "stampDutyAmount": 0,
-      "pejkpNumber": 0,
-      "pejkpReference": "s",
-      "user": "luna"
-    },
-    "invoiceDetails": [
-      {
-        "rowStatus": "ACT",
-        "countryId": 101,
-        "companyId": 32,
-        "branchId": 12,
-        "invoiceId": 0,
-        "sequence": 0,
-        "debetCredit": "D",
-        "accountId": 0,
-        "description": "s",
-        "type": 0,
-        "codingQuantity": true,
-        "quantity": 0,
-        "perQty": 0,
-        "sign": true,
-        "amountCrr": 0,
-        "amount": 0,
-        "percentVat": 0,
-        "amountVat": 0,
-        "eplDetailId": 0,
-        "vatId": 0,
-        "idLama": 0,
-        "isCostToCost": true,
-        "originalUsd": 0,
-        "originalRate": 0,
-        "user": "s",
-        "invoiceDetailProfitShares": [
-          {
-            "rowStatus": "s",
-            "countryId": 0,
-            "companyId": 0,
-            "branchId": 0,
-            "invoiceDetilId": 0,
-            "sequence": 0,
-            "sFeet20": 0,
-            "sFeet40": 0,
-            "sFeetHQ": 0,
-            "sFeetM3": 0,
-            "sRate20": 0,
-            "sRate40": 0,
-            "sRateHQ": 0,
-            "sRateM3": 0,
-            "bFeet20": 0,
-            "bFeet40": 0,
-            "bFeetHQ": 0,
-            "bFeetM3": 0,
-            "bRate20": 0,
-            "bRate40": 0,
-            "bRateHQ": 0,
-            "bRateM3": 0,
-            "percentage": 0,
-            "idLama": 0,
-            "user": "s"
-          }
-        ],
-        "invoiceDetailStorages": [
-          {
-            "rowStatus": "s",
-            "countryId": 0,
-            "companyId": 0,
-            "branchId": 0,
-            "invoiceDetailId": 0,
-            "sequence": 0,
-            "fromDate": "2022-09-26T04:48:42.216Z",
-            "toDate": "2022-09-26T04:48:42.216Z",
-            "totalDays": 0,
-            "storageDetailId": 0,
-            "amountIDR": 0,
-            "amountUSD": 0,
-            "storageId": 0,
-            "user": "s"
-          }
-        ]
-      }
-    ],
-    "invoiceReqDels": [
-      {
-        "rowStatus": "s",
-        "countryId": 0,
-        "companyId": 0,
-        "branchId": 0,
-        "id": 0,
-        "reference": "s",
-        "isNonJob": true,
-        "invoiceId": 0,
-        "deleteType": 0,
-        "remarks": "s",
-        "approvedStatus": 0,
-        "approvedRemarks": "s",
-        "approvedBy": "s",
-        "approvedOn": "2022-09-26T04:48:42.217Z",
-        "deleted": true,
-        "deletedOn": "2022-09-26T04:48:42.217Z",
-        "modifiedBy": "s",
-        "modifiedOn": "2022-09-26T04:48:42.217Z",
-        "createdBy": "s",
-        "createdOn": "2022-09-26T04:48:42.217Z"
-      }
-    ],
-    "invoiceExportEJKPs": [
-      {
-        "rowStatus": "s",
-        "countryId": 0,
-        "companyId": 0,
-        "branchId": 0,
-        "invoiceId": 0,
-        "sequence": 0,
-        "pejkpNumber": 0,
-        "isExported": true,
-        "exportedOn": "2022-09-26T04:48:42.217Z",
-        "exportedBy": "s",
-        "isUploaded": true,
-        "uploadedOn": "2022-09-26T04:48:42.217Z",
-        "uploadedBy": "s",
-        "modifiedBy": "s",
-        "modifiedOn": "2022-09-26T04:48:42.217Z",
-        "createdBy": "s",
-        "createdOn": "2022-09-26T04:48:42.217Z"
-      }
-    ],
-    "invoiceExportFakturs": [
-      {
-        "rowStatus": "s",
-        "countryId": 0,
-        "companyId": 0,
-        "branchId": 0,
-        "invoiceId": 0,
-        "sequence": 0,
-        "isInvoiceNonJob": true,
-        "isExported": true,
-        "exportedOn": "2022-09-26T04:48:42.217Z",
-        "exportedBy": "s",
-        "isUploaded": true,
-        "uploadedOn": "2022-09-26T04:48:42.217Z",
-        "uploadedBy": "s",
-        "modifiedBy": "s",
-        "modifiedOn": "2022-09-26T04:48:42.217Z",
-        "createdBy": "s",
-        "createdOn": "2022-09-26T04:48:42.217Z"
-      }
-    ]
-}
-
-let revisedHeadersDummy = [
-    {
-        "column": "invoiceNo",
-        "text": "Invoice Number",
-        "format": ""
-    },
-    {
-        "column": "printedOn",
-        "text": "Printed On",
-        "format": ""
-    },
-]
-
-let storageHeadersDummy = [
-    {
-        "column": "code",
-        "text": "Code",
-        "format": ""
-    },
-    {
-        "column": "name",
-        "text": "Name",
-        "format": ""
-    },
-    {
-        "column": "crr",
-        "text": "Crr",
-        "format": ""
-    },
-    {
-        "column": "payment",
-        "text": "Payment",
-        "format": ""
-    },
-    {
-        "column": "type",
-        "text": "Type",
-        "format": ""
-    },
-]
-
 const selectedStyle = { bgcolor: (theme) => theme.palette.primary.main }
 
-const CreateInvoicePage = () => {
+const ViewInvoicePage = () => {
     const { invId } = useParams()
     const history = useNavigate()
     const [tabValue, setTabValue] = useState(0);
     const [shipmentData, setShipmentData] = useState({})
-    const [openMLSO, setOpenMLSO] = useState(false)
-    const [LSOHeaders, setLSOHeaders] = useState([])
-    const [LSOData, setLSOData] = useState([])
     const [isInvoice, setIsInvoice] = useState(true)
     const [isCTC, setIsCTC] = useState(false)
     const [invoiceNo, setInvoiceNo] = useState('')
@@ -430,51 +157,13 @@ const CreateInvoicePage = () => {
     const [currency, setCurrency] = useState(1)
     const [kursKMK, setKursKMK] = useState(0)
     const [editInvoice, setEditInvoice] = useState({})
-    const [isDisabled, setIsDisabled] = useState(false)
-    const [dataContacts, setDataContacts] = useState([])
-    const [headerContacts, setHeaderContacts] = useState([])
-    const [maxPageContacts, setMaxPageContacts] = useState(0)
     const [openContacts, setOpenContacts] = useState(false)
-    const [selectedContact, setSelectedContact] = useState({})
-    const [openRevised, setOpenRevised] = useState(false)
-    const [handleSelectRevised, setHandleSelectRevised] = useState({})
-    const [headerRevised, setHeaderRevised] = useState(revisedHeadersDummy)
-    const [dataRevised, setDataRevised] = useState({})
-    const [openStorage, setOpenStorage] = useState(false)
-    const [selectedStorage, setSelectedStorage] = useState({})
-    const [headerStorage, setHeaderStorage] = useState(storageHeadersDummy)
-    const [dataStorage, setDataStorage] = useState([])
-    const [openModalDetail, setOpenModalDetail] = useState(false)
     const [detailSequence, setDetailSequence] = useState(0)
     const [selectedDetail, setSelectedDetail] = useState({})
-    const [detailEdit, setDetailEdit] = useState(false)
 
     useEffect(() => {
-        getShipmentOrder(50, 1)
-        fetchContact(50, 1)
-        if(invId) {
-            console.log('mode edit', invId)
-            setIsDisabled(true)
-            fetchEditData(invId)
-            fetchRevised(50, 1)
-        } else {
-            console.log('mode create')
-            // setInvoiceDetails(templateInvoice.invoiceDetails)
-        }
+        fetchEditData(invId)
     }, [invId]);
-
-    const handleSelectedDetail = (rowValue) => {
-        console.log(rowValue)
-        setSelectedDetail(rowValue)
-    }
-
-    const fetchStorage = (rowsCount = 50, NumPage = 1) => {
-        console.log('fetch invoice details storage')
-    }
-
-    const fetchRevised = (rowsCount = 50, NumPage = 1) => {
-        console.log('fetch revised invoice tax number')
-    }
 
     const fetchEditData = (invId) => {
         console.log('invoice id', invId)
@@ -522,126 +211,9 @@ const CreateInvoicePage = () => {
         }).catch(error => console.error(error))
     }
 
-    const getShipmentOrder = (rowsCount = 50, NumPage = 1) => {
-        // axios.get(API_URL + `shipmentorder/shipmentorder/${NumPage}/${rowsCount}`)
-        axios.post(
-            // `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=COMBO&pageNumber=${NumPage}&pageSize=${rowsCount}`,
-            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=PAGE&pageNumber=${NumPage}&pageSize=${rowsCount}`,
-            {
-                "userCode": "luna",
-                "countryId": 101,
-                "companyId": 32,
-                "branchId": 12
-            }
-        )
-        .then((response) => {
-            setLSOHeaders(response.data.data.columns)
-            setLSOData(response.data.data.shipmentOrders)
-            console.log('data ship list', response)
-        })
-        .catch(function (error) {
-          console.error(error)
-        })
-    }
-
-    const fetchContact = (rows = 50, page = 1) => {
-        axios.post(`http://stage-master.api.infoss.solusisentraldata.com/regcontact/regcontact/PostByPage?contactTypeId=1&pageNumber=${page}&pageSize=${rows}`,
-        {
-            "userCode": "luna",
-            "countryId": 101,
-            "companyId": 32,
-            "branchId": 12
-        }).then(response => {
-            console.log('response contact', response)
-            setDataContacts(response.data.data.contact)
-            setHeaderContacts(response.data.data.columns)
-            setMaxPageContacts(response.data.totalPage)
-        }).catch(error => console.error(error))
-    }
-
     const handleTab = (event, newValue) => {
         setTabValue(newValue);
     };
-
-    const handleSubmit = () => {
-        if(invId) {
-            let payload = {
-                invoice : editInvoice,
-                invoiceDetails
-            }
-            payload.invoice.shipmentId = shipmentData.id
-            payload.invoice.customerAddress = customerAddress
-            payload.invoice.invHeader = invHeader
-            payload.invoice.packingListNo = packingListNo
-            payload.invoice.siCustomerNo = siCustomerNo
-            payload.invoice.isStampDuty = isStampDuty
-            payload.invoice.stampDutyAmount = stampDutyAmount
-            console.log('payload', payload)
-            axios.put(
-                'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Update',
-                payload
-            ).then(response => {
-                console.log('res update', response)
-                history('/booking/invoice')
-            }).catch(error => console.error(error))
-        } else {
-            let payload = {
-                invoice: {
-                    "rowStatus": "ACT",
-                    "countryId": 101,
-                    "companyId": 32,
-                    "branchId": 12,
-                    "user": "luna",
-                    "debetCredit": debetCredit,
-                    "shipmentId": shipmentData.id,
-                    "customerTypeId": 0,
-                    "customerId": customerId,
-                    "customerName": customerName,
-                    "customerAddress": customerAddress,
-                    "paymentUSD": paymentUSD,
-                    "paymentIDR": paymentIDR,
-                    "totalVatUSD": totalVATUSD,
-                    "totalVatIDR": totalVATIDR,
-                    "rate": rate,
-                    "paid": paid,
-                    "paidOn": paidOn,
-                    "printing": printing,
-                    "printedOn": printedOn,
-                    "deleted": false,
-                    "deletedOn": "",
-                    "invHeader": invHeader,
-                    "rePrintApproved": false,
-                    "rePrintApprovedOn": "",
-                    "rePrintApprovedBy": "",
-                    "isCostToCost": isCTC,
-                    "kursKMK": kursKMK,
-                    "packingListNo": packingListNo,
-                    "siCustomerNo": siCustomerNo,
-                    "isStampDuty": isStampDuty,
-                    "stampDutyAmount": stampDutyAmount,
-                    
-                },
-                invoiceDetails
-            }
-
-            axios.post(
-                'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
-                payload
-            ).then(response => {
-                console.log('res create', response)
-                history('/booking/invoice')
-            })
-            .catch(error => console.error(error))
-        }
-    }
-
-    const handleSelectContact = (value) => {
-        console.log('select contact', value)
-        setCustomerId(value.contactId)
-        setCustomerName(value.pic)
-        setCustomerAddress(value.contactAddress)
-        setSelectedContact(value)
-    }
 
     const renderStamp = () => {
         if(isStampDuty === 'true') {
@@ -668,93 +240,14 @@ const CreateInvoicePage = () => {
         }
     }
 
-    const handleDetailAdd = () => {
-        if(!shipmentData.shipmentNo) {
-            Swal.fire(
-                'Information',
-                "Shipment Order Number can't be empty...!!",
-                'info'
-            )
-        } else {
-            setOpenModalDetail(true)
-        }
-    }
-
-    const saveDetail = (payload) => {
-        if(detailEdit === true) {
-            const newArr = invoiceDetails.slice()
-            console.log('new arr', newArr)
-            newArr.forEach(el =>  {
-                if(el.sequence === payload.sequence) {
-                    el.accountId = payload.accountId
-                    el.accountName = payload.accountName
-                    el.description = payload.description
-                    el.type = payload.type
-                    el.isCostToCost = payload.isCostToCost
-                    el.sign = payload.sign
-                    el.percentVat = payload.percentVat
-                    el.quantity = payload.quantity
-                    el.perQty = payload.perQty
-                    el.originalRate = payload.originalRate
-                    el.amount = payload.amount
-                    el.originalUsd = payload.originalUsd
-                }
-            })
-            setInvoiceDetails(newArr)
-            setDetailEdit(false)
-            setSelectedDetail({})
-        } else {
-            setDetailSequence(payload.sequence)
-            setInvoiceDetails(arr => [...arr, payload])
-        }
-    }
-
-    const handleDetailEdit = () => {
-        if(!selectedDetail.sequence) {
-            Swal.fire(
-                'Information',
-                "Please select detail data...!!",
-                'info'
-            )
-        } else {
-            setDetailEdit(true)
-            setOpenModalDetail(true)
-        }
-    }
-
-    const handleDetailDelete = () => {
-        if(!selectedDetail.sequence) {
-            Swal.fire(
-                'Information',
-                "Please select detail data...!!",
-                'info'
-            )
-        } else {
-            let tempSequence = selectedDetail.sequence
-            setSelectedDetail({})
-            
-            const deleteFunction = (invoices) => {
-                return invoices.sequence !== tempSequence
-            }
-            const result = invoiceDetails.filter(deleteFunction)
-            setInvoiceDetails(result)
-        }
-    }
-
     return (
         <Grid container spacing={2} direction="column">
             <Grid item xs={12}>
-                {
-                    invId 
-                    ?
-                    <h4>Edit Invoice</h4>
-                    :
-                    <h4>Create New Invoice</h4>
-                }
+                <h4>View Invoice</h4>
             </Grid>
             <Grid item xs={12}>
                 <Stack direction='row' spacing={1}>
-                    <Button variant="outlined" startIcon={<SaveIcon />} onClick={() => handleSubmit()}>
+                    <Button variant="outlined" startIcon={<SaveIcon />}>
                         save
                     </Button>
                     <Button variant="outlined" startIcon={<ReplyIcon />} onClick={() => history('/booking/invoice')}>
@@ -775,63 +268,6 @@ const CreateInvoicePage = () => {
                 </Stack>
             </Grid>
             <Paper variant="outlined" sx={{ m: 2, p: 2 }}>
-                <ModalTableInvoice 
-                open={openMLSO} 
-                onClose={() => setOpenMLSO(false)} 
-                setSelectedData={(e) => setShipmentData(e)}
-                headersData={LSOHeaders}
-                bodyData={LSOData}
-                fetchData={() => getShipmentOrder()}
-                maxPage={1}
-                type={'shipment'}
-                setName={e => setCustomerName(e)}
-                setId={e => setCustomerId(e)}
-                setAddress={e => setCustomerAddress(e)}
-                />
-
-                <ModalTableInvoice 
-                open={openContacts} 
-                onClose={() => setOpenContacts(false)} 
-                setSelectedData={(e) => handleSelectContact(e)}
-                headersData={headerContacts}
-                bodyData={dataContacts}
-                fetchData={(r, p) => fetchContact(r, p)}
-                type={'contact'}
-                maxPage={maxPageContacts}
-                />
-
-                <ModalTableInvoice 
-                open={openRevised} 
-                onClose={() => setOpenRevised(false)} 
-                setSelectedData={(e) => setHandleSelectRevised(e)}
-                headersData={headerRevised}
-                bodyData={dataRevised}
-                fetchData={(r, p) => fetchRevised(r, p)}
-                maxPage={1}
-                type={'revised'}
-                />
-
-                <ModalTableInvoice 
-                open={openStorage} 
-                onClose={() => setOpenStorage(false)} 
-                setSelectedData={(e) => setSelectedStorage(e)}
-                headersData={headerStorage}
-                bodyData={dataStorage}
-                fetchData={(r, p) => fetchStorage(r, p)}
-                maxPage={1}
-                />
-
-                <NestedModal 
-                open={openModalDetail} 
-                close={() => setOpenModalDetail(false)} 
-                shipperNo={customerId} 
-                shipperName={customerName}
-                sequence={detailSequence}
-                saveDetail={(e) => saveDetail(e)}
-                edit={detailEdit}
-                selected={selectedDetail}
-                />
-
                 <Grid container item spacing={3} direction="row">
                     <Grid item xs={6}>
                         <FormControl fullWidth>
@@ -843,8 +279,8 @@ const CreateInvoicePage = () => {
                             value={isInvoice}
                             onChange={e => setIsInvoice(e.target.value)}
                             >
-                                <FormControlLabel value={true} control={<Radio />} label="Invoices" disabled={isDisabled} />
-                                <FormControlLabel value={false} control={<Radio />} label="General Invoices" disabled={isDisabled} />
+                                <FormControlLabel value={true} control={<Radio />} label="Invoices" disabled />
+                                <FormControlLabel value={false} control={<Radio />} label="General Invoices" disabled />
                             </RadioGroup>
 
                             <FormLabel id="invoice-type-label">Type</FormLabel>
@@ -852,12 +288,11 @@ const CreateInvoicePage = () => {
                             row 
                             name="invoice-type-radio"
                             aria-labelledby="invoice-type-label"
-                            // defaultValue={false}
                             value={isCTC}
                             onChange={e => setIsCTC(e.target.value)}
                             >
-                                <FormControlLabel value={false} control={<Radio />} label="Non Cost To Cost" disabled={isDisabled} />
-                                <FormControlLabel value={true} control={<Radio />} label="Cost To Cost" disabled={isDisabled} />
+                                <FormControlLabel value={false} control={<Radio />} label="Non Cost To Cost" disabled />
+                                <FormControlLabel value={true} control={<Radio />} label="Cost To Cost" disabled />
                             </RadioGroup>
 
                             <TextField value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} id="invoice-number" label="Invoice Number" variant="filled" disabled />
@@ -909,6 +344,7 @@ const CreateInvoicePage = () => {
                                 value={invHeader}
                                 label="Invoice Header"
                                 onChange={e => setInvHeader(e.target.value)}
+                                disabled
                                 >
                                     <MenuItem value={0}>1 - AR</MenuItem>
                                     <MenuItem value={1}>2 - AR</MenuItem>
@@ -920,11 +356,12 @@ const CreateInvoicePage = () => {
                             onChange={e => setPackingListNo(e.target.value)}
                             id="invoice-packing-list" 
                             label="Packing List" 
-                            variant="standard" 
+                            variant="filled"
+                            disabled
                             />
                             <TextField
                             value={siCustomerNo}
-                            onChange={e => setSiCustomerNo(e.target.value)} id="invoice-si-customer" label="SI Customer" variant="standard" />
+                            onChange={e => setSiCustomerNo(e.target.value)} id="invoice-si-customer" label="SI Customer" variant="filled" disabled />
                         </FormControl>
                     </Grid>
                     <Grid item xs={6}>
@@ -933,9 +370,8 @@ const CreateInvoicePage = () => {
                             id="shipment-order-number" 
                             label="Shipment Order Number" 
                             variant="filled" 
-                            onClick={() => isDisabled === false ? setOpenMLSO(true) : setOpenMLSO(false)} 
                             value={ shipmentData.shipmentNo ? shipmentData.shipmentNo : '' }
-                            disabled={isDisabled}
+                            disabled
                             />
 
                             <Box m={1}>
@@ -959,8 +395,8 @@ const CreateInvoicePage = () => {
                                 value={customerTypeId}
                                 onChange={e => setCustomerTypeId(e.target.value)}
                                 >
-                                    <FormControlLabel value={0} control={<Radio />} label="Shipper" disabled={isDisabled} />
-                                    <FormControlLabel value={1} control={<Radio />} label="Agent" disabled={isDisabled} />
+                                    <FormControlLabel value={0} control={<Radio />} label="Shipper" disabled />
+                                    <FormControlLabel value={1} control={<Radio />} label="Agent" disabled />
                                 </RadioGroup>
 
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -979,7 +415,6 @@ const CreateInvoicePage = () => {
                                 customerAddress={customerAddress}
                                 setCustomerAddress={e => setCustomerAddress(e)}
                                 setOpenContacts={e => setOpenContacts(e)}
-                                isDisabled={isDisabled}
                                 >
                                     Shipper
                                 </TabPanel>
@@ -993,10 +428,11 @@ const CreateInvoicePage = () => {
                                 <TextField 
                                 value={eFaktur}
                                 onChange={e => setEFaktur(e.target.value)}
-                                variant="standard" 
+                                variant="filled" 
                                 label="Ref. E-Faktur" 
                                 id="invoice-faktur" 
-                                margin="normal" 
+                                margin="normal"
+                                disabled
                                 />
                                 <TextField
                                 value={revisedInvNo}
@@ -1005,7 +441,6 @@ const CreateInvoicePage = () => {
                                 label="Revised Tax Inv. No" 
                                 id="invoice-tax" 
                                 margin="normal"
-                                onClick={() => isDisabled === false ? setOpenRevised(true) : setOpenRevised(false)}
                                 disabled
                                 />
                             </Grid>
@@ -1021,8 +456,8 @@ const CreateInvoicePage = () => {
                                     value={isStampDuty}
                                     onChange={e => setIsStampDuty(e.target.value)}
                                     >
-                                        <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                                        <FormControlLabel value={false} control={<Radio />} label="No" />
+                                        <FormControlLabel value={true} control={<Radio />} label="Yes" disabled />
+                                        <FormControlLabel value={false} control={<Radio />} label="No" disabled />
                                     </RadioGroup>
                                     {renderStamp()}
                                 </Box>
@@ -1047,8 +482,8 @@ const CreateInvoicePage = () => {
                                 <RadioGroup 
                                 row 
                                 name="vat-radio">
-                                    <FormControlLabel value="11" control={<Radio />} label="ALL - VAT 11%" />
-                                    <FormControlLabel value="1,1" control={<Radio />} label="ALL - VAT 1,1%" />
+                                    <FormControlLabel value="11" control={<Radio />} label="ALL - VAT 11%" disabled />
+                                    <FormControlLabel value="1,1" control={<Radio />} label="ALL - VAT 1,1%" disabled />
                                 </RadioGroup>
                             </Grid>
                         </Grid>
@@ -1073,7 +508,6 @@ const CreateInvoicePage = () => {
                                             return (
                                                 <TableRow 
                                                 key={el.sequence} 
-                                                onClick={() => handleSelectedDetail(el)} 
                                                 sx={selectedDetail.sequence === el.sequence ? selectedStyle : {}}>
                                                     <TableCell>{el.sequence}</TableCell>
                                                     <TableCell>{el.description}</TableCell>
@@ -1102,24 +536,24 @@ const CreateInvoicePage = () => {
                         >
                             <Grid item container spacing={2} flexDirection="row" xs={10}>
                                 <Grid item>
-                                    <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" onClick={() => handleDetailAdd()}>
+                                    <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" disabled>
                                         add
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="outlined" startIcon={<ModeEditIcon />} color="secondary" onClick={() => handleDetailEdit()}>
+                                    <Button variant="outlined" startIcon={<ModeEditIcon />} color="secondary" disabled>
                                         edit
                                     </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="outlined" startIcon={<DeleteIcon />} color="secondary" onClick={() => handleDetailDelete()}>
+                                    <Button variant="outlined" startIcon={<DeleteIcon />} color="secondary" disabled>
                                         Delete
                                     </Button>
                                 </Grid>
                             </Grid>
 
                             <Grid item container flexDirection="row-reverse" xs={2}>
-                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
+                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" disabled>
                                     add storage
                                 </Button>
                             </Grid>
@@ -1171,7 +605,7 @@ const CreateInvoicePage = () => {
                             value={currency}
                             label="Invoice Currency"
                             onChange={e => setCurrency(e.target.value)}
-                            disabled={isDisabled}
+                            disabled
                             >
                                 <MenuItem value={1}>ALL</MenuItem>
                                 <MenuItem value={2}>IDR</MenuItem>
@@ -1188,4 +622,4 @@ const CreateInvoicePage = () => {
     )
 }
 
-export default CreateInvoicePage
+export default ViewInvoicePage

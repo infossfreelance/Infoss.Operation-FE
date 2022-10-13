@@ -48,6 +48,7 @@ const ModalInvoice = (props) => {
     const [remarks, setRemarks] = useState('')
     const [deliveredDate, setDeliveredDate] = useState(new Date())
     const [isDelivered, setIsDelivered] = useState(false)
+    const changePage = useNavigate();
 
     const handleSave = () => {
         if(props.type === 'credit') {
@@ -70,6 +71,13 @@ const ModalInvoice = (props) => {
         props.close()
     }
 
+    const editContra = () => {
+        //PROSES MEMBUAT CONTRA INVOICE DAHULU LALU MASUK KE PAGE EDIT
+        props.resetType()
+        changePage('/booking/invoice/edit/' + props.selectedData.id)
+        props.close()
+    }
+
     return (
         <Modal open={props.open} onClose={handleClose}>
             <Grid container spacing={1} flexDirection='column' sx={ modalStyle }>
@@ -78,6 +86,10 @@ const ModalInvoice = (props) => {
                         props.type === 'credit'
                         ?
                         <h5>Approval Credit</h5>
+                        : 
+                        props.type === 'edit'
+                        ?
+                        <h5>Edit Data</h5>
                         :
                         <h5>Delivered Status</h5>
                     }
@@ -97,6 +109,14 @@ const ModalInvoice = (props) => {
                                 onChange={e => setRemarks(e.target.value)}
                                 />
                             </FormControl>
+                            : 
+                            props.type === 'edit'
+                            ?
+                            <>
+                                <h6>Type : General</h6>
+                                <p>Invoice has been Printed</p>
+                                <p>Edit will make Contra Invoices and New Invoices Automatically</p>
+                            </>
                             :
                             <FormControl fullWidth>
                                 <FormLabel id="delivered-label">Delivered</FormLabel>
@@ -137,16 +157,40 @@ const ModalInvoice = (props) => {
                     </Box>
                 </Grid>
                 <Grid item container spacing={2} flexDirection='row-reverse'>
-                    <Grid item>
-                        <Button variant="danger" className='btn-sm' onClick={() => handleClose()}>
-                            Cancel
-                        </Button>
-                    </Grid>
-                    <Grid item>
-                        <Button variant="primary" className='btn-sm' onClick={() => handleSave()}>
-                            Save
-                        </Button>
-                    </Grid>
+                    {
+                        props.type === 'edit'
+                        ?
+                        <>
+                            <Grid item>
+                                <Button variant="info" className='btn-sm' onClick={() => changePage('/booking/invoice/view/' + props.selectedData.id)}>
+                                    View Only
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button variant="danger" className='btn-sm' onClick={() => handleClose()}>
+                                    Cancel
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button variant="primary" className='btn-sm' onClick={() => editContra()}>
+                                    OK
+                                </Button>
+                            </Grid>
+                        </>
+                        :
+                        <>
+                            <Grid item>
+                                <Button variant="danger" className='btn-sm' onClick={() => handleClose()}>
+                                    Cancel
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button variant="primary" className='btn-sm' onClick={() => handleSave()}>
+                                    Save
+                                </Button>
+                            </Grid>
+                        </> 
+                    }
                 </Grid>
             </Grid>
         </Modal>
@@ -206,8 +250,8 @@ const InvoicePage = () => {
             "companyId": 32,
             "branchId": 12
         }
-        // axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
-        axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        // axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         .then((response) => {
             console.log('response fetch invoice', response)
             if(response.data.code === 200) {
@@ -226,6 +270,11 @@ const InvoicePage = () => {
                         {
                             "column": "isCostToCost",
                             "text": "Ctc",
+                            "format": ""
+                        },
+                        {
+                            "column": "paid",
+                            "text": "Paid",
                             "format": ""
                         },
                         {
@@ -341,7 +390,16 @@ const InvoicePage = () => {
         if (SelectedData.id === undefined) {
             ErrorAlert("Please Select Data!")
         } else {
-          history('/booking/invoice/edit/'+ SelectedData.id)
+            if(SelectedData.rowStatus === 'DEL') {
+                ErrorAlert('Record Has Been Deleted')
+            } else if(SelectedData.paid === true) {
+                ErrorAlert('Invoice Has Been Paid')
+            } else if(SelectedData.printing > 0) {
+                setModalType('edit')
+                setOpenModal(true)
+            } else {
+                history('/booking/invoice/edit/'+ SelectedData.id)
+            }
         }
     }
 
@@ -641,6 +699,7 @@ const InvoicePage = () => {
                                 handleSave={e => handleSaveModal(e)} 
                                 type={modalType} 
                                 resetType={() => setModalType('')}
+                                selectedData={SelectedData}
                                 />
 
                                 <thead className='text-center text-infoss'>
