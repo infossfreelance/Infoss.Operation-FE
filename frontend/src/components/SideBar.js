@@ -43,6 +43,10 @@ import EstimateProfitLossEditPage from '../pages/Report/EstimateProfitLoss/edit'
 import InvoicePage from '../pages/Transaction/Invoice';
 import InvoiceDetailsPage from '../pages/Transaction/Invoice/details';
 import ViewInvoicePage from '../pages/Transaction/Invoice/viewOnly';
+import PaymentRequestPage from '../pages/Transaction/PaymentRequest';
+import PaymentRequestDetailPage from '../pages/Transaction/PaymentRequest/detail';
+import PaymentRequestEditPage from '../pages/Transaction/PaymentRequest/edit';
+import PaymentRequestViewPage from '../pages/Transaction/PaymentRequest/view';
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     color: theme.palette.text.secondary,
@@ -269,6 +273,10 @@ export default function MiniDrawer() {
         history('/booking/epl')
     }
 
+    function handlePaymentRequestRoute() {
+        history('/booking/payment-request')
+    }
+
     function handleInvoiceRoute() {
         history('/booking/invoice')
     }
@@ -444,6 +452,15 @@ export default function MiniDrawer() {
                             bgColor="#e8f0fe"
                             onClick={ handleInvoiceRoute }
                         />
+                        <StyledTreeItem
+                            nodeId="25"
+                            labelText="Payment Request"
+                            labelIcon={LocalOfferIcon}
+                            labelInfo=""
+                            color="#3c8039"
+                            bgColor="#e6f4ea"
+                            onClick={ handlePaymentRequestRoute }
+                        />
                     </StyledTreeItem>
                     <StyledTreeItem nodeId="3" labelText="Report" labelIcon={Label}>
                         <StyledTreeItem
@@ -519,8 +536,8 @@ export default function MiniDrawer() {
                             bgColor="#e6f4ea"
                             onClick={ handleEstimateRoute }
                         />
-
                     </StyledTreeItem>
+
                     <StyledTreeItem nodeId="4" labelText="Setting" labelIcon={Label}>
                         <StyledTreeItem
                             nodeId="24"
@@ -561,6 +578,10 @@ export default function MiniDrawer() {
                     <Route path="/epl" element={<><EstimateProfitLossPage /></>} />
                     <Route path="/epl/detail" element={<><EstimateProfitLossDetailPage /></>} />
                     <Route path="/epl/edit/:SOId" element={<><EstimateProfitLossEditPage /></>} />
+                    <Route path="/payment-request" element={<><PaymentRequestPage /></>} />
+                    <Route path="/payment-request/detail" element={<><PaymentRequestDetailPage /></>} />
+                    <Route path="/payment-request/edit/:SOId" element={<><PaymentRequestEditPage /></>} />
+                    <Route path="/payment-request/view/:SOId" element={<><PaymentRequestViewPage /></>} />
                     <Route path="/invoice" element={<><InvoicePage /></>} />
                     <Route path='/invoice/create' element={<><InvoiceDetailsPage /></>} />
                     <Route path='/invoice/edit/:invId' element={<><InvoiceDetailsPage /></>} />
