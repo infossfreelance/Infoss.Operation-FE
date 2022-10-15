@@ -40,6 +40,16 @@ import {API_URL, dateFormat} from '../../../helpers/constant';
 import Swal from 'sweetalert2';
 import NestedModal from "./modalInvoiceDetails";
 
+const succesAlert = (text) => {
+    Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: text,
+        showConfirmButton: false,
+        timer: 1500
+    })
+}
+
 function a11yProps(index) {
     return {
       id: `simple-tab-${index}`,
@@ -585,53 +595,61 @@ const CreateInvoicePage = () => {
                 history('/booking/invoice')
             }).catch(error => console.error(error))
         } else {
-            let payload = {
-                invoice: {
-                    "rowStatus": "ACT",
-                    "countryId": 101,
-                    "companyId": 32,
-                    "branchId": 12,
-                    "user": "luna",
-                    "debetCredit": debetCredit,
-                    "shipmentId": shipmentData.id,
-                    "customerTypeId": 0,
-                    "customerId": customerId,
-                    "customerName": customerName,
-                    "customerAddress": customerAddress,
-                    "paymentUSD": paymentUSD,
-                    "paymentIDR": paymentIDR,
-                    "totalVatUSD": totalVATUSD,
-                    "totalVatIDR": totalVATIDR,
-                    "rate": rate,
-                    "paid": paid,
-                    "paidOn": paidOn,
-                    "printing": printing,
-                    "printedOn": printedOn,
-                    "deleted": false,
-                    "deletedOn": "",
-                    "invHeader": invHeader,
-                    "rePrintApproved": false,
-                    "rePrintApprovedOn": "",
-                    "rePrintApprovedBy": "",
-                    "isCostToCost": isCTC,
-                    "kursKMK": kursKMK,
-                    "packingListNo": packingListNo,
-                    "siCustomerNo": siCustomerNo,
-                    "isStampDuty": isStampDuty,
-                    "stampDutyAmount": stampDutyAmount,
-                    
-                },
-                invoiceDetails
+            if(!shipmentData.shipmentNo) {
+                Swal.fire(
+                    'Information',
+                    "Shipment Order Number can't be empty...!!",
+                    'info'
+                )
+            } else {
+                let payload = {
+                    invoice: {
+                        "rowStatus": "ACT",
+                        "countryId": 101,
+                        "companyId": 32,
+                        "branchId": 12,
+                        "user": "luna",
+                        "debetCredit": debetCredit,
+                        "shipmentId": shipmentData.id,
+                        "customerTypeId": 0,
+                        "customerId": customerId,
+                        "customerName": customerName,
+                        "customerAddress": customerAddress,
+                        "paymentUSD": paymentUSD,
+                        "paymentIDR": paymentIDR,
+                        "totalVatUSD": totalVATUSD,
+                        "totalVatIDR": totalVATIDR,
+                        "rate": rate,
+                        "paid": paid,
+                        "paidOn": paidOn,
+                        "printing": printing,
+                        "printedOn": printedOn,
+                        "deleted": false,
+                        "deletedOn": "",
+                        "invHeader": invHeader,
+                        "rePrintApproved": false,
+                        "rePrintApprovedOn": "",
+                        "rePrintApprovedBy": "",
+                        "isCostToCost": isCTC,
+                        "kursKMK": kursKMK,
+                        "packingListNo": packingListNo,
+                        "siCustomerNo": siCustomerNo,
+                        "isStampDuty": isStampDuty,
+                        "stampDutyAmount": stampDutyAmount,
+                        
+                    },
+                    invoiceDetails
+                }
+    
+                axios.post(
+                    'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
+                    payload
+                ).then(response => {
+                    console.log('res create', response)
+                    history('/booking/invoice')
+                })
+                .catch(error => console.error(error))
             }
-
-            axios.post(
-                'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
-                payload
-            ).then(response => {
-                console.log('res create', response)
-                history('/booking/invoice')
-            })
-            .catch(error => console.error(error))
         }
     }
 
@@ -741,6 +759,119 @@ const CreateInvoicePage = () => {
         }
     }
 
+    const handleNewForm = () => {
+        Swal.fire({
+            title: 'Confirm',
+            text: "Are you sure you want to create NEW Invoice?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                history('/booking/invoice/create')
+                window.location.reload();
+            }
+        })
+    }
+
+    const handlePrint = () => {
+        if(invId) {
+            let printCount = editInvoice.printing
+            let canPrint = false
+            if(editInvoice.printing === 0) {
+                printCount += 1
+                canPrint = true
+            } else {
+                if(editInvoice.rePrintApproved === true) {
+                    printCount += 1
+                    canPrint = true
+                }
+            }
+            if(canPrint === true) {
+                const payload = {
+                    "rowStatus": editInvoice.rowStatus,
+                    "countryId": 101,
+                    "companyId": 32,
+                    "branchId": 12,
+                    "id": editInvoice.id,
+                    "invoiceNo": editInvoice.invoiceNo,
+                    "printing": printCount,
+                    "user": "luna"
+                }
+                console.log(payload)
+                axios.put('https://localhost:7160/Invoice/UpdateStatusPrint', payload)
+                .then(response => {
+                    console.log('hasil api print', response)
+                    if(response.data.code === 200) {
+                        succesAlert('Data berhasil di print')
+                    } else {
+                        Swal.fire(
+                            'Print Failed',
+                            `${response.data.message}`,
+                            'error'
+                        )
+                    }
+                }).catch(error => {
+                    console.error(error)
+                    Swal.fire(
+                        'Error',
+                        `${error.toString()}`,
+                        'error'
+                    )
+                })
+            } else {
+                Swal.fire(
+                    'Information',
+                    "Data Has Been Printed",
+                    'info'
+                )
+            }
+        }
+    }
+
+    const handleRePrint = () => {
+        if(invId) {
+            if(editInvoice.rePrintApproved === true) {
+                succesAlert('Print ulang sudah di setujui')
+            } else {
+                const payload = {
+                    "rowStatus": editInvoice.rowStatus,
+                    "countryId": 101,
+                    "companyId": 32,
+                    "branchId": 12,
+                    "id": editInvoice.id,
+                    "invoiceNo": editInvoice.invoiceNo,
+                    "rePrintApproved": 1,
+                    "rePrintApprovedBy": "luna",
+                    "user": "luna"
+                }
+                axios.put('https://localhost:7160/Invoice/UpdateStatusRePrint', payload)
+                .then(response => {
+                    console.log('response re print', response)
+                    if(response.data.code === 200) {
+                        succesAlert('Print ulang sudah di setujui')
+                    } else {
+                        Swal.fire(
+                            'Approval Error',
+                            `${response.data.message}`,
+                            'error'
+                        )
+                    }
+                })
+                .catch(error => {
+                    console.error(error)
+                    Swal.fire(
+                        'Print Failed',
+                        `${error.toString()}`,
+                        'error'
+                    )
+                })
+            }
+        }
+    }
+
     return (
         <Grid container spacing={2} direction="column">
             <Grid item xs={12}>
@@ -760,13 +891,13 @@ const CreateInvoicePage = () => {
                     <Button variant="outlined" startIcon={<ReplyIcon />} onClick={() => history('/booking/invoice')}>
                         back
                     </Button>
-                    <Button variant="outlined" startIcon={<PrintIcon />}>
+                    <Button variant="outlined" startIcon={<PrintIcon />} onClick={() => handlePrint()}>
                         print
                     </Button>
-                    <Button variant="outlined" startIcon={<AddToPhotosIcon />}>
+                    <Button variant="outlined" startIcon={<AddToPhotosIcon />} onClick={() => handleNewForm()}>
                         add new
                     </Button>
-                    <Button variant="outlined" startIcon={<ApprovalIcon />}>
+                    <Button variant="outlined" startIcon={<ApprovalIcon />} onClick={() => handleRePrint()}>
                         reprint approval
                     </Button>
                     <Button variant="outlined" startIcon={<CachedIcon />}>
