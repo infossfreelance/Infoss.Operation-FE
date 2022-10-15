@@ -47,7 +47,8 @@ const modalStyle = {
 const ModalInvoice = (props) => {
     const [remarks, setRemarks] = useState('')
     const [deliveredDate, setDeliveredDate] = useState(new Date())
-    const [isDelivered, setIsDelivered] = useState(false)
+    const [isDelivered, setIsDelivered] = useState(0)
+    const changePage = useNavigate();
 
     const handleSave = () => {
         if(props.type === 'credit') {
@@ -70,6 +71,13 @@ const ModalInvoice = (props) => {
         props.close()
     }
 
+    const editContra = () => {
+        //PROSES MEMBUAT CONTRA INVOICE DAHULU LALU MASUK KE PAGE EDIT
+        props.resetType()
+        changePage('/booking/invoice/edit/' + props.selectedData.id)
+        props.close()
+    }
+
     return (
         <Modal open={props.open} onClose={handleClose}>
             <Grid container spacing={1} flexDirection='column' sx={ modalStyle }>
@@ -78,6 +86,10 @@ const ModalInvoice = (props) => {
                         props.type === 'credit'
                         ?
                         <h5>Approval Credit</h5>
+                        : 
+                        props.type === 'edit'
+                        ?
+                        <h5>Edit Data</h5>
                         :
                         <h5>Delivered Status</h5>
                     }
@@ -97,6 +109,14 @@ const ModalInvoice = (props) => {
                                 onChange={e => setRemarks(e.target.value)}
                                 />
                             </FormControl>
+                            : 
+                            props.type === 'edit'
+                            ?
+                            <>
+                                <h6>Type : General</h6>
+                                <p>Invoice has been Printed</p>
+                                <p>Edit will make Contra Invoices and New Invoices Automatically</p>
+                            </>
                             :
                             <FormControl fullWidth>
                                 <FormLabel id="delivered-label">Delivered</FormLabel>
@@ -107,8 +127,8 @@ const ModalInvoice = (props) => {
                                 value={isDelivered}
                                 onChange={e => setIsDelivered(e.target.value)}
                                 >
-                                    <FormControlLabel value={true} control={<Radio />} label="Yes" />
-                                    <FormControlLabel value={false} control={<Radio />} label="No" />
+                                    <FormControlLabel value={1} control={<Radio />} label="Yes" />
+                                    <FormControlLabel value={0} control={<Radio />} label="No" />
                                 </RadioGroup>
 
                                 <LocalizationProvider dateAdapter={AdapterDateFns}>      
@@ -137,16 +157,40 @@ const ModalInvoice = (props) => {
                     </Box>
                 </Grid>
                 <Grid item container spacing={2} flexDirection='row-reverse'>
-                    <Grid item>
-                        <Button variant="danger" className='btn-sm' onClick={() => handleClose()}>
-                            Cancel
-                        </Button>
-                    </Grid>
-                    <Grid item>
-                        <Button variant="primary" className='btn-sm' onClick={() => handleSave()}>
-                            Save
-                        </Button>
-                    </Grid>
+                    {
+                        props.type === 'edit'
+                        ?
+                        <>
+                            <Grid item>
+                                <Button variant="info" className='btn-sm' onClick={() => changePage('/booking/invoice/view/' + props.selectedData.id)}>
+                                    View Only
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button variant="danger" className='btn-sm' onClick={() => handleClose()}>
+                                    Cancel
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button variant="primary" className='btn-sm' onClick={() => editContra()}>
+                                    OK
+                                </Button>
+                            </Grid>
+                        </>
+                        :
+                        <>
+                            <Grid item>
+                                <Button variant="danger" className='btn-sm' onClick={() => handleClose()}>
+                                    Cancel
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button variant="primary" className='btn-sm' onClick={() => handleSave()}>
+                                    Save
+                                </Button>
+                            </Grid>
+                        </> 
+                    }
                 </Grid>
             </Grid>
         </Modal>
@@ -206,8 +250,8 @@ const InvoicePage = () => {
             "companyId": 32,
             "branchId": 12
         }
-        // axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
-        axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        // axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         .then((response) => {
             console.log('response fetch invoice', response)
             if(response.data.code === 200) {
@@ -229,6 +273,11 @@ const InvoicePage = () => {
                             "format": ""
                         },
                         {
+                            "column": "paid",
+                            "text": "Paid",
+                            "format": ""
+                        },
+                        {
                             "column": "invoiceNo",
                             "text": "InvoiceNo",
                             "format": ""
@@ -242,6 +291,16 @@ const InvoicePage = () => {
                             "column": "siCustomerNo",
                             "text": "SiCustomerNo",
                             "format": ""
+                        },
+                        {
+                            "column": "isDelivered",
+                            "text": "IsDelivered",
+                            "format": ""
+                        },
+                        {
+                            "column": "deliveredOn",
+                            "text": "deliveredOn",
+                            "format": "date"
                         },
                         {
                             "column": "printing",
@@ -341,7 +400,16 @@ const InvoicePage = () => {
         if (SelectedData.id === undefined) {
             ErrorAlert("Please Select Data!")
         } else {
-          history('/booking/invoice/edit/'+ SelectedData.id)
+            if(SelectedData.rowStatus === 'DEL') {
+                ErrorAlert('Record Has Been Deleted')
+            } else if(SelectedData.paid === true) {
+                ErrorAlert('Invoice Has Been Paid')
+            } else if(SelectedData.printing > 0) {
+                setModalType('edit')
+                setOpenModal(true)
+            } else {
+                history('/booking/invoice/edit/'+ SelectedData.id)
+            }
         }
     }
 
@@ -391,40 +459,44 @@ const InvoicePage = () => {
         if (SelectedData.id === undefined) {
             ErrorAlert("Harap pilih data terlebih dahulu")
         } else {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.put(
-                        `http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Delete?id=${SelectedData.id}`,
-                        {
-                            "rowStatus": "ACT",
-                            "countryId": 101,
-                            "companyId": 32,
-                            "branchId": 12,
-                            "user": "luna"
-                        }
-                    ).then(response => {
-                        console.log('res delete', response)
-                        Swal.fire(
-                            'Deleted!',
-                            'Your file has been deleted.',
-                            'success'
-                        )
-                        fetchInvoices(numPage, rowsCount)
-                    })
-                    .catch(error => {
-                        console.error(error)
-                        ErrorAlert(error.toString(), true)
-                    })
-                }
-            })
+            if(SelectedData.rowStatus === 'DEL') {
+                ErrorAlert("Data Has Been Deleted")
+            } else {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.put(
+                            `http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Delete?id=${SelectedData.id}`,
+                            {
+                                "rowStatus": "ACT",
+                                "countryId": 101,
+                                "companyId": 32,
+                                "branchId": 12,
+                                "user": "luna"
+                            }
+                        ).then(response => {
+                            console.log('res delete', response)
+                            Swal.fire(
+                                'Deleted!',
+                                'Your file has been deleted.',
+                                'success'
+                            )
+                            fetchInvoices(numPage, rowsCount)
+                        })
+                        .catch(error => {
+                            console.error(error)
+                            ErrorAlert(error.toString(), true)
+                        })
+                    }
+                })
+            }
         }
     }
 
@@ -540,10 +612,40 @@ const InvoicePage = () => {
     }
 
     const handleSaveModal = (payload) => {
+        setLoading(true)
         if(modalType === 'credit') {
+            setLoading(false)
             console.log('save approval credit', payload)
         } else {
             console.log('save delivered', payload)
+            let body = {
+                "rowStatus": "ACT",
+                "countryId": 101,
+                "companyId": 32,
+                "branchId": 12,
+                "user": "luna",
+                "id": SelectedData.id,
+                "invoiceNo": SelectedData.invoiceNo,
+                "isDelivered": Number(payload.isDelivered),
+                deliveredOn: new Date(payload.deliveredDate).toISOString(),
+                "deliveredRemarks": payload.remarks
+            }
+            axios.put(
+                'https://localhost:7160/Invoice/UpdateStatusDelivered', 
+                body
+            ).then((response) => {
+                setLoading(false)
+                if(response.data.code === 200) {
+                    fetchInvoices(numPage, rowsCount)
+                } else {
+                    ErrorAlert(response.data.message, true)
+                }
+                console.log('res deliv', response)
+            }).catch(error => {
+                setLoading(false)
+                console.error(error)
+                ErrorAlert(error.toString(), true)
+            })
         }
     }
 
@@ -560,8 +662,12 @@ const InvoicePage = () => {
         if(!SelectedData.id) {
             ErrorAlert("Please Select Data!")
         } else {
-            setModalType('delivered')
-            setOpenModal(true)
+            if(SelectedData.isDelivered === true) {
+                ErrorAlert('Has been delivered')
+            } else {
+                setModalType('delivered')
+                setOpenModal(true)
+            }
         }
     }
 
@@ -641,6 +747,7 @@ const InvoicePage = () => {
                                 handleSave={e => handleSaveModal(e)} 
                                 type={modalType} 
                                 resetType={() => setModalType('')}
+                                selectedData={SelectedData}
                                 />
 
                                 <thead className='text-center text-infoss'>

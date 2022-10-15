@@ -117,13 +117,15 @@ const style = {
   overflowY: "scroll",
 };
 
-function ChildModal() {
+function ChildModal(props) {
     const [open, setOpen] = React.useState(false);
-    const [accountCode, setAccountCode] = useState('')
+    // const [accountCode, setAccountCode] = useState('')
     let accountData = []
 
     const handleOpen = () => {
-        setOpen(true);
+        if(props.isEdit === false) {
+            setOpen(true);
+        }
     };
     const handleClose = () => {
         setOpen(false);
@@ -133,8 +135,8 @@ function ChildModal() {
         <React.Fragment>
             <TextField
             onClick={handleOpen}
-            value={accountCode}
-            onChange={e => setAccountCode(e.target.value)} 
+            value={props.accountCode}
+            onChange={e => props.setAccountCode(e.target.value)} 
             id="account-code" 
             label="Code" 
             variant="filled" 
@@ -236,16 +238,32 @@ export default function NestedModal(props) {
     const [checked, setChecked] = useState(false)
     const [signRadio, setSignRadio] = useState(true)
     const [vat, setVat] = useState('')
-    const [quantity, setQuantity] = useState('')
-    const [cost, setCost] = useState('')
-    const [rate, setRate] = useState('')
-    const [amount, setAmount] = useState('')
-    const [originalUsd, setOriginalUsd] = useState('')
+    const [quantity, setQuantity] = useState(0)
+    const [cost, setCost] = useState(0)
+    const [rate, setRate] = useState(0)
+    const [amount, setAmount] = useState(0)
+    const [originalUsd, setOriginalUsd] = useState(0)
 
     useEffect(() => {
         setShipperNo(props.shipperNo)
         setShipperName(props.shipperName)
-    }, [props.shipperNo, props.shipperName])
+
+        if(props.edit === true) {
+            let temp = props.selected
+            setAccountId(temp.accountId)
+            setAccountName(temp.accountName)
+            setDescription(temp.description)
+            setCurrencyRadio(temp.type)
+            setChecked(temp.isCostToCost)
+            setSignRadio(temp.sign)
+            setVat(temp.percentVat)
+            setQuantity(temp.quantity)
+            setCost(temp.perQty)
+            setRate(temp.originalRate)
+            setAmount(temp.amount)
+            setOriginalUsd(temp.originalUsd)
+        }
+    }, [props.shipperNo, props.shipperName, props.selected, props.edit])
 
     const handleClose = () => {
         setShipperNo('')
@@ -258,11 +276,11 @@ export default function NestedModal(props) {
         setChecked(false)
         setSignRadio(true)
         setVat('')
-        setQuantity('')
-        setCost('')
-        setRate('')
-        setAmount('')
-        setOriginalUsd('')
+        setQuantity(0)
+        setCost(0)
+        setRate(0)
+        setAmount(0)
+        setOriginalUsd(0)
         
         props.close()
     };
@@ -274,7 +292,11 @@ export default function NestedModal(props) {
         if(vat === 11 || vat === 1.1) tempVat = vat
 
         let sequence = 1
-        if(props.sequence > 0) sequence = props.sequence + 1
+        if(props.edit === true) {
+            sequence = props.selected.sequence
+        } else {
+            if(props.sequence > 0) sequence = props.sequence + 1
+        }
 
         payload.accountId = accountId
         payload.accountName = accountName
@@ -283,11 +305,11 @@ export default function NestedModal(props) {
         payload.isCostToCost = checked
         payload.sign = signRadio
         payload.percentVat = tempVat
-        payload.quantity = quantity.length > 0 ? Number(quantity) : 0
-        payload.perQty = cost.length > 0 ? Number(cost) : 0
-        payload.originalRate = rate.length > 0 ? Number(rate) : 0
-        payload.amount = amount.length > 0 ? Number(amount) : 0
-        payload.originalUsd = originalUsd.length > 0 ? Number(originalUsd) : 0
+        payload.quantity = quantity
+        payload.perQty = cost
+        payload.originalRate = rate
+        payload.amount = amount
+        payload.originalUsd = originalUsd
         payload.invoiceDetailProfitShares = []
         payload.invoiceDetailStorages = []
         payload.user = 'luna'
@@ -354,7 +376,7 @@ export default function NestedModal(props) {
                         <FormLabel id="account-label">Account :</FormLabel>
                     </Grid>
                     <Grid item xs={3}>
-                        <ChildModal setAccountCode={(e) => setAccountId(e)}/>
+                        <ChildModal setAccountCode={(e) => setAccountId(e)} accountCode={accountId} isEdit={props.edit}/>
                     </Grid>
                     <Grid item xs={7}>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1 }}>
@@ -401,8 +423,8 @@ export default function NestedModal(props) {
                     <Grid item>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1 }}>
                             <RadioGroup row name="currency-radio" value={currencyRadio} onChange={e => setCurrencyRadio(e.target.value)}>
-                                <FormControlLabel value={0} control={<Radio />} label="USD" disabled />
-                                <FormControlLabel value={1} control={<Radio />} label="IDR" disabled />
+                                <FormControlLabel value={0} control={<Radio />} label="USD" />
+                                <FormControlLabel value={1} control={<Radio />} label="IDR" />
                             </RadioGroup>
                         </Box>
                     </Grid>
@@ -451,8 +473,8 @@ export default function NestedModal(props) {
                     </Grid>
                     <Grid item xs={3}>
                         <RadioGroup row name="sign-radio" value={signRadio} onChange={e => setSignRadio(e.target.value)}>
-                            <FormControlLabel value={true} control={<Radio />} label="+" disabled />
-                            <FormControlLabel value={false} control={<Radio />} label="-" disabled />
+                            <FormControlLabel value={true} control={<Radio />} label="+" />
+                            <FormControlLabel value={false} control={<Radio />} label="-" />
                         </RadioGroup>
                     </Grid>
                     <Grid item xs={2}>
