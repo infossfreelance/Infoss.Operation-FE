@@ -10,7 +10,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { dateFormat } from '../../../helpers/constant';
+// import { dateFormat } from '../../../helpers/constant';
 import { Dropdown, Pagination } from 'react-bootstrap'
 import axios from 'axios'
 
@@ -47,7 +47,7 @@ const style = {
 
 const selectedStyle = { bgcolor: (theme) => theme.palette.primary.main }
 
-const ModalListShipmentOrderInvoice = (props) => {
+const ModalTableInvoice = (props) => {
     // const [dataList, setDataList] = useState(dummy)
     const [selectedData, setSelectedData] = useState({})
     const [rowsCount, setRowsCount] = useState(50)
@@ -141,12 +141,28 @@ const ModalListShipmentOrderInvoice = (props) => {
         }
     }
 
+    const renderTitle = () => {
+      if(props.type === 'shipment') {
+        return (
+          <h4>List Shipment Order</h4>
+        )
+      } else if(props.type === 'contact') {
+        return (
+          <h4>List Customer</h4>
+        )
+      } else if(props.type === 'revised') {
+        return (
+          <h4>List Revised Tax Invoice</h4>
+        )
+      }
+    }
+
     return (
         <Modal open={props.open} onClose={handleClose}>
             <Grid container spacing={1} flexDirection='column' sx={ style }>
                 <Grid item container flex flexDirection='row' justifyContent='space-between' alignItems='center'>
                     <Grid item>
-                        <h4>List Shipment Order</h4>
+                        {renderTitle()}
                     </Grid>
                     <Grid item>
                         <Button variant='outlined' onClick={() => handleClose()} sx={{ mr: 1 }}>
@@ -247,4 +263,4 @@ const ModalListShipmentOrderInvoice = (props) => {
     )
 }
 
-export default ModalListShipmentOrderInvoice
+export default ModalTableInvoice
