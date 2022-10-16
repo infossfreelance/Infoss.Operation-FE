@@ -21,6 +21,7 @@ import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import { NumericFormat } from 'react-number-format';
 
 const invoiceDetailTemp = [
     {
@@ -441,12 +442,16 @@ export default function NestedModal(props) {
                         <FormLabel id="quantity-label">Quantity Unit :</FormLabel>
                     </Grid>
                     <Grid item xs={10}>
-                        <TextField
-                        id='quantity'
-                        variant='standard'
-                        placeholder='0.0000'
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        onValueChange={(values, sourceInfo) => {
+                            setQuantity(values.floatValue)
+                        }}
                         value={quantity}
-                        onChange={e => setQuantity(e.target.value)}
+                        id="quantity"
+                        variant='standard'
                         />
                     </Grid>
                 </Grid>
@@ -455,13 +460,33 @@ export default function NestedModal(props) {
                         <FormLabel id="quantity-label">Per Unit Cost :</FormLabel>
                     </Grid>
                     <Grid item xs={4}>
-                        <TextField id='unit-cost' placeholder='0.00' variant='standard' value={cost} onChange={e => setCost(e.target.value)} />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        onValueChange={(values, sourceInfo) => {
+                            setCost(values.floatValue)
+                        }}
+                        value={cost}
+                        id="unit-cost"
+                        variant='standard'
+                        />
                     </Grid>
                     <Grid item xs={2}>
                         <FormLabel id="rate-label">Original Rate :</FormLabel>
                     </Grid>
                     <Grid item xs={4}>
-                        <TextField id='original-rate' placeholder='0.00' variant='standard' value={rate} onChange={e => setRate(e.target.value)} />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        onValueChange={(values, sourceInfo) => {
+                            setRate(values.floatValue)
+                        }}
+                        value={rate}
+                        id="original-rate"
+                        variant='standard'
+                        />
                     </Grid>
                 </Grid>
                 <Grid item container flexDirection={'row'} justifyContent='center' spacing={2} xs={12}>
@@ -469,7 +494,17 @@ export default function NestedModal(props) {
                         <FormLabel id="amount-label">Amount :</FormLabel>
                     </Grid>
                     <Grid item xs={2}>
-                        <TextField id='amount' placeholder='0.00' variant='standard' value={amount} onChange={e => setAmount(e.target.value)} />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        onValueChange={(values, sourceInfo) => {
+                            setAmount(values.floatValue)
+                        }}
+                        value={amount}
+                        id="amount"
+                        variant='standard'
+                        />
                     </Grid>
                     <Grid item xs={3}>
                         <RadioGroup row name="sign-radio" value={signRadio} onChange={e => setSignRadio(e.target.value)}>
@@ -481,7 +516,17 @@ export default function NestedModal(props) {
                         <FormLabel id="usd-label">Original USD :</FormLabel>
                     </Grid>
                     <Grid item xs={3}>
-                        <TextField id='original-usd' placeholder='0.00' variant='standard' value={originalUsd} onChange={e => setOriginalUsd(e.target.value)}/>
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        onValueChange={(values, sourceInfo) => {
+                            setOriginalUsd(values.floatValue)
+                        }}
+                        value={originalUsd}
+                        id="original-usd"
+                        variant='standard'
+                        />
                     </Grid>
                 </Grid>
                 <Grid item container flexDirection={'row'} justifyContent='center' spacing={2} xs={12}>

@@ -39,6 +39,7 @@ import axios from 'axios'
 import {API_URL, dateFormat} from '../../../helpers/constant';
 import Swal from 'sweetalert2';
 import NestedModal from "./modalInvoiceDetails";
+import { NumericFormat } from 'react-number-format';
 
 const succesAlert = (text) => {
     Swal.fire({
@@ -687,6 +688,15 @@ const CreateInvoicePage = () => {
                 payload
             ).then(response => {
                 console.log('res update', response)
+                
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Update Data Success',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+
                 history('/booking/invoice')
             }).catch(error => console.error(error))
         } else {
@@ -730,7 +740,7 @@ const CreateInvoicePage = () => {
                         "packingListNo": packingListNo,
                         "siCustomerNo": siCustomerNo,
                         "isStampDuty": isStampDuty,
-                        "stampDutyAmount": stampDutyAmount,
+                        "stampDutyAmount": isStampDuty === true ? stampDutyAmount : 0,
                         transactionDate: new Date().toISOString()
                     },
                     invoiceDetails
@@ -741,6 +751,15 @@ const CreateInvoicePage = () => {
                     templateInvoice
                 ).then(response => {
                     console.log('res create', response)
+
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Create Data Success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+
                     history('/booking/invoice')
                 })
                 .catch(error => console.error(error))
@@ -763,20 +782,23 @@ const CreateInvoicePage = () => {
     const renderStamp = () => {
         if(isStampDuty === 'true') {
             return (
-                <TextField 
+                <NumericFormat 
+                customInput={TextField} 
+                thousandSeparator="," 
+                suffix={'.00'} 
+                label='Amount'
+                onValueChange={(values, sourceInfo) => {
+                    setStampDutyAmount(values.floatValue)
+                }}
                 value={stampDutyAmount}
-                onChange={e => setStampDutyAmount(e.target.value)}
-                variant="standard" 
-                label="Amount" 
                 id="invoice-stamp-duty"
                 />
             )
         } else {
             return (
                 <TextField 
-                value={stampDutyAmount}
-                onChange={e => setStampDutyAmount(e.target.value)}
-                variant="filled" 
+                value={'0.00'}
+                variant="filled"
                 disabled
                 label="Amount" 
                 id="invoice-stamp-duty"
@@ -1383,8 +1405,12 @@ const CreateInvoicePage = () => {
                                                 sx={selectedDetail.sequence === el.sequence ? selectedStyle : {}}>
                                                     <TableCell>{el.sequence}</TableCell>
                                                     <TableCell>{el.description}</TableCell>
-                                                    <TableCell>{el.amount}</TableCell>
-                                                    <TableCell>{el.amount}</TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                    </TableCell>
                                                     <TableCell>{el.percentVat}%</TableCell>
                                                     <TableCell>{el.sign === true ? '+' : '-'}</TableCell>
                                                     <TableCell>{el.isCostToCost === true ? 'Yes' : 'No'}</TableCell>
@@ -1462,16 +1488,64 @@ const CreateInvoicePage = () => {
                         </Box>
                     </Grid>
                     <Grid item>
-                        <TextField value={paymentUSD} onChange={e => setPaymentUSD(e.target.value)} id="payment-usd" label="Payment USD" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Payment USD'
+                        onValueChange={(values, sourceInfo) => {
+                            setPaymentUSD(values.floatValue)
+                        }}
+                        value={paymentUSD}
+                        id="payment-usd"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={paymentIDR} onChange={e => setPaymentIDR(e.target.value)} id="payment-idr" label="Payment IDR" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Payment IDR'
+                        onValueChange={(values, sourceInfo) => {
+                            setPaymentIDR(values.floatValue)
+                        }}
+                        value={paymentIDR}
+                        id="payment-idr"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={totalVATUSD} onChange={e => setTotalVATUSD(e.target.value)} id="vat-usd" label="Total Vat USD" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Total Vat USD'
+                        onValueChange={(values, sourceInfo) => {
+                            setTotalVATUSD(values.floatValue)
+                        }}
+                        value={totalVATUSD}
+                        id="vat-usd"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={totalVATIDR} onChange={e => setTotalVATIDR(e.target.value)} id="vat-idr" label="Total Vat IDR" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Total Vat IDR'
+                        onValueChange={(values, sourceInfo) => {
+                            setTotalVATIDR(values.floatValue)
+                        }}
+                        value={totalVATIDR}
+                        id="vat-idr"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                 </Grid>
                 <Grid container spacing={2} flexDirection="row" alignItems="center">

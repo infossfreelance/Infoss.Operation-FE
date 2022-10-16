@@ -9,6 +9,6 @@ export function numFormat(num) {
     return new Intl.NumberFormat('de-DE').format(num)
 }
 export function dateFormat(date) {
-    let formatCode = 'dd MMMM yyyy'
+    let formatCode = 'dd/MM/yyyy'
     return format(new Date(date), formatCode, { locale: enUS })
 }
