@@ -736,7 +736,7 @@ const InvoicePage = () => {
                         <Button variant="outline-infoss" className='btn-sm' onClick={() => handleOpenModalCredit()}>
                             <DoneOutlineIcon /> Approval Credit
                         </Button>
-                        <Button variant="outline-infoss" className='btn-sm'>
+                        <Button variant="outline-infoss" className='btn-sm' onClick={() => history('/booking/invoice/journal')}>
                             <SummarizeIcon /> Journal
                         </Button>
                     </Stack>
