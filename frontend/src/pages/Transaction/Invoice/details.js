@@ -39,6 +39,7 @@ import axios from 'axios'
 import {API_URL, dateFormat} from '../../../helpers/constant';
 import Swal from 'sweetalert2';
 import NestedModal from "./modalInvoiceDetails";
+import { NumericFormat } from 'react-number-format';
 
 const succesAlert = (text) => {
     Swal.fire({
@@ -517,9 +518,15 @@ const CreateInvoicePage = () => {
     const [headerRevised, setHeaderRevised] = useState(revisedHeadersDummy)
     const [dataRevised, setDataRevised] = useState({})
     const [openStorage, setOpenStorage] = useState(false)
+    const [openHf, setOpenHf] = useState(false)
+    const [openPs, setOpenPs] = useState(false)
     const [selectedStorage, setSelectedStorage] = useState({})
+    const [selectedHf, setSelectedHf] = useState({})
+    const [selectedPs, setSelectedPs] = useState({})
     const [headerStorage, setHeaderStorage] = useState(storageHeadersDummy)
     const [dataStorage, setDataStorage] = useState([])
+    const [dataHf, setDataHf] = useState([])
+    const [dataPs, setDataPs] = useState([])
     const [openModalDetail, setOpenModalDetail] = useState(false)
     const [detailSequence, setDetailSequence] = useState(0)
     const [selectedDetail, setSelectedDetail] = useState({})
@@ -528,6 +535,7 @@ const CreateInvoicePage = () => {
     const [billId, setBillId] = useState('')
     const [billName, setBillName] = useState('')
     const [billAddress, setBillAddress] = useState('')
+    const [detailMap, setDetailMap] = useState([])
 
     useEffect(() => {
         getShipmentOrder(50, 1)
@@ -552,6 +560,14 @@ const CreateInvoicePage = () => {
         console.log('fetch invoice details storage')
     }
 
+    const fetchHf = (rowsCount = 50, NumPage = 1) => {
+        console.log('fetch invoice details HF')
+    }
+
+    const fetchPs = (rowsCount = 50, NumPage = 1) => {
+        console.log('fetch invoice details PS')
+    }
+
     const fetchRevised = (rowsCount = 50, NumPage = 1) => {
         console.log('fetch revised invoice tax number')
     }
@@ -569,7 +585,17 @@ const CreateInvoicePage = () => {
         ).then(response => {
             console.log('data edit', response)
             setInvoiceDetails(response.data.data.invoiceDetails)
+
             let tempDetail = response.data.data.invoiceDetails
+            
+            const cleanFunction = (detail) => {
+                if(detail.rowStatus !== 'DEL' && detail.rowStatus !== 'DED') {
+                    return detail
+                }
+            }
+            const cleanDetail = tempDetail.filter(cleanFunction)
+            setDetailMap(cleanDetail)
+
             if(tempDetail.length > 0) {
                 setDetailSequence(tempDetail[tempDetail.length-1].sequence)
             }
@@ -662,6 +688,15 @@ const CreateInvoicePage = () => {
                 payload
             ).then(response => {
                 console.log('res update', response)
+                
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Update Data Success',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+
                 history('/booking/invoice')
             }).catch(error => console.error(error))
         } else {
@@ -705,7 +740,8 @@ const CreateInvoicePage = () => {
                         "packingListNo": packingListNo,
                         "siCustomerNo": siCustomerNo,
                         "isStampDuty": isStampDuty,
-                        "stampDutyAmount": stampDutyAmount
+                        "stampDutyAmount": isStampDuty === true ? stampDutyAmount : 0,
+                        transactionDate: new Date().toISOString()
                     },
                     invoiceDetails
                 }
@@ -715,6 +751,15 @@ const CreateInvoicePage = () => {
                     templateInvoice
                 ).then(response => {
                     console.log('res create', response)
+
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Create Data Success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+
                     history('/booking/invoice')
                 })
                 .catch(error => console.error(error))
@@ -737,20 +782,23 @@ const CreateInvoicePage = () => {
     const renderStamp = () => {
         if(isStampDuty === 'true') {
             return (
-                <TextField 
+                <NumericFormat 
+                customInput={TextField} 
+                thousandSeparator="," 
+                suffix={'.00'} 
+                label='Amount'
+                onValueChange={(values, sourceInfo) => {
+                    setStampDutyAmount(values.floatValue)
+                }}
                 value={stampDutyAmount}
-                onChange={e => setStampDutyAmount(e.target.value)}
-                variant="standard" 
-                label="Amount" 
                 id="invoice-stamp-duty"
                 />
             )
         } else {
             return (
                 <TextField 
-                value={stampDutyAmount}
-                onChange={e => setStampDutyAmount(e.target.value)}
-                variant="filled" 
+                value={'0.00'}
+                variant="filled"
                 disabled
                 label="Amount" 
                 id="invoice-stamp-duty"
@@ -774,7 +822,6 @@ const CreateInvoicePage = () => {
     const saveDetail = (payload) => {
         if(detailEdit === true) {
             const newArr = invoiceDetails.slice()
-            console.log('new arr', newArr)
             newArr.forEach(el =>  {
                 if(el.sequence === payload.sequence) {
                     el.accountId = payload.accountId
@@ -792,11 +839,21 @@ const CreateInvoicePage = () => {
                 }
             })
             setInvoiceDetails(newArr)
+
+            const cleanFunction = (detail) => {
+                if(detail.rowStatus !== 'DEL' && detail.rowStatus !== 'DED') {
+                    return detail
+                }
+            }
+            const cleanDetail = newArr.filter(cleanFunction)
+            setDetailMap(cleanDetail)
+
             setDetailEdit(false)
             setSelectedDetail({})
         } else {
             setDetailSequence(payload.sequence)
             setInvoiceDetails(arr => [...arr, payload])
+            setDetailMap(arr => [...arr, payload])
         }
     }
 
@@ -822,13 +879,31 @@ const CreateInvoicePage = () => {
             )
         } else {
             let tempSequence = selectedDetail.sequence
+
+            let newArr = invoiceDetails.slice()
+            newArr.forEach(el =>  {
+                if(el.sequence === tempSequence) {
+                    el.rowStatus = 'DEL'
+                }
+            })
+            setInvoiceDetails(newArr)
+
             setSelectedDetail({})
-            
-            const deleteFunction = (invoices) => {
-                return invoices.sequence !== tempSequence
+
+            const cleanFunction = (detail) => {
+                if(detail.rowStatus !== 'DEL' && detail.rowStatus !== 'DED') {
+                    return detail
+                }
             }
-            const result = invoiceDetails.filter(deleteFunction)
-            setInvoiceDetails(result)
+            const cleanDetail = newArr.filter(cleanFunction)
+            setDetailMap(cleanDetail)
+            
+            //CARA LAMA SEMUA DETAIL DI DELETE LANGSUNG HILANG
+            // const deleteFunction = (invoices) => {
+            //     return invoices.sequence !== tempSequence
+            // }
+            // const result = invoiceDetails.filter(deleteFunction)
+            // setInvoiceDetails(result)
         }
     }
 
@@ -1023,6 +1098,29 @@ const CreateInvoicePage = () => {
                 bodyData={dataStorage}
                 fetchData={(r, p) => fetchStorage(r, p)}
                 maxPage={1}
+                type={'storage'}
+                />
+
+                <ModalTableInvoice 
+                open={openHf} 
+                onClose={() => setOpenHf(false)} 
+                setSelectedData={(e) => setSelectedHf(e)}
+                headersData={headerStorage}
+                bodyData={dataHf}
+                fetchData={(r, p) => fetchHf(r, p)}
+                maxPage={1}
+                type={'hf'}
+                />
+
+                <ModalTableInvoice 
+                open={openPs} 
+                onClose={() => setOpenPs(false)} 
+                setSelectedData={(e) => setSelectedPs(e)}
+                headersData={headerStorage}
+                bodyData={dataPs}
+                fetchData={(r, p) => fetchPs(r, p)}
+                maxPage={1}
+                type={'ps'}
                 />
 
                 <NestedModal 
@@ -1297,9 +1395,9 @@ const CreateInvoicePage = () => {
                                 </TableHead>
                                 <TableBody>
                                     {
-                                        invoiceDetails.length > 0 
+                                        detailMap.length > 0 
                                         ?
-                                        invoiceDetails.map((el, index) => {
+                                        detailMap.map((el) => {
                                             return (
                                                 <TableRow 
                                                 key={el.sequence} 
@@ -1307,8 +1405,12 @@ const CreateInvoicePage = () => {
                                                 sx={selectedDetail.sequence === el.sequence ? selectedStyle : {}}>
                                                     <TableCell>{el.sequence}</TableCell>
                                                     <TableCell>{el.description}</TableCell>
-                                                    <TableCell>{el.amount}</TableCell>
-                                                    <TableCell>{el.amount}</TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                    </TableCell>
                                                     <TableCell>{el.percentVat}%</TableCell>
                                                     <TableCell>{el.sign === true ? '+' : '-'}</TableCell>
                                                     <TableCell>{el.isCostToCost === true ? 'Yes' : 'No'}</TableCell>
@@ -1359,12 +1461,12 @@ const CreateInvoicePage = () => {
                                     ?
                                     <>
                                         <Grid item>
-                                            <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
+                                            <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenPs(true)}>
                                                 add ps
                                             </Button>
                                         </Grid>
                                         <Grid item>
-                                            <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
+                                            <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenHf(true)}>
                                                 add hf
                                             </Button>
                                         </Grid>
@@ -1386,16 +1488,64 @@ const CreateInvoicePage = () => {
                         </Box>
                     </Grid>
                     <Grid item>
-                        <TextField value={paymentUSD} onChange={e => setPaymentUSD(e.target.value)} id="payment-usd" label="Payment USD" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Payment USD'
+                        onValueChange={(values, sourceInfo) => {
+                            setPaymentUSD(values.floatValue)
+                        }}
+                        value={paymentUSD}
+                        id="payment-usd"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={paymentIDR} onChange={e => setPaymentIDR(e.target.value)} id="payment-idr" label="Payment IDR" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Payment IDR'
+                        onValueChange={(values, sourceInfo) => {
+                            setPaymentIDR(values.floatValue)
+                        }}
+                        value={paymentIDR}
+                        id="payment-idr"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={totalVATUSD} onChange={e => setTotalVATUSD(e.target.value)} id="vat-usd" label="Total Vat USD" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Total Vat USD'
+                        onValueChange={(values, sourceInfo) => {
+                            setTotalVATUSD(values.floatValue)
+                        }}
+                        value={totalVATUSD}
+                        id="vat-usd"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={totalVATIDR} onChange={e => setTotalVATIDR(e.target.value)} id="vat-idr" label="Total Vat IDR" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Total Vat IDR'
+                        onValueChange={(values, sourceInfo) => {
+                            setTotalVATIDR(values.floatValue)
+                        }}
+                        value={totalVATIDR}
+                        id="vat-idr"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                 </Grid>
                 <Grid container spacing={2} flexDirection="row" alignItems="center">

@@ -66,6 +66,7 @@ const ModalTableInvoice = (props) => {
     }
 
     const saveSelectedData = () => {
+      if(selectedData.id || selectedData.contactId) {
         props.setSelectedData(selectedData)
         if(props.type === 'shipment') {
           let body = {
@@ -75,7 +76,7 @@ const ModalTableInvoice = (props) => {
             "branchId": 12
           }
           axios.post(
-            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostById?id=1`,
+            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostById?id=${selectedData.id}`,
             body
           ).then(res => {
             console.log('SO detail', res)
@@ -86,6 +87,12 @@ const ModalTableInvoice = (props) => {
         }
 
         handleClose()
+      }
+    }
+
+    const filterTable = (key, val) => {
+      console.log('key', key)
+      console.log('value', val)
     }
 
     const renderPagination = () => {
@@ -154,6 +161,18 @@ const ModalTableInvoice = (props) => {
         return (
           <h4>List Revised Tax Invoice</h4>
         )
+      } else if(props.type === 'storage') {
+        return (
+          <h4>List Storage</h4>
+        )
+      } else if(props.type === 'hf') {
+        return (
+          <h4>List Handling Fee</h4>
+        )
+      } else {
+        return (
+          <h4>List Profit Share</h4>
+        )
       }
     }
 
@@ -204,7 +223,7 @@ const ModalTableInvoice = (props) => {
                                     {
                                       props.headersData.map((el, index) => {
                                         return (
-                                          <TableCell key={index}>
+                                          <TableCell key={index} onChange={(e) => filterTable(el.column, e.target.value)}>
                                             <input  className="form-control col-search-form border-infoss" />
                                           </TableCell>
                                         )

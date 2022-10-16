@@ -36,6 +36,7 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios'
 import {API_URL, dateFormat} from '../../../helpers/constant';
+import { NumericFormat } from 'react-number-format';
 
 function a11yProps(index) {
     return {
@@ -218,20 +219,20 @@ const ViewInvoicePage = () => {
     const renderStamp = () => {
         if(isStampDuty === 'true') {
             return (
-                <TextField 
+                <NumericFormat 
+                customInput={TextField} 
+                thousandSeparator="," 
+                suffix={'.00'} 
+                label='Amount'
                 value={stampDutyAmount}
-                onChange={e => setStampDutyAmount(e.target.value)}
-                variant="standard" 
-                label="Amount" 
                 id="invoice-stamp-duty"
                 />
             )
         } else {
             return (
                 <TextField 
-                value={stampDutyAmount}
-                onChange={e => setStampDutyAmount(e.target.value)}
-                variant="filled" 
+                value={'0.00'}
+                variant="filled"
                 disabled
                 label="Amount" 
                 id="invoice-stamp-duty"
@@ -511,8 +512,12 @@ const ViewInvoicePage = () => {
                                                 sx={selectedDetail.sequence === el.sequence ? selectedStyle : {}}>
                                                     <TableCell>{el.sequence}</TableCell>
                                                     <TableCell>{el.description}</TableCell>
-                                                    <TableCell>{el.amount}</TableCell>
-                                                    <TableCell>{el.amount}</TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                    </TableCell>
                                                     <TableCell>{el.percentVat}%</TableCell>
                                                     <TableCell>{el.sign === true ? '+' : '-'}</TableCell>
                                                     <TableCell>{el.isCostToCost === true ? 'Yes' : 'No'}</TableCell>
@@ -570,16 +575,52 @@ const ViewInvoicePage = () => {
                         </Box>
                     </Grid>
                     <Grid item>
-                        <TextField value={paymentUSD} onChange={e => setPaymentUSD(e.target.value)} id="payment-usd" label="Payment USD" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Payment USD'
+                        value={paymentUSD}
+                        id="payment-usd"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={paymentIDR} onChange={e => setPaymentIDR(e.target.value)} id="payment-idr" label="Payment IDR" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Payment IDR'
+                        value={paymentIDR}
+                        id="payment-idr"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={totalVATUSD} onChange={e => setTotalVATUSD(e.target.value)} id="vat-usd" label="Total Vat USD" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Total Vat USD'
+                        value={totalVATUSD}
+                        id="vat-usd"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={totalVATIDR} onChange={e => setTotalVATIDR(e.target.value)} id="vat-idr" label="Total Vat IDR" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Total Vat IDR'
+                        value={totalVATIDR}
+                        id="vat-idr"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                 </Grid>
                 <Grid container spacing={2} flexDirection="row" alignItems="center">

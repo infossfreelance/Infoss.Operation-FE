@@ -700,7 +700,6 @@ const InvoicePage = () => {
             return data.index === currIndex
         }
         const result = copyArr.filter(changeSelectedData)
-        console.log('result', result)
         setSelectedData(...result)
     }
 
@@ -767,7 +766,7 @@ const InvoicePage = () => {
                 </Grid>
             </Grid>
             <Grid item xs={12} style={{ 'maxWidth': '97vw', 'borderStyle': 'groove', 'borderRadius': '5px', 'marginTop': '10px' }}>
-                <div className='mt-3 border rounded-10 p-2 table-responsive'>
+                <div className='mt-3 border rounded-10 p-2 table-responsive' style={{ 'maxHeight': '500px' }}>
                     {
                         loading ? 
                         <LoadingSpinner /> 
@@ -783,7 +782,7 @@ const InvoicePage = () => {
                                 selectedData={SelectedData}
                                 />
 
-                                <thead className='text-center text-infoss'>
+                                <thead className='text-center text-infoss' style={{ position: 'sticky', top: '-8px', 'background-color': '#fff', 'box-shadow': '0 1px #dee2e6, 0 -1px #dee2e6' }}>
                                     <tr>
                                         {
                                             columnData.map((el, index) => {
