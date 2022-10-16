@@ -203,7 +203,7 @@ const InvoicePage = () => {
     const [rowsCount, setRowsCount] = useState(5)
     const [totalRows, setTotalRows] = useState(5)
     const [SelectedData, setSelectedData] = useState({});
-    const [job, setJob] = useState('');
+    const [job, setJob] = useState(1);
     const [loading, setLoading] = useState(false)
     const [invoices, setInvoices] = useState([])
     const [invoicesMap, setInvoicesMap] = useState([])
@@ -257,7 +257,17 @@ const InvoicePage = () => {
             if(response.data.code === 200) {
                 setSelectedData({})
                 setInvoices(response.data.data.invoices);
-                setInvoicesMap(response.data.data.invoices)
+
+                let temp = response.data.data.invoices
+                let indexed = temp.map((el, index) => {
+                    let indexedTemp = {
+                        ...el,
+                        index
+                    }
+                    return indexedTemp
+                })
+
+                setInvoicesMap(indexed)
                 // setColumnData(response.data.data.columns)
                 setTotalRows(response.data.totalRowCount)
                 setColumnData(
@@ -392,7 +402,7 @@ const InvoicePage = () => {
                 setLoading(false)
             }
         } else {
-            ErrorAlert('Harap pilih data terlebih dahulu')
+            ErrorAlert('Please select data')
         }
     }
 
@@ -451,16 +461,16 @@ const InvoicePage = () => {
                 })
             }
         } else {
-            ErrorAlert('Harap pilih data terlebih dahulu')
+            ErrorAlert('Please select data')
         }
     }
 
     const handleDelete = () => {
         if (SelectedData.id === undefined) {
-            ErrorAlert("Harap pilih data terlebih dahulu")
+            ErrorAlert("Please select data")
         } else {
             if(SelectedData.rowStatus === 'DEL') {
-                ErrorAlert("Data Has Been Deleted")
+                ErrorAlert("Record Has Been Deleted")
             } else {
                 Swal.fire({
                     title: 'Are you sure?',
@@ -653,6 +663,7 @@ const InvoicePage = () => {
         if(!SelectedData.id) {
             ErrorAlert("Please Select Data!")
         } else {
+            console.log(SelectedData)
             setModalType('credit')
             setOpenModal(true)
         }
@@ -669,6 +680,28 @@ const InvoicePage = () => {
                 setOpenModal(true)
             }
         }
+    }
+
+    document.onkeydown = checkKey;
+    function checkKey(e) {
+        let currIndex = 0
+        if(e.keyCode === 38 && SelectedData.index > 0) {
+            //UP ARROW
+            currIndex = SelectedData.index
+            currIndex -= 1
+        } else if(e.keyCode === 40 && SelectedData.index < rowsCount - 1) {
+            //DOWN ARROW
+            currIndex = SelectedData.index
+            currIndex += 1
+        }
+
+        const copyArr = [...invoicesMap]
+        const changeSelectedData = (data) => {
+            return data.index === currIndex
+        }
+        const result = copyArr.filter(changeSelectedData)
+        console.log('result', result)
+        setSelectedData(...result)
     }
 
     return (
@@ -765,7 +798,7 @@ const InvoicePage = () => {
                                     <tr>
                                         {
                                             columnData.map((el, index) => {
-                                                if(el.text === 'Delete') {
+                                                if(el.text === 'Deleted') {
                                                     return (
                                                         <td key={index}> 
                                                             <select className='form-control col-search-form border-infoss'>
@@ -804,7 +837,7 @@ const InvoicePage = () => {
                                             return (
                                                 <tr 
                                                 key={index} 
-                                                onClick={(e) => setSelectedData(el)}
+                                                onClick={() => setSelectedData(el)}
                                                 className={tempStyle}>
                                                     {
                                                        columnData.map((headersEl, indexHeaders) => {

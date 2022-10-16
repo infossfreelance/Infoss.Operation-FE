@@ -69,8 +69,16 @@ function TabPanel(props) {
         customerAddress,
         setCustomerAddress,
         setOpenContacts,
-        isDisabled
+        isDisabled,
+        billId,
+        setBillId,
+        billName,
+        setBillName,
+        billAddress,
+        setBillAddress
     } = props;
+
+    const [addressLock, setAddressLock] = useState(true)
 
     return (
         <div
@@ -85,46 +93,104 @@ function TabPanel(props) {
                     <Grid item>
                         <FormLabel id="invoice-tabs">{children}</FormLabel>
                     </Grid>
-                    <Grid container item spacing={2} direction="row" xs={12}>
-                        <Grid item xs={4}>
-                            <TextField 
-                            id="tab-number" 
-                            label="Number" 
-                            variant="filled" 
-                            aria-labelledby="invoice-tabs" 
-                            disabled
-                            value={customerId}
-                            onChange={e => setCustomerId(e.target.value)}
-                            fullWidth
-                            onClick={() => isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)} 
-                            />
-                        </Grid>
-                        <Grid item xs={8}>
-                            <TextField
-                            id="tab-name" 
-                            label="Name" 
-                            variant="filled" 
-                            aria-labelledby="invoice-tabs" 
-                            disabled 
-                            value={customerName}
-                            onChange={e => setCustomerName(e.target.value)}
-                            fullWidth
-                            />
-                        </Grid>
-                    </Grid>
-                    <Grid item>
-                        <TextareaAutosize
-                        maxRows={3}
-                        aria-label="maximum height"
-                        placeholder="Address"
-                        minRows={2}
-                        style={{ width: 400 }}
-                        value={customerAddress}
-                        onChange={e => setCustomerAddress(e.target.value)}
-                        variant='filled'
-                        disabled
-                        />
-                    </Grid>
+                    {
+                        index === 0
+                        ?
+                        <>
+                            <Grid container item spacing={2} direction="row" xs={12}>
+                                <Grid item xs={4}>
+                                    <TextField 
+                                    id="tab-number" 
+                                    label="Number" 
+                                    variant="filled" 
+                                    aria-labelledby="invoice-tabs" 
+                                    disabled
+                                    value={customerId}
+                                    onChange={e => setCustomerId(e.target.value)}
+                                    fullWidth
+                                    onClick={() => isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)} 
+                                    />
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <TextField
+                                    id="tab-name" 
+                                    label="Name" 
+                                    variant="filled" 
+                                    aria-labelledby="invoice-tabs" 
+                                    disabled 
+                                    value={customerName}
+                                    onChange={e => setCustomerName(e.target.value)}
+                                    fullWidth
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid item>
+                                <TextareaAutosize
+                                maxRows={3}
+                                aria-label="maximum height"
+                                placeholder="Address"
+                                minRows={2}
+                                style={{ width: 400 }}
+                                value={customerAddress}
+                                onChange={e => setCustomerAddress(e.target.value)}
+                                variant='filled'
+                                disabled={addressLock}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <Button variant="outlined" color="secondary" onClick={() => setAddressLock(false)}>
+                                    change address
+                                </Button>
+                            </Grid>
+                        </>
+                        :
+                        <>
+                            <Grid container item spacing={2} direction="row" xs={12}>
+                                <Grid item xs={4}>
+                                    <TextField 
+                                    id="tab-number-bill" 
+                                    label="Number" 
+                                    variant="filled" 
+                                    aria-labelledby="invoice-tabs" 
+                                    disabled
+                                    value={billId}
+                                    onChange={e => setBillId(e.target.value)}
+                                    fullWidth
+                                    onClick={() => isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)}
+                                    />
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <TextField
+                                    id="tab-name-bill" 
+                                    label="Name" 
+                                    variant="filled" 
+                                    aria-labelledby="invoice-tabs" 
+                                    disabled 
+                                    value={billName}
+                                    onChange={e => setBillName(e.target.value)}
+                                    fullWidth
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid item>
+                                <TextareaAutosize
+                                maxRows={3}
+                                minRows={2}
+                                placeholder="Address"
+                                style={{ width: 400 }}
+                                value={billAddress}
+                                onChange={e => setBillAddress(e.target.value)}
+                                variant='filled'
+                                disabled={addressLock}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <Button variant="outlined" color="secondary" onClick={() => setAddressLock(false)}>
+                                    change address
+                                </Button>
+                            </Grid>
+                        </>
+                    }
                 </Grid>
             </Box>
         )}
@@ -151,7 +217,7 @@ let templateInvoice = {
       "shipmentId": 123,
       "customerTypeId": 0,
       "customerId": 0,
-      "customerName": "s",
+      "customerName": "tester boy",
       "customerAddress": "s",
       "billId": 0,
       "billName": "s",
@@ -172,20 +238,20 @@ let templateInvoice = {
       "linkTo": "s",
       "dueDate": 0,
       "paid": false,
-      "paidOn": "",
+      "paidOn": "2022-09-26T04:48:42.216Z",
       "saveOR": true,
       "badDebt": true,
       "badDebtOn": "2022-09-26T04:48:42.216Z",
       "reBadDebt": true,
       "dateReBadDebt": "2022-09-26T04:48:42.216Z",
       "printing": 0,
-      "printedOn": "",
-      "deleted": false,
-      "deletedOn": "",
+      "printedOn": "2022-09-26T04:48:42.216Z",
+      "deleted": true,
+      "deletedOn": "2022-09-26T04:48:42.216Z",
       "invoiceNo2": "s",
       "invHeader": 0,
       "exRateId": 0,
-      "rePrintApproved": false,
+      "rePrintApproved": true,
       "rePrintApprovedOn": "2022-09-26T04:48:42.216Z",
       "rePrintApprovedBy": "s",
       "deletedRemarks": "s",
@@ -200,7 +266,7 @@ let templateInvoice = {
       "deleteTypeRefInvId": 0,
       "kursKMK": 0,
       "kursKMKId": 0,
-      "isDelivered": true,
+      "isDelivered": false,
       "deliveredOn": "2022-09-26T04:48:42.216Z",
       "deliveredRemarks": "s",
       "sfpReference": "s",
@@ -359,7 +425,7 @@ let templateInvoice = {
         "createdOn": "2022-09-26T04:48:42.217Z"
       }
     ]
-}
+  }
 
 let revisedHeadersDummy = [
     {
@@ -421,7 +487,7 @@ const CreateInvoicePage = () => {
     const [packingListNo, setPackingListNo] = useState('')
     const [siCustomerNo, setSiCustomerNo] = useState('')
     const [debetCredit, setDebetCredit] = useState('D')
-    const [customerTypeId, setCustomerTypeId] = useState(0)
+    const [customerTypeId, setCustomerTypeId] = useState(2)
     const [customerId, setCustomerId] = useState('')
     const [customerName, setCustomerName] = useState('')
     const [customerAddress, setCustomerAddress] = useState('')
@@ -458,6 +524,10 @@ const CreateInvoicePage = () => {
     const [detailSequence, setDetailSequence] = useState(0)
     const [selectedDetail, setSelectedDetail] = useState({})
     const [detailEdit, setDetailEdit] = useState(false)
+    const [invoiceAgent, setInvoiceAgent] = useState('')
+    const [billId, setBillId] = useState('')
+    const [billName, setBillName] = useState('')
+    const [billAddress, setBillAddress] = useState('')
 
     useEffect(() => {
         getShipmentOrder(50, 1)
@@ -635,15 +705,14 @@ const CreateInvoicePage = () => {
                         "packingListNo": packingListNo,
                         "siCustomerNo": siCustomerNo,
                         "isStampDuty": isStampDuty,
-                        "stampDutyAmount": stampDutyAmount,
-                        
+                        "stampDutyAmount": stampDutyAmount
                     },
                     invoiceDetails
                 }
     
                 axios.post(
                     'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
-                    payload
+                    templateInvoice
                 ).then(response => {
                     console.log('res create', response)
                     history('/booking/invoice')
@@ -659,6 +728,10 @@ const CreateInvoicePage = () => {
         setCustomerName(value.pic)
         setCustomerAddress(value.contactAddress)
         setSelectedContact(value)
+
+        setBillId(value.contactId)
+        setBillName(value.pic)
+        setBillAddress(value.contactAddress)
     }
 
     const renderStamp = () => {
@@ -993,6 +1066,21 @@ const CreateInvoicePage = () => {
 
                             <TextField value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} id="invoice-number" label="Invoice Number" variant="filled" disabled />
 
+                            {
+                                customerTypeId == 5
+                                ?
+                                <TextField 
+                                value={invoiceAgent} 
+                                onChange={e => setInvoiceAgent(e.target.value)} 
+                                id='invoice-agent' 
+                                label='Invoice From Agent Number'
+                                variant="standard"
+                                margin="normal"
+                                />
+                                :
+                                <></>
+                            }
+
                             <Box mt={1}>
                                 <FormLabel id="invoice-print-label">Printing</FormLabel>
                                 <Grid container item spacing={2} direction="row">
@@ -1090,8 +1178,8 @@ const CreateInvoicePage = () => {
                                 value={customerTypeId}
                                 onChange={e => setCustomerTypeId(e.target.value)}
                                 >
-                                    <FormControlLabel value={0} control={<Radio />} label="Shipper" disabled={isDisabled} />
-                                    <FormControlLabel value={1} control={<Radio />} label="Agent" disabled={isDisabled} />
+                                    <FormControlLabel value={2} control={<Radio />} label="Shipper" disabled={isDisabled} />
+                                    <FormControlLabel value={5} control={<Radio />} label="Agent" disabled={isDisabled} />
                                 </RadioGroup>
 
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -1114,7 +1202,18 @@ const CreateInvoicePage = () => {
                                 >
                                     Shipper
                                 </TabPanel>
-                                <TabPanel value={tabValue} index={1}>
+                                <TabPanel 
+                                value={tabValue} 
+                                index={1}
+                                billId={billId}
+                                setBillId={e => setBillId(e)}
+                                billName={billName}
+                                setBillName={e => setBillName(e)}
+                                billAddress={billAddress}
+                                setBillAddress={e => setBillAddress(e)}
+                                isDisabled={isDisabled}
+                                setOpenContacts={e => setOpenContacts(e)}
+                                >
                                     Bill To
                                 </TabPanel>
                             </Box>
@@ -1231,7 +1330,7 @@ const CreateInvoicePage = () => {
                         flexDirection="row"
                         sx={{ mt: 2 }}
                         >
-                            <Grid item container spacing={2} flexDirection="row" xs={10}>
+                            <Grid item container spacing={2} flexDirection="row" xs={6}>
                                 <Grid item>
                                     <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" onClick={() => handleDetailAdd()}>
                                         add
@@ -1249,10 +1348,30 @@ const CreateInvoicePage = () => {
                                 </Grid>
                             </Grid>
 
-                            <Grid item container flexDirection="row-reverse" xs={2}>
-                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
-                                    add storage
-                                </Button>
+                            <Grid item container flexDirection="row-reverse" xs={6} spacing={2}>
+                                    <Grid item>
+                                        <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
+                                            add storage
+                                        </Button>
+                                    </Grid>
+                                {
+                                    customerTypeId == 5
+                                    ?
+                                    <>
+                                        <Grid item>
+                                            <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
+                                                add ps
+                                            </Button>
+                                        </Grid>
+                                        <Grid item>
+                                            <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
+                                                add hf
+                                            </Button>
+                                        </Grid>
+                                    </>
+                                    :
+                                    <></>
+                                }
                             </Grid>
                         </Grid>
                     </Box>
