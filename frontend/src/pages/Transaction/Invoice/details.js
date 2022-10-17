@@ -76,7 +76,8 @@ function TabPanel(props) {
         billName,
         setBillName,
         billAddress,
-        setBillAddress
+        setBillAddress,
+        setContactType
     } = props;
 
     const [addressLock, setAddressLock] = useState(true)
@@ -109,7 +110,13 @@ function TabPanel(props) {
                                     value={customerId}
                                     onChange={e => setCustomerId(e.target.value)}
                                     fullWidth
-                                    onClick={() => isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)} 
+                                    onClick={() => {
+                                        // isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)
+                                        if(isDisabled === false) {
+                                            setOpenContacts(true)
+                                            setContactType('shipper-customer')
+                                        }
+                                    }} 
                                     />
                                 </Grid>
                                 <Grid item xs={8}>
@@ -157,7 +164,12 @@ function TabPanel(props) {
                                     value={billId}
                                     onChange={e => setBillId(e.target.value)}
                                     fullWidth
-                                    onClick={() => isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)}
+                                    onClick={() => {
+                                        if(isDisabled === false) {
+                                            setOpenContacts(true)
+                                            setContactType('shipper-bill')
+                                        }
+                                    }}
                                     />
                                 </Grid>
                                 <Grid item xs={8}>
@@ -536,6 +548,7 @@ const CreateInvoicePage = () => {
     const [billName, setBillName] = useState('')
     const [billAddress, setBillAddress] = useState('')
     const [detailMap, setDetailMap] = useState([])
+    const [contactType, setContactType] = useState('shipper-customer')
 
     useEffect(() => {
         getShipmentOrder(50, 1)
@@ -767,18 +780,24 @@ const CreateInvoicePage = () => {
         }
     }
 
-    const handleSelectContact = (value) => {
+    const handleSelectContact = (value, type) => {
         console.log('select contact', value)
-        setCustomerId(value.contactId)
-        setCustomerName(value.pic)
-        setCustomerAddress(value.contactAddress)
-        setSelectedContact(value)
-
-        setBillId(value.contactId)
-        setBillName(value.pic)
-        setBillAddress(value.contactAddress)
+        console.log('contact type', type)
+        if(type === 'shipper-customer') {
+            setCustomerId(value.contactId)
+            setCustomerName(value.pic)
+            setCustomerAddress(value.contactAddress)
+            setSelectedContact(value)
+        } else if(type === 'shipper-bill') {
+            setBillId(value.contactId)
+            setBillName(value.pic)
+            setBillAddress(value.contactAddress)
+            setSelectedContact(value)
+        }
+        
+        
     }
-
+    
     const renderStamp = () => {
         if(isStampDuty === 'true') {
             return (
@@ -1020,6 +1039,29 @@ const CreateInvoicePage = () => {
         }
     }
 
+    const handleContactType = (value) => {
+        setCustomerTypeId(value)
+        if(value == 2) setDebetCredit('D')
+    }
+
+    const renderDebetCredit = () => {
+        if(customerTypeId == 2) {
+            return (
+                <>
+                    <FormControlLabel value="D" control={<Radio />} label="Debit" disabled />
+                    <FormControlLabel value="C" control={<Radio />} label="Credit" disabled />
+                </>
+            )
+        } else {
+            return (
+                <>
+                    <FormControlLabel value="D" control={<Radio />} label="Debit" />
+                    <FormControlLabel value="C" control={<Radio />} label="Credit" />
+                </>
+            )
+        }
+    }
+
     return (
         <Grid container spacing={2} direction="column">
             <Grid item xs={12}>
@@ -1071,11 +1113,12 @@ const CreateInvoicePage = () => {
                 <ModalTableInvoice 
                 open={openContacts} 
                 onClose={() => setOpenContacts(false)} 
-                setSelectedData={(e) => handleSelectContact(e)}
+                setSelectedData={(data, type) => handleSelectContact(data, type)}
                 headersData={headerContacts}
                 bodyData={dataContacts}
                 fetchData={(r, p) => fetchContact(r, p)}
                 type={'contact'}
+                contactType={contactType}
                 maxPage={maxPageContacts}
                 />
 
@@ -1254,7 +1297,7 @@ const CreateInvoicePage = () => {
                             value={ shipmentData.shipmentNo ? shipmentData.shipmentNo : '' }
                             disabled={isDisabled}
                             />
-
+                            
                             <Box m={1}>
                                 <FormLabel id="invoice-dc-label">Debet / Credit</FormLabel>
                                 <RadioGroup 
@@ -1264,8 +1307,7 @@ const CreateInvoicePage = () => {
                                 value={debetCredit}
                                 onChange={e => setDebetCredit(e.target.value)}
                                 >
-                                    <FormControlLabel value="D" control={<Radio />} label="Debit" disabled />
-                                    <FormControlLabel value="C" control={<Radio />} label="Credit" disabled />
+                                    {renderDebetCredit()}
                                 </RadioGroup>
                             </Box>
 
@@ -1274,7 +1316,7 @@ const CreateInvoicePage = () => {
                                 row 
                                 name="shiper-or-agent-radio"
                                 value={customerTypeId}
-                                onChange={e => setCustomerTypeId(e.target.value)}
+                                onChange={e => handleContactType(e.target.value)}
                                 >
                                     <FormControlLabel value={2} control={<Radio />} label="Shipper" disabled={isDisabled} />
                                     <FormControlLabel value={5} control={<Radio />} label="Agent" disabled={isDisabled} />
@@ -1297,6 +1339,7 @@ const CreateInvoicePage = () => {
                                 setCustomerAddress={e => setCustomerAddress(e)}
                                 setOpenContacts={e => setOpenContacts(e)}
                                 isDisabled={isDisabled}
+                                setContactType={e => setContactType(e)}
                                 >
                                     Shipper
                                 </TabPanel>
@@ -1311,6 +1354,7 @@ const CreateInvoicePage = () => {
                                 setBillAddress={e => setBillAddress(e)}
                                 isDisabled={isDisabled}
                                 setOpenContacts={e => setOpenContacts(e)}
+                                setContactType={e => setContactType(e)}
                                 >
                                     Bill To
                                 </TabPanel>
