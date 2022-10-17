@@ -68,6 +68,11 @@ const ModalTableInvoice = (props) => {
     const saveSelectedData = () => {
       if(selectedData.id || selectedData.contactId) {
         props.setSelectedData(selectedData)
+
+        if(props.contactType) {
+          props.setSelectedData(selectedData, props.contactType)
+        }
+
         if(props.type === 'shipment') {
           let body = {
             "userCode": "luna",

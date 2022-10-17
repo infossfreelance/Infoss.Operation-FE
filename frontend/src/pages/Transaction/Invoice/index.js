@@ -209,6 +209,8 @@ const InvoicePage = () => {
     const [invoicesMap, setInvoicesMap] = useState([])
     const [columnData, setColumnData] = useState([])
     const [modalType, setModalType] = useState('')
+    const [filterJson, setFilterJson] = useState({})
+    const [filterArr, setFilterArr] = useState([])
     const history = useNavigate();
 
     const ErrorAlert = (string, isError = false) => {
@@ -242,13 +244,14 @@ const InvoicePage = () => {
         fetchInvoices(numPage, rowsCount)
     }, [])
 
-    const fetchInvoices = (pageNumber = 1, pageSize = 10) => {
+    const fetchInvoices = (pageNumber = 1, pageSize = 10, filter = []) => {
         setLoading(true)
         const payload = {
             "userCode": "luna",
             "countryId": 101,
             "companyId": 32,
-            "branchId": 12
+            "branchId": 12,
+            filter: filter
         }
         // axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
@@ -280,12 +283,12 @@ const InvoicePage = () => {
                         {
                             "column": "isCostToCost",
                             "text": "Ctc",
-                            "format": ""
+                            "format": "boolean"
                         },
                         {
                             "column": "paid",
                             "text": "Paid",
-                            "format": ""
+                            "format": "boolean"
                         },
                         {
                             "column": "invoiceNo",
@@ -530,45 +533,6 @@ const InvoicePage = () => {
         setJob(event.target.value);
     };
 
-    const filterTable = (key, val) => {
-        console.log(key)
-        console.log(val)
-
-        // if (val === '') {
-        //     setInvoicesMap(invoices)
-        //     return false
-        // } 
-        
-        // let temp = invoices
-        // let arr = [];
-    
-        // if(key === 'delete') {
-        //     invoices.data.forEach((v, k) => {
-        //         console.log(v)
-        //         v.delete.includes(val) && arr.push(v)
-        //     })
-        //     setInvoicesMap(arr)
-        // }
-
-        // if(key === 'type') {
-        //     invoices.data.forEach((v, k) => {
-        //         // console.log(v)
-        //         v.type.includes(val) && arr.push(v)
-        //     })
-        //     temp.data = arr
-        //     setInvoicesMap(temp)
-        // }
-
-        // if(key === 'inv. no.') {
-        //     invoices.data.forEach((v, k) => {
-        //         v.invNo.includes(val) && arr.push(v)
-        //     })
-        //     setInvoicesMap(arr)
-        // }
-
-        // console.log(invoicesMap)
-    }
-
     const renderPagination = () => {
         let MaxPage = 1
         if(invoices.length > 0) {
@@ -682,8 +646,37 @@ const InvoicePage = () => {
         }
     }
 
+    const filterTable = (key, val) => {
+        let filter = filterJson
+        let temp = {
+            field: key,
+            data: val
+        }
+        let arr = []
+
+        if(!filter[key]) {
+            filter[key] = temp
+            setFilterJson(filter)
+        } else {
+            filter[key].data = val
+            setFilterJson(filter)
+        }
+
+        if(filter[key].data.length === 0) {
+            delete filter[key]
+            setFilterJson(filter)
+        }
+
+        for(const key in filter) {
+            arr.push(filter[key])
+        }
+        
+        setFilterArr(arr)
+    }
+
     document.onkeydown = checkKey;
     function checkKey(e) {
+        console.log(e.keyCode)
         let currIndex = 0
         if(e.keyCode === 38 && SelectedData.index > 0) {
             //UP ARROW
@@ -693,6 +686,14 @@ const InvoicePage = () => {
             //DOWN ARROW
             currIndex = SelectedData.index
             currIndex += 1
+        } else if(e.keyCode === 13 && filterArr.length > 0) {
+            //PRESS ENTER
+            //THEN DO FILTER
+            setNumPage(1)
+            setRowsCount(5)
+            fetchInvoices(1, 5, filterArr)
+            setFilterArr([])
+            setFilterJson({})
         }
 
         const copyArr = [...invoicesMap]
@@ -782,7 +783,7 @@ const InvoicePage = () => {
                                 selectedData={SelectedData}
                                 />
 
-                                <thead className='text-center text-infoss' style={{ position: 'sticky', top: '-8px', 'background-color': '#fff', 'box-shadow': '0 1px #dee2e6, 0 -1px #dee2e6' }}>
+                                <thead className='text-center text-infoss' style={{ position: 'sticky', top: '-8px', 'backgroundColor': '#fff', 'boxShadow': '0 1px #dee2e6, 0 -1px #dee2e6' }}>
                                     <tr>
                                         {
                                             columnData.map((el, index) => {
@@ -800,22 +801,42 @@ const InvoicePage = () => {
                                                 if(el.text === 'Deleted') {
                                                     return (
                                                         <td key={index}> 
-                                                            <select className='form-control col-search-form border-infoss'>
-                                                                <option value="all">All</option>
-                                                                <option value="yes">Yes</option>
-                                                                <option value="no">No</option>
+                                                            <select 
+                                                            className='form-control col-search-form border-infoss' 
+                                                            onChange={(e) => filterTable(el.column, e.target.value)}
+                                                            >
+                                                                <option value="ALL">All</option>
+                                                                <option value="DEL">Yes</option>
+                                                                <option value="ACT">No</option>
                                                             </select>
                                                         </td>
                                                     )
                                                 } else {
-                                                    return (
-                                                        <td key={index}>
-                                                            <input 
-                                                            className="form-control col-search-form border-infoss" 
-                                                            onChange={(e) => filterTable(el.column, e.target.value)} 
-                                                            style={{ 'minWidth': '100px' }}/>
-                                                        </td> 
-                                                    )
+                                                    if(el.format === 'boolean') {
+                                                        return (
+                                                            <td key={index}> 
+                                                                <select 
+                                                                className='form-control col-search-form border-infoss' 
+                                                                onChange={(e) => filterTable(el.column, e.target.value)}
+                                                                style={{ 'minWidth': '50px' }}
+                                                                >
+                                                                    <option value="ALL">All</option>
+                                                                    <option value="true">Yes</option>
+                                                                    <option value="false">No</option>
+                                                                </select>
+                                                            </td>
+                                                        )
+                                                    } else {
+                                                        return (
+                                                            <td key={index}>
+                                                                <input 
+                                                                className="form-control col-search-form border-infoss" 
+                                                                onChange={(e) => filterTable(el.column, e.target.value)} 
+                                                                style={{ 'minWidth': '100px' }}
+                                                                />
+                                                            </td> 
+                                                        )
+                                                    }
                                                 }
                                             })
                                         }
