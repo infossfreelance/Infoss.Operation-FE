@@ -253,8 +253,9 @@ const InvoicePage = () => {
             "branchId": 12,
             filter: filter
         }
+        // axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         // axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
-        axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        axios.post(`https://localhost:7160/Invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         .then((response) => {
             console.log('response fetch invoice', response)
             if(response.data.code === 200) {
@@ -271,77 +272,77 @@ const InvoicePage = () => {
                 })
 
                 setInvoicesMap(indexed)
-                // setColumnData(response.data.data.columns)
+                setColumnData(response.data.data.columns)
                 setTotalRows(response.data.totalRowCount)
-                setColumnData(
-                    [
-                        {
-                            "column": "rowStatus",
-                            "text": "Deleted",
-                            "format": ""
-                        },
-                        {
-                            "column": "isCostToCost",
-                            "text": "Ctc",
-                            "format": "boolean"
-                        },
-                        {
-                            "column": "paid",
-                            "text": "Paid",
-                            "format": "boolean"
-                        },
-                        {
-                            "column": "invoiceNo",
-                            "text": "InvoiceNo",
-                            "format": ""
-                        },
-                        {
-                            "column": "customerName",
-                            "text": "CustomerName",
-                            "format": ""
-                        },
-                        {
-                            "column": "siCustomerNo",
-                            "text": "SiCustomerNo",
-                            "format": ""
-                        },
-                        {
-                            "column": "isDelivered",
-                            "text": "IsDelivered",
-                            "format": ""
-                        },
-                        {
-                            "column": "deliveredOn",
-                            "text": "deliveredOn",
-                            "format": "date"
-                        },
-                        {
-                            "column": "printing",
-                            "text": "Print",
-                            "format": ""
-                        },
-                        {
-                            column: 'printedOn',
-                            text: 'Print Date',
-                            format: 'date'
-                        },
-                        {
-                            column: 'rePrintApproved',
-                            text: 'RePrint Approved',
-                            format: ''
-                        },
-                        {
-                            column: 'rePrintApprovedBy',
-                            text: 'Approved By',
-                            format: ''
-                        },
-                        {
-                            column: 'rePrintApprovedOn',
-                            text: 'Approved On',
-                            format: 'date'
-                        },
-                    ]
-                )
+                // setColumnData(
+                //     [
+                //         {
+                //             "column": "rowStatus",
+                //             "text": "Deleted",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "isCostToCost",
+                //             "text": "Ctc",
+                //             "format": "boolean"
+                //         },
+                //         {
+                //             "column": "paid",
+                //             "text": "Paid",
+                //             "format": "boolean"
+                //         },
+                //         {
+                //             "column": "invoiceNo",
+                //             "text": "InvoiceNo",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "customerName",
+                //             "text": "CustomerName",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "siCustomerNo",
+                //             "text": "SiCustomerNo",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "isDelivered",
+                //             "text": "IsDelivered",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "deliveredOn",
+                //             "text": "deliveredOn",
+                //             "format": "date"
+                //         },
+                //         {
+                //             "column": "printing",
+                //             "text": "Print",
+                //             "format": ""
+                //         },
+                //         {
+                //             column: 'printedOn',
+                //             text: 'Print Date',
+                //             format: 'date'
+                //         },
+                //         {
+                //             column: 'rePrintApproved',
+                //             text: 'RePrint Approved',
+                //             format: ''
+                //         },
+                //         {
+                //             column: 'rePrintApprovedBy',
+                //             text: 'Approved By',
+                //             format: ''
+                //         },
+                //         {
+                //             column: 'rePrintApprovedOn',
+                //             text: 'Approved On',
+                //             format: 'date'
+                //         },
+                //     ]
+                // )
                 setLoading(false)
             } 
             // else {
@@ -691,7 +692,7 @@ const InvoicePage = () => {
             //THEN DO FILTER
             setNumPage(1)
             setRowsCount(5)
-            fetchInvoices(1, 5, filterArr)
+            fetchInvoices(1, rowsCount, filterArr)
             setFilterArr([])
             setFilterJson({})
         }
