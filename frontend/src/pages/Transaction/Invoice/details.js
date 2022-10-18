@@ -111,7 +111,6 @@ function TabPanel(props) {
                                     onChange={e => setCustomerId(e.target.value)}
                                     fullWidth
                                     onClick={() => {
-                                        // isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)
                                         if(isDisabled === false) {
                                             setOpenContacts(true)
                                             setContactType('shipper-customer')
@@ -504,6 +503,9 @@ const CreateInvoicePage = () => {
     const [customerId, setCustomerId] = useState('')
     const [customerName, setCustomerName] = useState('')
     const [customerAddress, setCustomerAddress] = useState('')
+    const [agentId, setAgentId] = useState('')
+    const [agentName, setAgentName] = useState('')
+    const [agentAddress, setAgentAddress] = useState('')
     const [eFaktur, setEFaktur] = useState('')
     const [revisedInvNo, setRevisedInvNo] = useState('')
     const [isStampDuty, setIsStampDuty] = useState(false)
@@ -547,6 +549,9 @@ const CreateInvoicePage = () => {
     const [billId, setBillId] = useState('')
     const [billName, setBillName] = useState('')
     const [billAddress, setBillAddress] = useState('')
+    const [billIdAgent, setBillIdAgent] = useState('')
+    const [billNameAgent, setBillNameAgent] = useState('')
+    const [billAddressAgent, setBillAddressAgent] = useState('')
     const [detailMap, setDetailMap] = useState([])
     const [contactType, setContactType] = useState('shipper-customer')
 
@@ -784,15 +789,29 @@ const CreateInvoicePage = () => {
         console.log('select contact', value)
         console.log('contact type', type)
         if(type === 'shipper-customer') {
-            setCustomerId(value.contactId)
-            setCustomerName(value.pic)
-            setCustomerAddress(value.contactAddress)
-            setSelectedContact(value)
+            if(customerTypeId == 2) {
+                setCustomerId(value.contactId)
+                setCustomerName(value.pic)
+                setCustomerAddress(value.contactAddress)
+                setSelectedContact(value)
+            } else {
+                setAgentId(value.contactId)
+                setAgentName(value.pic)
+                setAgentAddress(value.contactAddress)
+                setSelectedContact(value)
+            }
         } else if(type === 'shipper-bill') {
-            setBillId(value.contactId)
-            setBillName(value.pic)
-            setBillAddress(value.contactAddress)
-            setSelectedContact(value)
+            if(customerTypeId == 2) {
+                setBillId(value.contactId)
+                setBillName(value.pic)
+                setBillAddress(value.contactAddress)
+                setSelectedContact(value)
+            } else {
+                setBillIdAgent(value.contactId)
+                setBillNameAgent(value.pic)
+                setBillAddressAgent(value.contactAddress)
+                setSelectedContact(value)
+            }
         }
         
         
@@ -1328,36 +1347,75 @@ const CreateInvoicePage = () => {
                                         <Tab label="Bill To" {...a11yProps(1)} />
                                     </Tabs>
                                 </Box>
-                                <TabPanel 
-                                value={tabValue} 
-                                index={0}
-                                customerId={customerId}
-                                setCustomerId={e => setCustomerId(e)}
-                                customerName={customerName}
-                                setCustomerName={e => setCustomerName(e)}
-                                customerAddress={customerAddress}
-                                setCustomerAddress={e => setCustomerAddress(e)}
-                                setOpenContacts={e => setOpenContacts(e)}
-                                isDisabled={isDisabled}
-                                setContactType={e => setContactType(e)}
-                                >
-                                    Shipper
-                                </TabPanel>
-                                <TabPanel 
-                                value={tabValue} 
-                                index={1}
-                                billId={billId}
-                                setBillId={e => setBillId(e)}
-                                billName={billName}
-                                setBillName={e => setBillName(e)}
-                                billAddress={billAddress}
-                                setBillAddress={e => setBillAddress(e)}
-                                isDisabled={isDisabled}
-                                setOpenContacts={e => setOpenContacts(e)}
-                                setContactType={e => setContactType(e)}
-                                >
-                                    Bill To
-                                </TabPanel>
+                                {
+                                    customerTypeId == 2
+                                    ?
+                                    <>
+                                        <TabPanel 
+                                        value={tabValue} 
+                                        index={0}
+                                        customerId={customerId}
+                                        setCustomerId={e => setCustomerId(e)}
+                                        customerName={customerName}
+                                        setCustomerName={e => setCustomerName(e)}
+                                        customerAddress={customerAddress}
+                                        setCustomerAddress={e => setCustomerAddress(e)}
+                                        setOpenContacts={e => setOpenContacts(e)}
+                                        isDisabled={isDisabled}
+                                        setContactType={e => setContactType(e)}
+                                        >
+                                            Shipper
+                                        </TabPanel>
+                                        <TabPanel 
+                                        value={tabValue} 
+                                        index={1}
+                                        billId={billId}
+                                        setBillId={e => setBillId(e)}
+                                        billName={billName}
+                                        setBillName={e => setBillName(e)}
+                                        billAddress={billAddress}
+                                        setBillAddress={e => setBillAddress(e)}
+                                        isDisabled={isDisabled}
+                                        setOpenContacts={e => setOpenContacts(e)}
+                                        setContactType={e => setContactType(e)}
+                                        >
+                                            Bill To
+                                        </TabPanel>
+                                    </>
+                                    :
+                                    <>
+                                        <TabPanel 
+                                        value={tabValue} 
+                                        index={0}
+                                        customerId={agentId}
+                                        setCustomerId={e => setAgentId(e)}
+                                        customerName={agentName}
+                                        setCustomerName={e => setAgentName(e)}
+                                        customerAddress={customerAddress}
+                                        setCustomerAddress={e => setAgentAddress(e)}
+                                        setOpenContacts={e => setOpenContacts(e)}
+                                        isDisabled={isDisabled}
+                                        setContactType={e => setContactType(e)}
+                                        >
+                                            Agent
+                                        </TabPanel>
+                                        <TabPanel 
+                                        value={tabValue} 
+                                        index={1}
+                                        billId={billIdAgent}
+                                        setBillId={e => setBillIdAgent(e)}
+                                        billName={billNameAgent}
+                                        setBillName={e => setBillNameAgent(e)}
+                                        billAddress={billAddressAgent}
+                                        setBillAddress={e => setBillAddressAgent(e)}
+                                        isDisabled={isDisabled}
+                                        setOpenContacts={e => setOpenContacts(e)}
+                                        setContactType={e => setContactType(e)}
+                                        >
+                                            Bill To
+                                        </TabPanel>
+                                    </>
+                                }
                             </Box>
                         </FormControl>
                         <Grid item container spacing={2} direction="row">
