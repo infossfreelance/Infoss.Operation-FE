@@ -39,6 +39,7 @@ import axios from 'axios'
 import {API_URL, dateFormat} from '../../../helpers/constant';
 import Swal from 'sweetalert2';
 import NestedModal from "./modalInvoiceDetails";
+import { NumericFormat } from 'react-number-format';
 
 const succesAlert = (text) => {
     Swal.fire({
@@ -69,8 +70,17 @@ function TabPanel(props) {
         customerAddress,
         setCustomerAddress,
         setOpenContacts,
-        isDisabled
+        isDisabled,
+        billId,
+        setBillId,
+        billName,
+        setBillName,
+        billAddress,
+        setBillAddress,
+        setContactType
     } = props;
+
+    const [addressLock, setAddressLock] = useState(true)
 
     return (
         <div
@@ -85,46 +95,114 @@ function TabPanel(props) {
                     <Grid item>
                         <FormLabel id="invoice-tabs">{children}</FormLabel>
                     </Grid>
-                    <Grid container item spacing={2} direction="row" xs={12}>
-                        <Grid item xs={4}>
-                            <TextField 
-                            id="tab-number" 
-                            label="Number" 
-                            variant="filled" 
-                            aria-labelledby="invoice-tabs" 
-                            disabled
-                            value={customerId}
-                            onChange={e => setCustomerId(e.target.value)}
-                            fullWidth
-                            onClick={() => isDisabled === false ? setOpenContacts(true) : setOpenContacts(false)} 
-                            />
-                        </Grid>
-                        <Grid item xs={8}>
-                            <TextField
-                            id="tab-name" 
-                            label="Name" 
-                            variant="filled" 
-                            aria-labelledby="invoice-tabs" 
-                            disabled 
-                            value={customerName}
-                            onChange={e => setCustomerName(e.target.value)}
-                            fullWidth
-                            />
-                        </Grid>
-                    </Grid>
-                    <Grid item>
-                        <TextareaAutosize
-                        maxRows={3}
-                        aria-label="maximum height"
-                        placeholder="Address"
-                        minRows={2}
-                        style={{ width: 400 }}
-                        value={customerAddress}
-                        onChange={e => setCustomerAddress(e.target.value)}
-                        variant='filled'
-                        disabled
-                        />
-                    </Grid>
+                    {
+                        index === 0
+                        ?
+                        <>
+                            <Grid container item spacing={2} direction="row" xs={12}>
+                                <Grid item xs={4}>
+                                    <TextField 
+                                    id="tab-number" 
+                                    label="Number" 
+                                    variant="filled" 
+                                    aria-labelledby="invoice-tabs" 
+                                    disabled
+                                    value={customerId}
+                                    onChange={e => setCustomerId(e.target.value)}
+                                    fullWidth
+                                    onClick={() => {
+                                        if(isDisabled === false) {
+                                            setOpenContacts(true)
+                                            setContactType('shipper-customer')
+                                        }
+                                    }} 
+                                    />
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <TextField
+                                    id="tab-name" 
+                                    label="Name" 
+                                    variant="filled" 
+                                    aria-labelledby="invoice-tabs" 
+                                    disabled 
+                                    value={customerName}
+                                    onChange={e => setCustomerName(e.target.value)}
+                                    fullWidth
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid item>
+                                <TextareaAutosize
+                                maxRows={3}
+                                aria-label="maximum height"
+                                placeholder="Address"
+                                minRows={2}
+                                style={{ width: 400 }}
+                                value={customerAddress}
+                                onChange={e => setCustomerAddress(e.target.value)}
+                                variant='filled'
+                                disabled={addressLock}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <Button variant="outlined" color="secondary" onClick={() => setAddressLock(false)}>
+                                    change address
+                                </Button>
+                            </Grid>
+                        </>
+                        :
+                        <>
+                            <Grid container item spacing={2} direction="row" xs={12}>
+                                <Grid item xs={4}>
+                                    <TextField 
+                                    id="tab-number-bill" 
+                                    label="Number" 
+                                    variant="filled" 
+                                    aria-labelledby="invoice-tabs" 
+                                    disabled
+                                    value={billId}
+                                    onChange={e => setBillId(e.target.value)}
+                                    fullWidth
+                                    onClick={() => {
+                                        if(isDisabled === false) {
+                                            setOpenContacts(true)
+                                            setContactType('shipper-bill')
+                                        }
+                                    }}
+                                    />
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <TextField
+                                    id="tab-name-bill" 
+                                    label="Name" 
+                                    variant="filled" 
+                                    aria-labelledby="invoice-tabs" 
+                                    disabled 
+                                    value={billName}
+                                    onChange={e => setBillName(e.target.value)}
+                                    fullWidth
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid item>
+                                <TextareaAutosize
+                                maxRows={3}
+                                minRows={2}
+                                placeholder="Address"
+                                style={{ width: 400 }}
+                                value={billAddress}
+                                onChange={e => setBillAddress(e.target.value)}
+                                variant='filled'
+                                disabled={addressLock}
+                                />
+                            </Grid>
+                            <Grid item>
+                                <Button variant="outlined" color="secondary" onClick={() => setAddressLock(false)}>
+                                    change address
+                                </Button>
+                            </Grid>
+                        </>
+                    }
                 </Grid>
             </Box>
         )}
@@ -151,7 +229,7 @@ let templateInvoice = {
       "shipmentId": 123,
       "customerTypeId": 0,
       "customerId": 0,
-      "customerName": "s",
+      "customerName": "tester boy",
       "customerAddress": "s",
       "billId": 0,
       "billName": "s",
@@ -172,20 +250,20 @@ let templateInvoice = {
       "linkTo": "s",
       "dueDate": 0,
       "paid": false,
-      "paidOn": "",
+      "paidOn": "2022-09-26T04:48:42.216Z",
       "saveOR": true,
       "badDebt": true,
       "badDebtOn": "2022-09-26T04:48:42.216Z",
       "reBadDebt": true,
       "dateReBadDebt": "2022-09-26T04:48:42.216Z",
       "printing": 0,
-      "printedOn": "",
-      "deleted": false,
-      "deletedOn": "",
+      "printedOn": "2022-09-26T04:48:42.216Z",
+      "deleted": true,
+      "deletedOn": "2022-09-26T04:48:42.216Z",
       "invoiceNo2": "s",
       "invHeader": 0,
       "exRateId": 0,
-      "rePrintApproved": false,
+      "rePrintApproved": true,
       "rePrintApprovedOn": "2022-09-26T04:48:42.216Z",
       "rePrintApprovedBy": "s",
       "deletedRemarks": "s",
@@ -200,7 +278,7 @@ let templateInvoice = {
       "deleteTypeRefInvId": 0,
       "kursKMK": 0,
       "kursKMKId": 0,
-      "isDelivered": true,
+      "isDelivered": false,
       "deliveredOn": "2022-09-26T04:48:42.216Z",
       "deliveredRemarks": "s",
       "sfpReference": "s",
@@ -359,7 +437,7 @@ let templateInvoice = {
         "createdOn": "2022-09-26T04:48:42.217Z"
       }
     ]
-}
+  }
 
 let revisedHeadersDummy = [
     {
@@ -421,10 +499,13 @@ const CreateInvoicePage = () => {
     const [packingListNo, setPackingListNo] = useState('')
     const [siCustomerNo, setSiCustomerNo] = useState('')
     const [debetCredit, setDebetCredit] = useState('D')
-    const [customerTypeId, setCustomerTypeId] = useState(0)
+    const [customerTypeId, setCustomerTypeId] = useState(2)
     const [customerId, setCustomerId] = useState('')
     const [customerName, setCustomerName] = useState('')
     const [customerAddress, setCustomerAddress] = useState('')
+    const [agentId, setAgentId] = useState('')
+    const [agentName, setAgentName] = useState('')
+    const [agentAddress, setAgentAddress] = useState('')
     const [eFaktur, setEFaktur] = useState('')
     const [revisedInvNo, setRevisedInvNo] = useState('')
     const [isStampDuty, setIsStampDuty] = useState(false)
@@ -451,13 +532,28 @@ const CreateInvoicePage = () => {
     const [headerRevised, setHeaderRevised] = useState(revisedHeadersDummy)
     const [dataRevised, setDataRevised] = useState({})
     const [openStorage, setOpenStorage] = useState(false)
+    const [openHf, setOpenHf] = useState(false)
+    const [openPs, setOpenPs] = useState(false)
     const [selectedStorage, setSelectedStorage] = useState({})
+    const [selectedHf, setSelectedHf] = useState({})
+    const [selectedPs, setSelectedPs] = useState({})
     const [headerStorage, setHeaderStorage] = useState(storageHeadersDummy)
     const [dataStorage, setDataStorage] = useState([])
+    const [dataHf, setDataHf] = useState([])
+    const [dataPs, setDataPs] = useState([])
     const [openModalDetail, setOpenModalDetail] = useState(false)
     const [detailSequence, setDetailSequence] = useState(0)
     const [selectedDetail, setSelectedDetail] = useState({})
     const [detailEdit, setDetailEdit] = useState(false)
+    const [invoiceAgent, setInvoiceAgent] = useState('')
+    const [billId, setBillId] = useState('')
+    const [billName, setBillName] = useState('')
+    const [billAddress, setBillAddress] = useState('')
+    const [billIdAgent, setBillIdAgent] = useState('')
+    const [billNameAgent, setBillNameAgent] = useState('')
+    const [billAddressAgent, setBillAddressAgent] = useState('')
+    const [detailMap, setDetailMap] = useState([])
+    const [contactType, setContactType] = useState('shipper-customer')
 
     useEffect(() => {
         getShipmentOrder(50, 1)
@@ -482,6 +578,14 @@ const CreateInvoicePage = () => {
         console.log('fetch invoice details storage')
     }
 
+    const fetchHf = (rowsCount = 50, NumPage = 1) => {
+        console.log('fetch invoice details HF')
+    }
+
+    const fetchPs = (rowsCount = 50, NumPage = 1) => {
+        console.log('fetch invoice details PS')
+    }
+
     const fetchRevised = (rowsCount = 50, NumPage = 1) => {
         console.log('fetch revised invoice tax number')
     }
@@ -499,7 +603,17 @@ const CreateInvoicePage = () => {
         ).then(response => {
             console.log('data edit', response)
             setInvoiceDetails(response.data.data.invoiceDetails)
+
             let tempDetail = response.data.data.invoiceDetails
+            
+            const cleanFunction = (detail) => {
+                if(detail.rowStatus !== 'DEL' && detail.rowStatus !== 'DED') {
+                    return detail
+                }
+            }
+            const cleanDetail = tempDetail.filter(cleanFunction)
+            setDetailMap(cleanDetail)
+
             if(tempDetail.length > 0) {
                 setDetailSequence(tempDetail[tempDetail.length-1].sequence)
             }
@@ -592,6 +706,15 @@ const CreateInvoicePage = () => {
                 payload
             ).then(response => {
                 console.log('res update', response)
+                
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Update Data Success',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+
                 history('/booking/invoice')
             }).catch(error => console.error(error))
         } else {
@@ -635,17 +758,26 @@ const CreateInvoicePage = () => {
                         "packingListNo": packingListNo,
                         "siCustomerNo": siCustomerNo,
                         "isStampDuty": isStampDuty,
-                        "stampDutyAmount": stampDutyAmount,
-                        
+                        "stampDutyAmount": isStampDuty === true ? stampDutyAmount : 0,
+                        transactionDate: new Date().toISOString()
                     },
                     invoiceDetails
                 }
     
                 axios.post(
                     'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
-                    payload
+                    templateInvoice
                 ).then(response => {
                     console.log('res create', response)
+
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Create Data Success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+
                     history('/booking/invoice')
                 })
                 .catch(error => console.error(error))
@@ -653,31 +785,58 @@ const CreateInvoicePage = () => {
         }
     }
 
-    const handleSelectContact = (value) => {
+    const handleSelectContact = (value, type) => {
         console.log('select contact', value)
-        setCustomerId(value.contactId)
-        setCustomerName(value.pic)
-        setCustomerAddress(value.contactAddress)
-        setSelectedContact(value)
+        console.log('contact type', type)
+        if(type === 'shipper-customer') {
+            if(customerTypeId == 2) {
+                setCustomerId(value.contactId)
+                setCustomerName(value.pic)
+                setCustomerAddress(value.contactAddress)
+                setSelectedContact(value)
+            } else {
+                setAgentId(value.contactId)
+                setAgentName(value.pic)
+                setAgentAddress(value.contactAddress)
+                setSelectedContact(value)
+            }
+        } else if(type === 'shipper-bill') {
+            if(customerTypeId == 2) {
+                setBillId(value.contactId)
+                setBillName(value.pic)
+                setBillAddress(value.contactAddress)
+                setSelectedContact(value)
+            } else {
+                setBillIdAgent(value.contactId)
+                setBillNameAgent(value.pic)
+                setBillAddressAgent(value.contactAddress)
+                setSelectedContact(value)
+            }
+        }
+        
+        
     }
-
+    
     const renderStamp = () => {
         if(isStampDuty === 'true') {
             return (
-                <TextField 
+                <NumericFormat 
+                customInput={TextField} 
+                thousandSeparator="," 
+                suffix={'.00'} 
+                label='Amount'
+                onValueChange={(values, sourceInfo) => {
+                    setStampDutyAmount(values.floatValue)
+                }}
                 value={stampDutyAmount}
-                onChange={e => setStampDutyAmount(e.target.value)}
-                variant="standard" 
-                label="Amount" 
                 id="invoice-stamp-duty"
                 />
             )
         } else {
             return (
                 <TextField 
-                value={stampDutyAmount}
-                onChange={e => setStampDutyAmount(e.target.value)}
-                variant="filled" 
+                value={'0.00'}
+                variant="filled"
                 disabled
                 label="Amount" 
                 id="invoice-stamp-duty"
@@ -701,7 +860,6 @@ const CreateInvoicePage = () => {
     const saveDetail = (payload) => {
         if(detailEdit === true) {
             const newArr = invoiceDetails.slice()
-            console.log('new arr', newArr)
             newArr.forEach(el =>  {
                 if(el.sequence === payload.sequence) {
                     el.accountId = payload.accountId
@@ -719,11 +877,21 @@ const CreateInvoicePage = () => {
                 }
             })
             setInvoiceDetails(newArr)
+
+            const cleanFunction = (detail) => {
+                if(detail.rowStatus !== 'DEL' && detail.rowStatus !== 'DED') {
+                    return detail
+                }
+            }
+            const cleanDetail = newArr.filter(cleanFunction)
+            setDetailMap(cleanDetail)
+
             setDetailEdit(false)
             setSelectedDetail({})
         } else {
             setDetailSequence(payload.sequence)
             setInvoiceDetails(arr => [...arr, payload])
+            setDetailMap(arr => [...arr, payload])
         }
     }
 
@@ -749,13 +917,31 @@ const CreateInvoicePage = () => {
             )
         } else {
             let tempSequence = selectedDetail.sequence
+
+            let newArr = invoiceDetails.slice()
+            newArr.forEach(el =>  {
+                if(el.sequence === tempSequence) {
+                    el.rowStatus = 'DEL'
+                }
+            })
+            setInvoiceDetails(newArr)
+
             setSelectedDetail({})
-            
-            const deleteFunction = (invoices) => {
-                return invoices.sequence !== tempSequence
+
+            const cleanFunction = (detail) => {
+                if(detail.rowStatus !== 'DEL' && detail.rowStatus !== 'DED') {
+                    return detail
+                }
             }
-            const result = invoiceDetails.filter(deleteFunction)
-            setInvoiceDetails(result)
+            const cleanDetail = newArr.filter(cleanFunction)
+            setDetailMap(cleanDetail)
+            
+            //CARA LAMA SEMUA DETAIL DI DELETE LANGSUNG HILANG
+            // const deleteFunction = (invoices) => {
+            //     return invoices.sequence !== tempSequence
+            // }
+            // const result = invoiceDetails.filter(deleteFunction)
+            // setInvoiceDetails(result)
         }
     }
 
@@ -872,6 +1058,29 @@ const CreateInvoicePage = () => {
         }
     }
 
+    const handleContactType = (value) => {
+        setCustomerTypeId(value)
+        if(value == 2) setDebetCredit('D')
+    }
+
+    const renderDebetCredit = () => {
+        if(customerTypeId == 2) {
+            return (
+                <>
+                    <FormControlLabel value="D" control={<Radio />} label="Debit" disabled />
+                    <FormControlLabel value="C" control={<Radio />} label="Credit" disabled />
+                </>
+            )
+        } else {
+            return (
+                <>
+                    <FormControlLabel value="D" control={<Radio />} label="Debit" />
+                    <FormControlLabel value="C" control={<Radio />} label="Credit" />
+                </>
+            )
+        }
+    }
+
     return (
         <Grid container spacing={2} direction="column">
             <Grid item xs={12}>
@@ -923,11 +1132,12 @@ const CreateInvoicePage = () => {
                 <ModalTableInvoice 
                 open={openContacts} 
                 onClose={() => setOpenContacts(false)} 
-                setSelectedData={(e) => handleSelectContact(e)}
+                setSelectedData={(data, type) => handleSelectContact(data, type)}
                 headersData={headerContacts}
                 bodyData={dataContacts}
                 fetchData={(r, p) => fetchContact(r, p)}
                 type={'contact'}
+                contactType={contactType}
                 maxPage={maxPageContacts}
                 />
 
@@ -950,6 +1160,29 @@ const CreateInvoicePage = () => {
                 bodyData={dataStorage}
                 fetchData={(r, p) => fetchStorage(r, p)}
                 maxPage={1}
+                type={'storage'}
+                />
+
+                <ModalTableInvoice 
+                open={openHf} 
+                onClose={() => setOpenHf(false)} 
+                setSelectedData={(e) => setSelectedHf(e)}
+                headersData={headerStorage}
+                bodyData={dataHf}
+                fetchData={(r, p) => fetchHf(r, p)}
+                maxPage={1}
+                type={'hf'}
+                />
+
+                <ModalTableInvoice 
+                open={openPs} 
+                onClose={() => setOpenPs(false)} 
+                setSelectedData={(e) => setSelectedPs(e)}
+                headersData={headerStorage}
+                bodyData={dataPs}
+                fetchData={(r, p) => fetchPs(r, p)}
+                maxPage={1}
+                type={'ps'}
                 />
 
                 <NestedModal 
@@ -992,6 +1225,21 @@ const CreateInvoicePage = () => {
                             </RadioGroup>
 
                             <TextField value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} id="invoice-number" label="Invoice Number" variant="filled" disabled />
+
+                            {
+                                customerTypeId == 5
+                                ?
+                                <TextField 
+                                value={invoiceAgent} 
+                                onChange={e => setInvoiceAgent(e.target.value)} 
+                                id='invoice-agent' 
+                                label='Invoice From Agent Number'
+                                variant="standard"
+                                margin="normal"
+                                />
+                                :
+                                <></>
+                            }
 
                             <Box mt={1}>
                                 <FormLabel id="invoice-print-label">Printing</FormLabel>
@@ -1068,7 +1316,7 @@ const CreateInvoicePage = () => {
                             value={ shipmentData.shipmentNo ? shipmentData.shipmentNo : '' }
                             disabled={isDisabled}
                             />
-
+                            
                             <Box m={1}>
                                 <FormLabel id="invoice-dc-label">Debet / Credit</FormLabel>
                                 <RadioGroup 
@@ -1078,8 +1326,7 @@ const CreateInvoicePage = () => {
                                 value={debetCredit}
                                 onChange={e => setDebetCredit(e.target.value)}
                                 >
-                                    <FormControlLabel value="D" control={<Radio />} label="Debit" disabled />
-                                    <FormControlLabel value="C" control={<Radio />} label="Credit" disabled />
+                                    {renderDebetCredit()}
                                 </RadioGroup>
                             </Box>
 
@@ -1088,10 +1335,10 @@ const CreateInvoicePage = () => {
                                 row 
                                 name="shiper-or-agent-radio"
                                 value={customerTypeId}
-                                onChange={e => setCustomerTypeId(e.target.value)}
+                                onChange={e => handleContactType(e.target.value)}
                                 >
-                                    <FormControlLabel value={0} control={<Radio />} label="Shipper" disabled={isDisabled} />
-                                    <FormControlLabel value={1} control={<Radio />} label="Agent" disabled={isDisabled} />
+                                    <FormControlLabel value={2} control={<Radio />} label="Shipper" disabled={isDisabled} />
+                                    <FormControlLabel value={5} control={<Radio />} label="Agent" disabled={isDisabled} />
                                 </RadioGroup>
 
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -1100,23 +1347,75 @@ const CreateInvoicePage = () => {
                                         <Tab label="Bill To" {...a11yProps(1)} />
                                     </Tabs>
                                 </Box>
-                                <TabPanel 
-                                value={tabValue} 
-                                index={0}
-                                customerId={customerId}
-                                setCustomerId={e => setCustomerId(e)}
-                                customerName={customerName}
-                                setCustomerName={e => setCustomerName(e)}
-                                customerAddress={customerAddress}
-                                setCustomerAddress={e => setCustomerAddress(e)}
-                                setOpenContacts={e => setOpenContacts(e)}
-                                isDisabled={isDisabled}
-                                >
-                                    Shipper
-                                </TabPanel>
-                                <TabPanel value={tabValue} index={1}>
-                                    Bill To
-                                </TabPanel>
+                                {
+                                    customerTypeId == 2
+                                    ?
+                                    <>
+                                        <TabPanel 
+                                        value={tabValue} 
+                                        index={0}
+                                        customerId={customerId}
+                                        setCustomerId={e => setCustomerId(e)}
+                                        customerName={customerName}
+                                        setCustomerName={e => setCustomerName(e)}
+                                        customerAddress={customerAddress}
+                                        setCustomerAddress={e => setCustomerAddress(e)}
+                                        setOpenContacts={e => setOpenContacts(e)}
+                                        isDisabled={isDisabled}
+                                        setContactType={e => setContactType(e)}
+                                        >
+                                            Shipper
+                                        </TabPanel>
+                                        <TabPanel 
+                                        value={tabValue} 
+                                        index={1}
+                                        billId={billId}
+                                        setBillId={e => setBillId(e)}
+                                        billName={billName}
+                                        setBillName={e => setBillName(e)}
+                                        billAddress={billAddress}
+                                        setBillAddress={e => setBillAddress(e)}
+                                        isDisabled={isDisabled}
+                                        setOpenContacts={e => setOpenContacts(e)}
+                                        setContactType={e => setContactType(e)}
+                                        >
+                                            Bill To
+                                        </TabPanel>
+                                    </>
+                                    :
+                                    <>
+                                        <TabPanel 
+                                        value={tabValue} 
+                                        index={0}
+                                        customerId={agentId}
+                                        setCustomerId={e => setAgentId(e)}
+                                        customerName={agentName}
+                                        setCustomerName={e => setAgentName(e)}
+                                        customerAddress={customerAddress}
+                                        setCustomerAddress={e => setAgentAddress(e)}
+                                        setOpenContacts={e => setOpenContacts(e)}
+                                        isDisabled={isDisabled}
+                                        setContactType={e => setContactType(e)}
+                                        >
+                                            Agent
+                                        </TabPanel>
+                                        <TabPanel 
+                                        value={tabValue} 
+                                        index={1}
+                                        billId={billIdAgent}
+                                        setBillId={e => setBillIdAgent(e)}
+                                        billName={billNameAgent}
+                                        setBillName={e => setBillNameAgent(e)}
+                                        billAddress={billAddressAgent}
+                                        setBillAddress={e => setBillAddressAgent(e)}
+                                        isDisabled={isDisabled}
+                                        setOpenContacts={e => setOpenContacts(e)}
+                                        setContactType={e => setContactType(e)}
+                                        >
+                                            Bill To
+                                        </TabPanel>
+                                    </>
+                                }
                             </Box>
                         </FormControl>
                         <Grid item container spacing={2} direction="row">
@@ -1198,9 +1497,9 @@ const CreateInvoicePage = () => {
                                 </TableHead>
                                 <TableBody>
                                     {
-                                        invoiceDetails.length > 0 
+                                        detailMap.length > 0 
                                         ?
-                                        invoiceDetails.map((el, index) => {
+                                        detailMap.map((el) => {
                                             return (
                                                 <TableRow 
                                                 key={el.sequence} 
@@ -1208,8 +1507,12 @@ const CreateInvoicePage = () => {
                                                 sx={selectedDetail.sequence === el.sequence ? selectedStyle : {}}>
                                                     <TableCell>{el.sequence}</TableCell>
                                                     <TableCell>{el.description}</TableCell>
-                                                    <TableCell>{el.amount}</TableCell>
-                                                    <TableCell>{el.amount}</TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                    </TableCell>
                                                     <TableCell>{el.percentVat}%</TableCell>
                                                     <TableCell>{el.sign === true ? '+' : '-'}</TableCell>
                                                     <TableCell>{el.isCostToCost === true ? 'Yes' : 'No'}</TableCell>
@@ -1231,7 +1534,7 @@ const CreateInvoicePage = () => {
                         flexDirection="row"
                         sx={{ mt: 2 }}
                         >
-                            <Grid item container spacing={2} flexDirection="row" xs={10}>
+                            <Grid item container spacing={2} flexDirection="row" xs={6}>
                                 <Grid item>
                                     <Button variant="outlined" startIcon={<AddBoxIcon />} color="secondary" onClick={() => handleDetailAdd()}>
                                         add
@@ -1249,10 +1552,30 @@ const CreateInvoicePage = () => {
                                 </Grid>
                             </Grid>
 
-                            <Grid item container flexDirection="row-reverse" xs={2}>
-                                <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
-                                    add storage
-                                </Button>
+                            <Grid item container flexDirection="row-reverse" xs={6} spacing={2}>
+                                    <Grid item>
+                                        <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenStorage(true)}>
+                                            add storage
+                                        </Button>
+                                    </Grid>
+                                {
+                                    customerTypeId == 5
+                                    ?
+                                    <>
+                                        <Grid item>
+                                            <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenPs(true)}>
+                                                add ps
+                                            </Button>
+                                        </Grid>
+                                        <Grid item>
+                                            <Button variant="outlined" startIcon={<AddToPhotosIcon />} color="secondary" onClick={() => setOpenHf(true)}>
+                                                add hf
+                                            </Button>
+                                        </Grid>
+                                    </>
+                                    :
+                                    <></>
+                                }
                             </Grid>
                         </Grid>
                     </Box>
@@ -1267,16 +1590,64 @@ const CreateInvoicePage = () => {
                         </Box>
                     </Grid>
                     <Grid item>
-                        <TextField value={paymentUSD} onChange={e => setPaymentUSD(e.target.value)} id="payment-usd" label="Payment USD" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Payment USD'
+                        onValueChange={(values, sourceInfo) => {
+                            setPaymentUSD(values.floatValue)
+                        }}
+                        value={paymentUSD}
+                        id="payment-usd"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={paymentIDR} onChange={e => setPaymentIDR(e.target.value)} id="payment-idr" label="Payment IDR" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Payment IDR'
+                        onValueChange={(values, sourceInfo) => {
+                            setPaymentIDR(values.floatValue)
+                        }}
+                        value={paymentIDR}
+                        id="payment-idr"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={totalVATUSD} onChange={e => setTotalVATUSD(e.target.value)} id="vat-usd" label="Total Vat USD" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Total Vat USD'
+                        onValueChange={(values, sourceInfo) => {
+                            setTotalVATUSD(values.floatValue)
+                        }}
+                        value={totalVATUSD}
+                        id="vat-usd"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                     <Grid item>
-                        <TextField value={totalVATIDR} onChange={e => setTotalVATIDR(e.target.value)} id="vat-idr" label="Total Vat IDR" variant="filled" disabled />
+                        <NumericFormat 
+                        customInput={TextField} 
+                        thousandSeparator="," 
+                        suffix={'.00'} 
+                        label='Total Vat IDR'
+                        onValueChange={(values, sourceInfo) => {
+                            setTotalVATIDR(values.floatValue)
+                        }}
+                        value={totalVATIDR}
+                        id="vat-idr"
+                        variant="filled"
+                        disabled
+                        />
                     </Grid>
                 </Grid>
                 <Grid container spacing={2} flexDirection="row" alignItems="center">

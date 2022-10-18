@@ -203,12 +203,14 @@ const InvoicePage = () => {
     const [rowsCount, setRowsCount] = useState(5)
     const [totalRows, setTotalRows] = useState(5)
     const [SelectedData, setSelectedData] = useState({});
-    const [job, setJob] = useState('');
+    const [job, setJob] = useState(1);
     const [loading, setLoading] = useState(false)
     const [invoices, setInvoices] = useState([])
     const [invoicesMap, setInvoicesMap] = useState([])
     const [columnData, setColumnData] = useState([])
     const [modalType, setModalType] = useState('')
+    const [filterJson, setFilterJson] = useState({})
+    const [filterArr, setFilterArr] = useState([])
     const history = useNavigate();
 
     const ErrorAlert = (string, isError = false) => {
@@ -242,93 +244,105 @@ const InvoicePage = () => {
         fetchInvoices(numPage, rowsCount)
     }, [])
 
-    const fetchInvoices = (pageNumber = 1, pageSize = 10) => {
+    const fetchInvoices = (pageNumber = 1, pageSize = 10, filter = []) => {
         setLoading(true)
         const payload = {
             "userCode": "luna",
             "countryId": 101,
             "companyId": 32,
-            "branchId": 12
+            "branchId": 12,
+            filter: filter
         }
+        // axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         // axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
-        axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+        axios.post(`https://localhost:7160/Invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         .then((response) => {
             console.log('response fetch invoice', response)
             if(response.data.code === 200) {
                 setSelectedData({})
                 setInvoices(response.data.data.invoices);
-                setInvoicesMap(response.data.data.invoices)
-                // setColumnData(response.data.data.columns)
+
+                let temp = response.data.data.invoices
+                let indexed = temp.map((el, index) => {
+                    let indexedTemp = {
+                        ...el,
+                        index
+                    }
+                    return indexedTemp
+                })
+
+                setInvoicesMap(indexed)
+                setColumnData(response.data.data.columns)
                 setTotalRows(response.data.totalRowCount)
-                setColumnData(
-                    [
-                        {
-                            "column": "rowStatus",
-                            "text": "Deleted",
-                            "format": ""
-                        },
-                        {
-                            "column": "isCostToCost",
-                            "text": "Ctc",
-                            "format": ""
-                        },
-                        {
-                            "column": "paid",
-                            "text": "Paid",
-                            "format": ""
-                        },
-                        {
-                            "column": "invoiceNo",
-                            "text": "InvoiceNo",
-                            "format": ""
-                        },
-                        {
-                            "column": "customerName",
-                            "text": "CustomerName",
-                            "format": ""
-                        },
-                        {
-                            "column": "siCustomerNo",
-                            "text": "SiCustomerNo",
-                            "format": ""
-                        },
-                        {
-                            "column": "isDelivered",
-                            "text": "IsDelivered",
-                            "format": ""
-                        },
-                        {
-                            "column": "deliveredOn",
-                            "text": "deliveredOn",
-                            "format": "date"
-                        },
-                        {
-                            "column": "printing",
-                            "text": "Print",
-                            "format": ""
-                        },
-                        {
-                            column: 'printedOn',
-                            text: 'Print Date',
-                            format: 'date'
-                        },
-                        {
-                            column: 'rePrintApproved',
-                            text: 'RePrint Approved',
-                            format: ''
-                        },
-                        {
-                            column: 'rePrintApprovedBy',
-                            text: 'Approved By',
-                            format: ''
-                        },
-                        {
-                            column: 'rePrintApprovedOn',
-                            text: 'Approved On',
-                            format: 'date'
-                        },
-                    ]
-                )
+                // setColumnData(
+                //     [
+                //         {
+                //             "column": "rowStatus",
+                //             "text": "Deleted",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "isCostToCost",
+                //             "text": "Ctc",
+                //             "format": "boolean"
+                //         },
+                //         {
+                //             "column": "paid",
+                //             "text": "Paid",
+                //             "format": "boolean"
+                //         },
+                //         {
+                //             "column": "invoiceNo",
+                //             "text": "InvoiceNo",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "customerName",
+                //             "text": "CustomerName",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "siCustomerNo",
+                //             "text": "SiCustomerNo",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "isDelivered",
+                //             "text": "IsDelivered",
+                //             "format": ""
+                //         },
+                //         {
+                //             "column": "deliveredOn",
+                //             "text": "deliveredOn",
+                //             "format": "date"
+                //         },
+                //         {
+                //             "column": "printing",
+                //             "text": "Print",
+                //             "format": ""
+                //         },
+                //         {
+                //             column: 'printedOn',
+                //             text: 'Print Date',
+                //             format: 'date'
+                //         },
+                //         {
+                //             column: 'rePrintApproved',
+                //             text: 'RePrint Approved',
+                //             format: ''
+                //         },
+                //         {
+                //             column: 'rePrintApprovedBy',
+                //             text: 'Approved By',
+                //             format: ''
+                //         },
+                //         {
+                //             column: 'rePrintApprovedOn',
+                //             text: 'Approved On',
+                //             format: 'date'
+                //         },
+                //     ]
+                // )
                 setLoading(false)
             } 
             // else {
@@ -392,7 +406,7 @@ const InvoicePage = () => {
                 setLoading(false)
             }
         } else {
-            ErrorAlert('Harap pilih data terlebih dahulu')
+            ErrorAlert('Please select data')
         }
     }
 
@@ -451,16 +465,16 @@ const InvoicePage = () => {
                 })
             }
         } else {
-            ErrorAlert('Harap pilih data terlebih dahulu')
+            ErrorAlert('Please select data')
         }
     }
 
     const handleDelete = () => {
         if (SelectedData.id === undefined) {
-            ErrorAlert("Harap pilih data terlebih dahulu")
+            ErrorAlert("Please select data")
         } else {
             if(SelectedData.rowStatus === 'DEL') {
-                ErrorAlert("Data Has Been Deleted")
+                ErrorAlert("Record Has Been Deleted")
             } else {
                 Swal.fire({
                     title: 'Are you sure?',
@@ -519,45 +533,6 @@ const InvoicePage = () => {
     const handleChange = (event) => {
         setJob(event.target.value);
     };
-
-    const filterTable = (key, val) => {
-        console.log(key)
-        console.log(val)
-
-        // if (val === '') {
-        //     setInvoicesMap(invoices)
-        //     return false
-        // } 
-        
-        // let temp = invoices
-        // let arr = [];
-    
-        // if(key === 'delete') {
-        //     invoices.data.forEach((v, k) => {
-        //         console.log(v)
-        //         v.delete.includes(val) && arr.push(v)
-        //     })
-        //     setInvoicesMap(arr)
-        // }
-
-        // if(key === 'type') {
-        //     invoices.data.forEach((v, k) => {
-        //         // console.log(v)
-        //         v.type.includes(val) && arr.push(v)
-        //     })
-        //     temp.data = arr
-        //     setInvoicesMap(temp)
-        // }
-
-        // if(key === 'inv. no.') {
-        //     invoices.data.forEach((v, k) => {
-        //         v.invNo.includes(val) && arr.push(v)
-        //     })
-        //     setInvoicesMap(arr)
-        // }
-
-        // console.log(invoicesMap)
-    }
 
     const renderPagination = () => {
         let MaxPage = 1
@@ -653,6 +628,7 @@ const InvoicePage = () => {
         if(!SelectedData.id) {
             ErrorAlert("Please Select Data!")
         } else {
+            console.log(SelectedData)
             setModalType('credit')
             setOpenModal(true)
         }
@@ -669,6 +645,64 @@ const InvoicePage = () => {
                 setOpenModal(true)
             }
         }
+    }
+
+    const filterTable = (key, val) => {
+        let filter = filterJson
+        let temp = {
+            field: key,
+            data: val
+        }
+        let arr = []
+
+        if(!filter[key]) {
+            filter[key] = temp
+            setFilterJson(filter)
+        } else {
+            filter[key].data = val
+            setFilterJson(filter)
+        }
+
+        if(filter[key].data.length === 0) {
+            delete filter[key]
+            setFilterJson(filter)
+        }
+
+        for(const key in filter) {
+            arr.push(filter[key])
+        }
+        
+        setFilterArr(arr)
+    }
+
+    document.onkeydown = checkKey;
+    function checkKey(e) {
+        console.log(e.keyCode)
+        let currIndex = 0
+        if(e.keyCode === 38 && SelectedData.index > 0) {
+            //UP ARROW
+            currIndex = SelectedData.index
+            currIndex -= 1
+        } else if(e.keyCode === 40 && SelectedData.index < rowsCount - 1) {
+            //DOWN ARROW
+            currIndex = SelectedData.index
+            currIndex += 1
+        } else if(e.keyCode === 13 && filterArr.length > 0) {
+            //PRESS ENTER
+            //THEN DO FILTER
+            setNumPage(1)
+            setRowsCount(5)
+            fetchInvoices(1, rowsCount, filterArr)
+            setFilterArr([])
+            setFilterJson({})
+        }
+
+        const copyArr = [...invoicesMap]
+        const changeSelectedData = (data) => {
+            return data.index === currIndex
+        }
+        const result = copyArr.filter(changeSelectedData)
+        setSelectedData(...result)
     }
 
     return (
@@ -703,7 +737,7 @@ const InvoicePage = () => {
                         <Button variant="outline-infoss" className='btn-sm' onClick={() => handleOpenModalCredit()}>
                             <DoneOutlineIcon /> Approval Credit
                         </Button>
-                        <Button variant="outline-infoss" className='btn-sm'>
+                        <Button variant="outline-infoss" className='btn-sm' onClick={() => history('/booking/invoice/journal')}>
                             <SummarizeIcon /> Journal
                         </Button>
                     </Stack>
@@ -734,7 +768,7 @@ const InvoicePage = () => {
                 </Grid>
             </Grid>
             <Grid item xs={12} style={{ 'maxWidth': '97vw', 'borderStyle': 'groove', 'borderRadius': '5px', 'marginTop': '10px' }}>
-                <div className='mt-3 border rounded-10 p-2 table-responsive'>
+                <div className='mt-3 border rounded-10 p-2 table-responsive' style={{ 'maxHeight': '500px' }}>
                     {
                         loading ? 
                         <LoadingSpinner /> 
@@ -750,7 +784,7 @@ const InvoicePage = () => {
                                 selectedData={SelectedData}
                                 />
 
-                                <thead className='text-center text-infoss'>
+                                <thead className='text-center text-infoss' style={{ position: 'sticky', top: '-8px', 'backgroundColor': '#fff', 'boxShadow': '0 1px #dee2e6, 0 -1px #dee2e6' }}>
                                     <tr>
                                         {
                                             columnData.map((el, index) => {
@@ -765,25 +799,45 @@ const InvoicePage = () => {
                                     <tr>
                                         {
                                             columnData.map((el, index) => {
-                                                if(el.text === 'Delete') {
+                                                if(el.text === 'Deleted') {
                                                     return (
                                                         <td key={index}> 
-                                                            <select className='form-control col-search-form border-infoss'>
-                                                                <option value="all">All</option>
-                                                                <option value="yes">Yes</option>
-                                                                <option value="no">No</option>
+                                                            <select 
+                                                            className='form-control col-search-form border-infoss' 
+                                                            onChange={(e) => filterTable(el.column, e.target.value)}
+                                                            >
+                                                                <option value="ALL">All</option>
+                                                                <option value="DEL">Yes</option>
+                                                                <option value="ACT">No</option>
                                                             </select>
                                                         </td>
                                                     )
                                                 } else {
-                                                    return (
-                                                        <td key={index}>
-                                                            <input 
-                                                            className="form-control col-search-form border-infoss" 
-                                                            onChange={(e) => filterTable(el.column, e.target.value)} 
-                                                            style={{ 'minWidth': '100px' }}/>
-                                                        </td> 
-                                                    )
+                                                    if(el.format === 'boolean') {
+                                                        return (
+                                                            <td key={index}> 
+                                                                <select 
+                                                                className='form-control col-search-form border-infoss' 
+                                                                onChange={(e) => filterTable(el.column, e.target.value)}
+                                                                style={{ 'minWidth': '50px' }}
+                                                                >
+                                                                    <option value="ALL">All</option>
+                                                                    <option value="true">Yes</option>
+                                                                    <option value="false">No</option>
+                                                                </select>
+                                                            </td>
+                                                        )
+                                                    } else {
+                                                        return (
+                                                            <td key={index}>
+                                                                <input 
+                                                                className="form-control col-search-form border-infoss" 
+                                                                onChange={(e) => filterTable(el.column, e.target.value)} 
+                                                                style={{ 'minWidth': '100px' }}
+                                                                />
+                                                            </td> 
+                                                        )
+                                                    }
                                                 }
                                             })
                                         }
@@ -804,7 +858,7 @@ const InvoicePage = () => {
                                             return (
                                                 <tr 
                                                 key={index} 
-                                                onClick={(e) => setSelectedData(el)}
+                                                onClick={() => setSelectedData(el)}
                                                 className={tempStyle}>
                                                     {
                                                        columnData.map((headersEl, indexHeaders) => {
