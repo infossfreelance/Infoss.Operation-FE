@@ -17,7 +17,7 @@ export default function AddAccountList(props) {
   const [selectedData, setSelectedData] = useState({});
 
   useEffect(() => {
-    getAccountList()
+    // getAccountList()
 }, []);
 
 const getAccountList = () => {
@@ -86,6 +86,7 @@ const getAccountList = () => {
               AccountList.map((v, k) => {
                 return (
                   <AddAccountListRow
+                    key={k}
                     v={v}
                     k={k}
                     setSelectedData={(e) => setSelectedData(e)}

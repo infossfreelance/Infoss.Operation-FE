@@ -29,7 +29,7 @@ export default function AddCustomer(props) {
     }
     axios.post(`http://stage-master.api.infoss.solusisentraldata.com/regContact/regcontact/PostById?id=3019`, payload)
     .then((response) => {
-        console.log('CUSTOMER DATA ON MODAL', response)
+        // console.log('CUSTOMER DATA ON MODAL', response)
     })
     .catch(function (error) {
       console.error(error)

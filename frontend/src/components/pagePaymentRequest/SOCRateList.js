@@ -18,7 +18,7 @@ export default function SOCRateList(props) {
   const [selectedPort, setSelectedPort] = useState({});
 
   useEffect(() => {
-    getAccountList()
+    // getAccountList()
 }, []);
 
 const getAccountList = () => {
@@ -123,6 +123,7 @@ const getAccountList = () => {
               AccountList.map((v, k) => {
                 return (
                   <SOCRateListRow
+                    key={k}
                     v={v}
                     k={k}
                     setSelectedData={(e) => setSelectedData(e)}

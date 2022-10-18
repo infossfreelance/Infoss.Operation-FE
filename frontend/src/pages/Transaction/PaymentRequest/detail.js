@@ -40,7 +40,6 @@ const PaymentRequestAddPage = () => {
     const [showAddCustomer, setShowAddCustomer] = useState(false);
     const [showAddPersonal, setShowAddPersonal] = useState(false);
     const [SelectedData, setSelectedData] = useState({});
-    console.log("SELECTED", SelectedData)
     const [AccountName, setAccountName] = useState('');
     const ref = useRef();
     const [defShipNo, setdefShipNo] = useState('');
@@ -60,11 +59,12 @@ const PaymentRequestAddPage = () => {
     const [SecondEP, setSecondEP] = useState(false);
     const [IncShipperList, setIncShipperList] = useState([]);    
     const [SelectedShipperList, setSelectedShipperList] = useState({});
+    // console.log("SELECTED", SelectedShipperList)
 
-    const [PaymentForm, setPaymentForm] = useState('');
+    const [IsGeneralPayment, setIsGeneralPayment] = useState(false);
     const [ShipmentOrder, setShipmentOrder] = useState('');
     const [PrincipleBy, setPrincipleBy] = useState('');
-    const [CTCType, setCTCType] = useState('');
+    const [CTCType, setCTCType] = useState(false);
     const [ETSETA, setETSETA] = useState('');
     const [PaymentRequestNumber, setPaymentRequestNumber] = useState('');
     const [Reference, setReference] = useState('');
@@ -78,10 +78,6 @@ const PaymentRequestAddPage = () => {
     const [DNVendor, setDNVendor] = useState('');
     const [Personal, setPersonal] = useState('');
     const [SubPersonal, setSubPersonal] = useState('');
-
-    
-    const [TotalUSD, setTotalUSD] = useState('');
-    const [TotalIDR, setTotalIDR] = useState('');
 
     useEffect(() => {
         getShipmentOrder()     
@@ -116,54 +112,35 @@ const PaymentRequestAddPage = () => {
       axios.post(`http://stage-master.api.infoss.solusisentraldata.com/regContact/regcontact/PostById?id=3019`, payload)
       .then((response) => {
           console.log('CUSTOMER', response)
-          // setCustomerData(response.data.data)
+          setCustomerData(response.data.data)
       })
       .catch(function (error) {
         console.error(error)
       })
   }
 
-    const handleSave = () => {
-      // console.log("PaymentForm", PaymentForm)
-      // console.log("ShipmentOrder", ShipmentOrder)
-      // console.log("PrincipleBy", PrincipleBy)
-      // console.log("CTCType", CTCType)
-      // console.log("ETSETA", ETSETA)
-      // console.log("PaymentRequestNumber", PaymentRequestNumber)
-      // console.log("Reference", Reference)
-      // console.log("PaymentTo", PaymentTo)
-      // console.log("Rate", Rate)
-      // console.log("SubRate", SubRate)
-      // console.log("Printing", Printing)
-      // console.log("SubPrinting", SubPrinting)
-      // console.log("Customer", Customer)
-      // console.log("SubCustomer", SubCustomer)
-      // console.log("DNVendor", DNVendor)
-      // console.log("Personal", Personal)
-      // console.log("SubPersonal", SubPersonal)
-      
+    const handleSave = () => {      
       const payload = {        
           "paymentRequest": {
             "rowStatus": "string",
             "countryId": 101,
             "companyId": 32,
             "branchId": 12,
-            "id": 0,
-            "ticketId": 0,
-            "prNo": 0,
-            // "prNo": PaymentRequestNumber,
+            "id": 1,
+            "ticketId": 1,
+            "prNo": 1,
             "debetCredit": "string",
-            "shipmentId": 0,
+            "shipmentId": 1,
             "reference": "string",
-            "prStatus": 0,
-            "isGeneralPR": true,
-            "customerId": 0,
-            "customerTypeId": 0,
-            "personalId": 0,
-            "paymentUSD": 0,
-            "paymentIDR": 0,
+            "prStatus": 1,
+            "isGeneralPR": IsGeneralPayment,
+            "customerId": 1,
+            "customerTypeId": 1,
+            "personalId": 1,
+            "paymentUSD": 1,
+            "paymentIDR": 1,
             "prContraStatus": "string",
-            "prContraNo": 0,
+            "prContraNo": 1,
             "paidUSD": true,
             "datePaidUSD": "2022-10-09T01:25:44.400Z",
             "paidIDR": true,
@@ -174,21 +151,21 @@ const PaymentRequestAddPage = () => {
             "approveOprOn": "2022-10-09T01:25:44.400Z",
             "approveAcc": true,
             "approveAccOn": "2022-10-09T01:25:44.400Z",
-            "rate": 0,
+            "rate": 1,
             "exRateDate": "2022-10-09T01:25:44.400Z",
-            "printing": 0,
+            "printing": 1,
             "printedOn": "2022-10-09T01:25:44.400Z",
             "prNo2": "string",
-            "exRateId": 0,
+            "exRateId": 1,
             "deletedRemarks": "string",
-            "idLama": 0,
-            "isCostToCost": true,
-            "totalPpnUSD": 0,
-            "totalPpnIDR": 0,
+            "idLama": 1,
+            "isCostToCost": CTCType,
+            "totalPpnUSD": 1,
+            "totalPpnIDR": 1,
             "uniqueKeyPR": "string",
             "packingListNo": "string",
             "siCustomerNo": "string",
-            "vendorDN": "string",
+            "vendorDN": DNVendor,
             "approved": true,
             "approvedOn": "2022-10-09T01:25:44.400Z",
             "approvedBy": "string",
@@ -198,161 +175,19 @@ const PaymentRequestAddPage = () => {
             "approvedMarketingBy": "string",
             "user": "string"
           },
-          "paymentRequestDetails": [
-            {
-              "rowStatus": "string",
-              "countryId": 0,
-              "companyId": 0,
-              "branchId": 0,
-              "paymentRequestId": 0,
-              "sequence": 0,
-              "debetCredit": "string",
-              "accountId": 0,
-              "description": "string",
-              "type": 0,
-              "codingQuantity": true,
-              "quantity": 0,
-              "perQty": 0,
-              "amount": 0,
-              "amountCrr": 0,
-              "paid": true,
-              "paidOn": "2022-10-09T01:25:44.400Z",
-              "paidPV": true,
-              "eplDetailId": 0,
-              "statusMemo": true,
-              "memoNo": 0,
-              "idLama": 0,
-              "isCostToCost": true,
-              "isPpn": true,
-              "persenPpn": 0,
-              "fakturNo": "string",
-              "fakturDate": "2022-10-09T01:25:44.401Z",
-              "isCostTrucking": true,
-              "kendaraanId": 0,
-              "kendaraanNopol": "string",
-              "employeeId": 0,
-              "employeeName": "string",
-              "mrgId": 0,
-              "deliveryDate": "2022-10-09T01:25:44.401Z",
-              "originalUsd": 0,
-              "originalRate": 0,
-              "user": "string"
-            }
-          ]
+          "paymentRequestDetails": IncShipperList
       }
 
-      console.log("PAYLOAD", payload)
-      // return false
-      
-      // const payload = {        
-      //     "paymentRequest": {
-      //       "rowStatus": "string",
-      //       "countryId": 0,
-      //       "companyId": 0,
-      //       "branchId": 0,
-      //       "id": 0,
-      //       "ticketId": 0,
-      //       "prNo": 0,
-      //       "debetCredit": "string",
-      //       "shipmentId": 0,
-      //       "reference": "string",
-      //       "prStatus": 0,
-      //       "isGeneralPR": true,
-      //       "customerId": 0,
-      //       "customerTypeId": 0,
-      //       "personalId": 0,
-      //       "paymentUSD": 0,
-      //       "paymentIDR": 0,
-      //       "prContraStatus": "string",
-      //       "prContraNo": 0,
-      //       "paidUSD": true,
-      //       "datePaidUSD": "2022-10-09T01:25:44.400Z",
-      //       "paidIDR": true,
-      //       "datePaidIDR": "2022-10-09T01:25:44.400Z",
-      //       "deleted": true,
-      //       "deletedOn": "2022-10-09T01:25:44.400Z",
-      //       "approveOpr": true,
-      //       "approveOprOn": "2022-10-09T01:25:44.400Z",
-      //       "approveAcc": true,
-      //       "approveAccOn": "2022-10-09T01:25:44.400Z",
-      //       "rate": 0,
-      //       "exRateDate": "2022-10-09T01:25:44.400Z",
-      //       "printing": 0,
-      //       "printedOn": "2022-10-09T01:25:44.400Z",
-      //       "prNo2": "string",
-      //       "exRateId": 0,
-      //       "deletedRemarks": "string",
-      //       "idLama": 0,
-      //       "isCostToCost": true,
-      //       "totalPpnUSD": 0,
-      //       "totalPpnIDR": 0,
-      //       "uniqueKeyPR": "string",
-      //       "packingListNo": "string",
-      //       "siCustomerNo": "string",
-      //       "vendorDN": "string",
-      //       "approved": true,
-      //       "approvedOn": "2022-10-09T01:25:44.400Z",
-      //       "approvedBy": "string",
-      //       "approvedRemarks": "string",
-      //       "approvedMarketing": true,
-      //       "approvedMarketingOn": "2022-10-09T01:25:44.400Z",
-      //       "approvedMarketingBy": "string",
-      //       "user": "string"
-      //     },
-      //     "paymentRequestDetails": [
-      //       {
-      //         "rowStatus": "string",
-      //         "countryId": 0,
-      //         "companyId": 0,
-      //         "branchId": 0,
-      //         "paymentRequestId": 0,
-      //         "sequence": 0,
-      //         "debetCredit": "string",
-      //         "accountId": 0,
-      //         "description": "string",
-      //         "type": 0,
-      //         "codingQuantity": true,
-      //         "quantity": 0,
-      //         "perQty": 0,
-      //         "amount": 0,
-      //         "amountCrr": 0,
-      //         "paid": true,
-      //         "paidOn": "2022-10-09T01:25:44.400Z",
-      //         "paidPV": true,
-      //         "eplDetailId": 0,
-      //         "statusMemo": true,
-      //         "memoNo": 0,
-      //         "idLama": 0,
-      //         "isCostToCost": true,
-      //         "isPpn": true,
-      //         "persenPpn": 0,
-      //         "fakturNo": "string",
-      //         "fakturDate": "2022-10-09T01:25:44.401Z",
-      //         "isCostTrucking": true,
-      //         "kendaraanId": 0,
-      //         "kendaraanNopol": "string",
-      //         "employeeId": 0,
-      //         "employeeName": "string",
-      //         "mrgId": 0,
-      //         "deliveryDate": "2022-10-09T01:25:44.401Z",
-      //         "originalUsd": 0,
-      //         "originalRate": 0,
-      //         "user": "string"
-      //       }
-      //     ]
-      // }
-
       axios.post(API_URL + 'PaymentRequest/Create', payload)
-        .then((response) => {
-            NotifAlert('Data Saved!', 'success')
-            setIsLoading(false);
-            history('/booking/payment-request')
-        })
-        .catch(function (error) {
-            setIsLoading(false);
-            NotifAlert('Something Went Wrong!', 'error')
-        })
-
+      .then((response) => {
+          NotifAlert('Data Saved!', 'success')
+          setIsLoading(false);
+          history('/booking/payment-request')
+      })
+      .catch(function (error) {
+          setIsLoading(false);
+          NotifAlert('Something Went Wrong!', 'error')
+      })
     }
 
     const handleAddNew = () => {
@@ -360,15 +195,10 @@ const PaymentRequestAddPage = () => {
     }
 
     const handlePrintSO = () => {
-        alert("Print")
+      alert("Print")
     }
     
-    const handleApproveAccMgr = () => {
-      // if (SelectedData.id === undefined) {
-      //   NotifAlert("Please Select Data!", "warning")
-      //   return false
-      // }    
-
+    const handleApproveAccMgr = () => { 
       Swal.fire({
         icon: 'question',
         title: 'Are you sure you want to Multi Approval - Payment Request?',
@@ -399,20 +229,44 @@ const PaymentRequestAddPage = () => {
     }  
 
     const handleApproveGeneralPR = () => {
-        alert("Approve General PR")
+      alert("Approve General PR")
     }
 
     const handleApproveMKT = () => {
-        alert("Approve MKT")
+      alert("Approve MKT")
     }
 
     const handleAdd = (type) => {
-        if (localStorage.getItem("id") === '') {
-            NotifAlert("Shipment Order Number Can't Be Empty!", "error");
-            return false;
-        }
-        setIsAdd(true)
-        setShowAddbeingForPayment(true)
+      if (localStorage.getItem("id") === '') {
+          NotifAlert("Shipment Order Number Can't Be Empty!", "error");
+          return false;
+      }
+      setIsAdd(true)
+      setShowAddbeingForPayment(true)
+    }
+
+    const handleRemove = () => {
+      SelectedShipperList.idRow !== undefined ?
+        Swal.fire({
+          icon: 'question',
+          title: 'Are you sure you want to delete the selected data?',
+          showCancelButton: true,
+          confirmButtonText: 'Ok',
+          cancelButtonText: 'Cancel',
+          customClass: {
+              confirmButton: 'btn btn-infoss px-4',
+              cancelButton: 'btn btn-outline-infoss px-4'
+          }
+        })
+        .then((result) => {
+          if (result.value) {
+            let filteredArray = IncShipperList.filter(function(e) { return e.idRow !== SelectedShipperList.idRow })
+            setIncShipperList(filteredArray)
+            setSelectedShipperList({})
+          }
+        })
+      :
+      NotifAlert("Please Select Data!", "warning")
     }
 
     const handleClose = (event, reason) => {
@@ -462,7 +316,7 @@ const PaymentRequestAddPage = () => {
                                 defaultChecked={true}
                                 control={
                                     <Radio
-                                        onChange={(e) => setPaymentForm("PaymentRequest")}
+                                        onChange={(e) => setIsGeneralPayment(false)}
                                     />
                                 }
                                 label="Payment Request"
@@ -471,7 +325,7 @@ const PaymentRequestAddPage = () => {
                                 defaultChecked={false}
                                 control={
                                     <Radio
-                                    onChange={(e) => setPaymentForm("General PaymentRequest")}
+                                    onChange={(e) => setIsGeneralPayment(true)}
                                     />
                                 }
                                 label="General Payment Request"
@@ -508,7 +362,7 @@ const PaymentRequestAddPage = () => {
                                 defaultChecked={true}
                                 control={
                                   <Radio
-                                      onChange={(e) => setCTCType("Non CTC")}
+                                      onChange={(e) => setCTCType(false)}
                                   />
                                 }
                                 label="Non - Cost To Cost"
@@ -517,7 +371,7 @@ const PaymentRequestAddPage = () => {
                                 defaultChecked={false}
                                 control={
                                   <Radio
-                                  onChange={(e) => setCTCType("CTC")}
+                                  onChange={(e) => setCTCType(true)}
                                   />
                                 }
                                 label="Cost To Cost"
@@ -684,78 +538,77 @@ const PaymentRequestAddPage = () => {
                 </section>
 
                 {
-                    IsLoading ?
-                        <LoadingSpinner />
-                        :
-                        <section className='mt-5'>
-                            <Tabs
-                                id="controlled-tab-example"
-                                activeKey={key}
-                                onSelect={(k) => { setKey(k); setSelectedShipperList({}) }}
-                                className="mb-3"
-                            >
-                                <Tab eventKey="inc-shipper" title="Being For Payment"> 
-                                    <div className='border border-secondary rounded-10 p-3'>
-                                        <Table className="table-borderless">
-                                            <thead className='text-infoss'>
-                                                <tr>
-                                                    <td>Code</td>
-                                                    <td>Paid</td>
-                                                    <td>Description</td>
-                                                    <td>Amount USD</td>
-                                                    <td>Amount IDR</td>
-                                                    <td>Cost To Cost</td>
-                                                    <td>PPn 10%</td>
-                                                    <td>Faktur No.</td>
-                                                    <td>NoPol Truck</td>
-                                                    <td>Driver</td>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="text-muted">
-                                                {
-                                                    IncShipperList.length ?
-                                                        IncShipperList.map((v, k) => {
-                                                            return (
-                                                                <ListTab1
-                                                                    key={k}
-                                                                    k={k}
-                                                                    v={v}
-                                                                    SelectedShipperList={SelectedShipperList.id === v.id ? true : false}
-                                                                    setSelectedShipperList={(e) => setSelectedShipperList(e)}
-                                                                />
-                                                            )
-                                                        })
-                                                        :
-                                                        <tr>
-                                                            <td colSpan={10} className="text-center py-3 text-muted">Data Empty</td>
-                                                        </tr>
-                                                }
-
-                                            </tbody>
-                                        </Table>
-                                        
-                                        <div className='row px-2 py-3'>
-                                            <div className='col-8'>
-                                                <Button variant='outline-infoss me-3' onClick={() => handleAdd()}>
-                                                    <AddToPhotosIcon />
-                                                </Button>
-                                                <Button variant='outline-infoss me-3'>
-                                                    <ModeEditOutlineIcon />
-                                                </Button>
-                                                <Button variant='outline-infoss me-3'>
-                                                    <DeleteForeverIcon />
-                                                </Button>
-                                            </div>
-                                            <div className='col-4 text-end'>
-                                                <Button variant='outline-infoss'>
-                                                    <AddToPhotosIcon /> Add Trucking
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </div> 
-                                </Tab>
-                            </Tabs>
-                        </section>
+                  IsLoading ?
+                    <LoadingSpinner />
+                    :
+                    <section className='mt-5'>
+                      <Tabs
+                          id="controlled-tab-example"
+                          activeKey={key}
+                          onSelect={(k) => { setKey(k); setSelectedShipperList({}) }}
+                          className="mb-3"
+                      >
+                        <Tab eventKey="inc-shipper" title="Being For Payment"> 
+                          <div className='border border-secondary rounded-10 p-3'>
+                              <Table className="table-borderless">
+                                <thead className='text-infoss'>
+                                  <tr>
+                                      <td>Code</td>
+                                      <td>Paid</td>
+                                      <td>Description</td>
+                                      <td>Amount USD</td>
+                                      <td>Amount IDR</td>
+                                      <td>Cost To Cost</td>
+                                      <td>PPn 10%</td>
+                                      <td>Faktur No.</td>
+                                      <td>NoPol Truck</td>
+                                      <td>Driver</td>
+                                  </tr>
+                                </thead>
+                                <tbody className="text-muted">
+                                  {
+                                    IncShipperList.length ?
+                                      IncShipperList.map((v, k) => {
+                                        return (
+                                          <ListTab1
+                                            key={k}
+                                            k={k}
+                                            v={v}
+                                            SelectedShipperList={SelectedShipperList.idRow === v.idRow ? true : false}
+                                            setSelectedShipperList={(e) => setSelectedShipperList(e)}
+                                          />
+                                        )
+                                      })
+                                      :
+                                      <tr>
+                                          <td colSpan={10} className="text-center py-3 text-muted">Data Empty</td>
+                                      </tr>
+                                  }
+                                </tbody>
+                              </Table>
+                              
+                              <div className='row px-2 py-3'>
+                                  <div className='col-8'>
+                                      <Button variant='outline-infoss me-3' onClick={() => handleAdd()}>
+                                          <AddToPhotosIcon />
+                                      </Button>
+                                      <Button variant='outline-infoss me-3'>
+                                          <ModeEditOutlineIcon />
+                                      </Button>
+                                      <Button variant='outline-infoss me-3' onClick={() => handleRemove()}>
+                                          <DeleteForeverIcon />
+                                      </Button>
+                                  </div>
+                                  <div className='col-4 text-end'>
+                                      <Button variant='outline-infoss'>
+                                          <AddToPhotosIcon /> Add Trucking
+                                      </Button>
+                                  </div>
+                              </div>
+                          </div> 
+                        </Tab>
+                      </Tabs>
+                    </section>
                 }
                 
                 <div className='row my-4 px-2'>
@@ -773,9 +626,7 @@ const PaymentRequestAddPage = () => {
                                   <FormControlLabel value="Paid"
                                     defaultChecked={true}
                                     control={
-                                      <Radio
-                                          onChange={(e) => setTotalUSD("Paid")}
-                                      />
+                                      <Radio/>
                                     }
                                     label="Paid"
                                   />  
@@ -784,9 +635,7 @@ const PaymentRequestAddPage = () => {
                                   <FormControlLabel value="Not Paid"
                                     defaultChecked={false}
                                     control={
-                                      <Radio
-                                        onChange={(e) => setTotalUSD("Not Paid")}
-                                      />
+                                      <Radio/>
                                     }
                                     label="Not Paid"
                                   />    
@@ -809,9 +658,7 @@ const PaymentRequestAddPage = () => {
                                   <FormControlLabel value="Paid"
                                     defaultChecked={true}
                                     control={
-                                      <Radio
-                                        onChange={(e) => setTotalIDR("Paid")}
-                                      />
+                                      <Radio/>
                                     }
                                     label="Paid"
                                   />  
@@ -820,9 +667,7 @@ const PaymentRequestAddPage = () => {
                                   <FormControlLabel value="Not Paid"
                                     defaultChecked={false}
                                     control={
-                                      <Radio
-                                        onChange={(e) => setTotalIDR("Not Paid")}
-                                      />
+                                      <Radio/>
                                     }
                                     label="Not Paid"
                                   />    

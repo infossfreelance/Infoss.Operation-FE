@@ -16,9 +16,6 @@ import SearchIcon from '@mui/icons-material/Search';
 
 export default function AddbeingForPayment(props) {
 
-  console.log("IncShipperList", props.IncShipperList)
-  // console.log("setIncShipperList", props.setIncShipperList)
-
   useEffect(() => {
     
   }, []);
@@ -34,11 +31,12 @@ export default function AddbeingForPayment(props) {
   const vertical = 'top'
   const horizontal = 'right'
 
-  const [Account, setAccountName] = useState('')
+  const [Account, setAccount] = useState('')
+  const [IsPaid, setIsPaid] = useState(false)
   const [Desc, setDesc] = useState('')
   const [Amount, setAmount] = useState('')
-  const [CostToCost, setCostToCost] = useState('')
-  const [CostTrucking, setCostTrucking] = useState('')
+  const [IsCostToCost, setIsCostToCost] = useState(false)
+  const [IsCostTrucking, setIsCostTrucking] = useState(false)
   const [CTCType, setCTCType] = useState('')
   const [Currency, setCurrency] = useState('')
   const [DefShipNo, setDefShipNo] = useState('')
@@ -49,40 +47,90 @@ export default function AddbeingForPayment(props) {
   const [OriginalUSD, setOriginalUSD] = useState('')
   const [SubjectVAT, setSubjectVAT] = useState(false)
   const [FakturNo, setFakturNo] = useState('')
+  const [NoPolTruck, setNoPolTruck] = useState('')
+  const [Driver, setDriver] = useState('')
 
   const clearForm = () => {
     setSelectedAccount({})
+
+    setAccount('')
+    setIsPaid(false)
+    setDesc('')
+    setAmount('')
+    setIsCostToCost(false)
+    setIsCostTrucking(false)
+    setCTCType('')
+    setCurrency('')
+    setDefShipNo('')
+    setQtyUnit('')
+    setDifferentCost('')
+    setOriginalRate('')
+    setPerUnitCost('')
+    setOriginalUSD('')
+    setSubjectVAT(false)
+    setFakturNo('')
+    setNoPolTruck('')
+    setDriver('')
   }
 
   const saveData = () => {
-    // alert("SAVED!")
 
-    const data = {
-      Account: Account,
-      Desc: Desc,
-      Amount: Amount,
-      CostToCost: CostToCost,
-      CostTrucking: CostTrucking,
-      CTCType: CTCType,
-      Currency: Currency,
-      DefShipNo: DefShipNo,
-      QtyUnit: QtyUnit,
-      DifferentCost: DifferentCost,
-      OriginalRate: OriginalRate,
-      PerUnitCost: PerUnitCost,
-      OriginalUSD: OriginalUSD,
-      SubjectVAT: SubjectVAT,
-      FakturNo: FakturNo,
+    const amountIDR = Currency === "IDR" ? Amount : 0;
+    const amountUSD = Currency === "USD" ? Amount : 0;
+
+    const data = {    
+      
+      idRow: props.IncShipperList.length + 1,
+
+      paid: IsPaid,
+      description: Desc,
+      amount: Amount,
+      type: 0,
+      isCostToCost: IsCostToCost,
+      isCostTrucking: IsCostTrucking,
+      originalUsd: OriginalUSD,
+      originalRate: OriginalRate,
+      quantity: QtyUnit,
+      perQty: PerUnitCost,
+      fakturNo: FakturNo,
+      kendaraanNopol: NoPolTruck,
+      employeeName: Driver,
+      countryId: 101,
+      companyId: 32,
+      branchId: 12,
+      
+      // accountId: Account,
+      // persenPpn: SubjectVAT,
+      
+      accountId: 1,
+      persenPpn: 10,
+
+
+      rowStatus: "string",
+      paymentRequestId: 0,
+      sequence: 0,
+      debetCredit: "string",
+      codingQuantity: true,
+      amountCrr: 0,
+      paidOn: "2022-10-09T01:25:44.400Z",
+      paidPV: true,
+      eplDetailId: 0,
+      statusMemo: true,
+      memoNo: 0,
+      idLama: 0,
+      isPpn: true,
+      fakturDate: "2022-10-09T01:25:44.401Z",
+      kendaraanId: 0,
+      employeeId: 0,
+      mrgId: 0,
+      deliveryDate: "2022-10-09T01:25:44.401Z",
+      user: "string"
     }
 
-    console.log("Data", data)
-    let old = props.IncShipperList
-    let temp = []
-    
-    temp = old.push(data)
-    
-    console.log("first", temp)
-    props.setIncShipperList(temp)
+   
+    props.IncShipperList.push(data);
+    clearForm();
+    props.onHide();
 
   }
 
@@ -92,6 +140,7 @@ export default function AddbeingForPayment(props) {
       return;
     }
     setOpenAlert(false);
+    clearForm();
   };
 
   const NotifAlert = (text, color) => {
@@ -133,9 +182,30 @@ export default function AddbeingForPayment(props) {
             <div className='col-1'>
               <FindInPageIcon className='text-infoss' onClick={() => setShowAddAccountList(true)} />
             </div>
-            <div className='col-4'>
-              <input type='radio' /> Paid
-              <input type='radio' className='ms-2' /> Not Paid
+            <div className='col-4 row'>              
+              <RadioGroup
+                row
+                aria-labelledby="demo-row-radio-buttons-group-label"
+                name="row-radio-buttons-group"
+              >
+                <FormControlLabel value="Paid"
+                  control={
+                    <Radio
+                      onChange={(e) => setIsPaid(true)}
+                    />
+                  }
+                  label="Paid"
+                />
+                <FormControlLabel value="Not Paid"
+                  defaultChecked={true}
+                  control={
+                    <Radio
+                      onChange={(e) => setIsPaid(false)}
+                    />
+                  }
+                  label="Not Paid"
+                />
+              </RadioGroup>
             </div>
             <div className='col-5'>
               <input type='checkbox' disabled /> 20
@@ -205,7 +275,6 @@ export default function AddbeingForPayment(props) {
                 :
                 <>
                   <FormControlLabel value="USD"
-                    defaultChecked={props.IsAdd ? false : (props.data.amountUSD !== 0 ? true : false)}
                     control={
                       <Radio
                         onChange={(e) => setCurrency("USD")}
@@ -214,7 +283,6 @@ export default function AddbeingForPayment(props) {
                     label="USD"
                   />
                   <FormControlLabel value="IDR"
-                    defaultChecked={props.IsAdd ? false : (props.data.amountIDR !== 0 ? true : false)}
                     control={
                       <Radio
                         onChange={(e) => setCurrency("IDR")}
@@ -229,10 +297,10 @@ export default function AddbeingForPayment(props) {
           </div>          
           <div className='col-7 row'>  
             <div className='col-4 offset-4 pt-2'>
-              <input type='checkbox'onChange={(e) => setCostTrucking(!CostTrucking)} /> Cost Trucking
+              <input type='checkbox'onChange={(e) => setIsCostTrucking(!IsCostTrucking)} /> Cost Trucking
             </div>     
             <div className='col-4 pt-2'>
-              <input type='checkbox' onChange={(e) => setCostToCost(!CostToCost)} /> Cost To Cost
+              <input type='checkbox' onChange={(e) => setIsCostToCost(!IsCostToCost)} /> Cost To Cost
             </div>
           </div>
         </div>        
@@ -301,6 +369,29 @@ export default function AddbeingForPayment(props) {
             <div className='col-6'>
               <input type="number" disabled className='form-control'
                 onChange={(e) => setDifferentCost(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className='row mt-3' hidden={!IsCostTrucking}>
+          <div className='col-6 row'>
+            <div className='col-4'>
+              NoPol Truck
+            </div>
+            <div className='col-6 ms-1'>
+              <input min={0} type="text" className='form-control ms-1'                  
+                onChange={(e) => setNoPolTruck(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className='col-6 row'>
+            <div className='col-6 text-end'>
+              Driver
+            </div>
+            <div className='col-6'>
+              <input type="text" className='form-control'
+                onChange={(e) => setDriver(e.target.value)}
               />
             </div>
           </div>
