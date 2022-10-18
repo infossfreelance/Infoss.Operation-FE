@@ -40,23 +40,53 @@ const EstimateProfitLossPage = () => {
   const [SelectedData, setSelectedData] = useState({});
   const [noJob, setNoJob] = useState(true)
 
-  console.log("EPLData", EPLData)
+  // console.log("EPLData", EPLData[0])
 
   useEffect(() => {
     getData();
   }, []);
 
-  const getData = (rowsCount = 50, NumPage = 1) => {
+  const getData = (param = "", value = "") => {
     setIsLoading(true);
     const payload = {
       userCode: "string",
       countryId: 101,
       companyId: 32,
-      branchId: 12
+      branchId: 12,
+      filter: [{
+        field: param,
+        data: value
+      }]
     }
     axios.post(API_URL + `PaymentRequest/PostByPage?pageNumber=${NumPage}&pageSize=${rowsCount}`, payload)
     .then((response) => {
       setIsLoading(false);
+      setMaxPage(response.data.totalPage)
+      response.data.data.length > 0 &&
+        setEPLDataMap(response.data.data)
+        setEPLData(response.data.data);
+    })
+    .catch(function (error) {
+      setIsLoading(false);
+      NotifAlert("Something Went Wrong!", "error")
+    })
+  }
+
+  const getDataFilter = (param , value ) => {
+    // console.log("PARAM", param)
+    // console.log("VALUE", value)
+    const payload = {
+      userCode: "string",
+      countryId: 101,
+      companyId: 32,
+      branchId: 12,
+      filter: [{
+        field: param,
+        data: value
+      }]
+    }
+    axios.post(API_URL + `PaymentRequest/PostByPage?pageNumber=${NumPage}&pageSize=${rowsCount}`, payload)
+    .then((response) => {
       setMaxPage(response.data.totalPage)
       response.data.data.length > 0 &&
         setEPLDataMap(response.data.data)
@@ -161,7 +191,6 @@ const EstimateProfitLossPage = () => {
   }  
 
   const handleApprove = (appv_id) => {
-    console.log("APPV ID", appv_id)
     if (SelectedData.id === undefined) {
       NotifAlert("Please Select Data!", "warning")
       return false
@@ -265,116 +294,6 @@ const EstimateProfitLossPage = () => {
     pri.document.close();
     pri.focus();
     pri.print();
-  }
-  
-  const filterTable = (key, val) => {
-
-    if (val === '') {
-      setEPLDataMap(EPLData)
-      return false
-    } 
-    
-    let arr = [];
-
-    if(key === 1) {
-      EPLData.map((v, k) => {
-        v.shipmentId.includes(val) && arr.push(v)
-      })
-      setEPLDataMap(arr)
-    }
-
-    if(key === 2) {
-      // EPLData.map((v, k) => {
-      //   v.printedOn.includes(val) && arr.push(v)
-      // })
-      // setEPLDataMap(arr)
-    }
-
-    if(key === 3) {
-      // EPLData.map((v, k) => {
-      //   v.printedOn.includes(val) && arr.push(v)
-      // })
-      // setEPLDataMap(arr)
-    }
-
-    if(key === 4) {
-      // EPLData.map((v, k) => {
-      //   v.estUSDShipCons.includes(val) && arr.push(v)
-      // })
-      // setEPLDataMap(arr)
-    }
-
-    if(key === 5) {
-      // EPLData.map((v, k) => {
-      //   v.estIDRShipCons.includes(val) && arr.push(v)
-      // })
-      // setEPLDataMap(arr)
-    }
-
-    if(key === 6) {
-      EPLData.map((v, k) => {
-        v.estUSDShipCons.includes(val) && arr.push(v)
-      })
-      setEPLDataMap(arr)
-    }
-
-    if(key === 7) {
-      EPLData.map((v, k) => {
-        v.estIDRShipCons.includes(val) && arr.push(v)
-      })
-      setEPLDataMap(arr)
-    }
-
-    if(key === 8) {
-      EPLData.map((v, k) => {
-        v.estUSDAgent.includes(val) && arr.push(v)
-      })
-      setEPLDataMap(arr)
-    }
-
-    if(key === 9) {
-      EPLData.map((v, k) => {
-        v.estIDRAgent.includes(val) && arr.push(v)
-      })
-      setEPLDataMap(arr)
-    }
-
-    if(key === 10) {
-      // EPLData.map((v, k) => {
-      //   v.printedOn.includes(val) && arr.push(v)
-      // })
-      // setEPLDataMap(arr)
-    }
-
-    if(key === 11) {
-      EPLData.map((v, k) => {
-        v.printing.includes(val) && arr.push(v)
-      })
-      setEPLDataMap(arr)
-    }
-
-    if(key === 12) {
-      EPLData.map((v, k) => {
-        v.printedOn.includes(val) && arr.push(v)
-      })
-      setEPLDataMap(arr)
-    }
-
-    if(key === 13) {
-      EPLData.map((v, k) => {
-        v.createdOn.includes(val) && arr.push(v)
-      })
-      setEPLDataMap(arr)
-    }
-
-    if(key === 14) {
-      EPLData.map((v, k) => {
-        v.createdBy.includes(val) && arr.push(v)
-      })
-      setEPLDataMap(arr)
-    }
-
-        
   }
 
   const handleClose = (event, reason) => {
@@ -517,86 +436,90 @@ const EstimateProfitLossPage = () => {
                           <tbody className="text-muted">
                               <tr>
                                   <td>
-                                      <select className='form-control col-search-form border-infoss'>
-                                          <option value="all">All</option>
-                                          <option value="yes">Yes</option>
-                                          <option value="no">No</option>
+                                      <select className='form-control col-search-form border-infoss' onChange={(e) => getDataFilter("deleted", e.target.value)}>
+                                          <option value="">All</option>
+                                          <option value="true">Yes</option>
+                                          <option value="false">No</option>
                                       </select>
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(1, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("shipmentId", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(2, e.target.value)} />
+                                      <select className='form-control col-search-form border-infoss' onChange={(e) => getDataFilter("isCostToCost", e.target.value)}>
+                                          <option value="">All</option>
+                                          <option value="true">Yes</option>
+                                          <option value="false">No</option>
+                                      </select>
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(3, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("prContraNo", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(4, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("reference", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(5, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(6, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(7, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(8, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(9, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(10, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(11, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("paymentUSD", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(12, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("paymentIDR", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(13, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("printedOn", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("customerId", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("rate", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("exRateDate", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("createdOn", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("printing", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("totalPpnUSD", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("totalPpnIDR", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("vendorDN", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => filterTable(14, e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                               </tr>
                               {
