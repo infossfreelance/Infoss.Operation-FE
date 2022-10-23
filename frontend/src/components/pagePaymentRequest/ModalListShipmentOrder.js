@@ -10,7 +10,7 @@ import LSORow from './LSORow';
 
 export default function ModalListShipmentOrder(props) {
   const column = props.LSOData.columns !== undefined ? props.LSOData.columns : '';
-  const row = props.LSOData.shipmentOrders !== undefined ? props.LSOData.shipmentOrders : '';
+  const row = props.LSOData.shipmentOrderHeader !== undefined ? props.LSOData.shipmentOrderHeader : '';
 
   const [selectedId, setSelectedId] = useState('')
   const [selectedData, setSelectedData] = useState({})
@@ -149,14 +149,14 @@ export default function ModalListShipmentOrder(props) {
                       v={v}
                       k={k}
                       setSelectedData={(e) => setSelectedData(e)}
-                      selectedId={selectedData.shipperId === v.shipperId ? true : false}
+                      selectedId={selectedData.id === v.id ? true : false}
                       column={column}
                     />
                   )
                 })
                : (
                   <tr>
-                    <td colSpan={column.length} className="py-3 text-muted text-center">Data Empty</td>
+                    <td colSpan={5} className="py-3 text-muted text-center">Data Empty</td>
                   </tr>
                 )
               }

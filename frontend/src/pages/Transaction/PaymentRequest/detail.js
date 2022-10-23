@@ -93,6 +93,7 @@ const PaymentRequestAddPage = () => {
       }
       axios.post(`http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=COMBO&pageNumber=1&pageSize=20`, payload)
       .then((response) => {
+        console.log("RESPONSE", response)
           setIsLoading(false);
           response.data.data !== null && setLSOData(response.data.data)
       })
@@ -177,6 +178,8 @@ const PaymentRequestAddPage = () => {
           },
           "paymentRequestDetails": IncShipperList
       }
+
+      console.log("PAYLOAD", payload)
 
       axios.post(API_URL + 'PaymentRequest/Create', payload)
       .then((response) => {
