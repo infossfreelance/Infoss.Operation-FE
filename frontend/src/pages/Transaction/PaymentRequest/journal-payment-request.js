@@ -39,10 +39,8 @@ const EstimateProfitLossPage = () => {
   const [rowsCount, setRowsCount] = useState(50);
   const [SelectedData, setSelectedData] = useState({});
   const [noJob, setNoJob] = useState(true)
-  const [Column, setColumn] = useState([])
 
-  console.log("EPLData", EPLData[0])
-  // console.log("COLUMNS", Column)
+  // console.log("EPLData", EPLData[0])
 
   useEffect(() => {
     getData();
@@ -55,21 +53,18 @@ const EstimateProfitLossPage = () => {
       countryId: 101,
       companyId: 32,
       branchId: 12,
-      // filter: [{
-      //   field: param,
-      //   data: value
-      // }]
+      filter: [{
+        field: param,
+        data: value
+      }]
     }
-    axios.post(`http://stage-operation.api.infoss.solusisentraldata.com/paymentRequest/paymentRequest/PostByPage?pageNumber=1&pageSize=20`, payload)
-    // axios.post(API_URL + `PaymentRequest/PostByPage?pageNumber=${NumPage}&pageSize=${rowsCount}`, payload)
+    axios.post(API_URL + `PaymentRequest/PostByPage?pageNumber=${NumPage}&pageSize=${rowsCount}`, payload)
     .then((response) => {
       setIsLoading(false);
-      // console.log("RESPONSE", response.data)
       setMaxPage(response.data.totalPage)
-      response.data.data.paymentRequest.length > 0 &&
-        setEPLDataMap(response.data.data.paymentRequest)
-        setEPLData(response.data.data.paymentRequest);
-        setColumn(response.data.data.columns.headerColumns)
+      response.data.data.length > 0 &&
+        setEPLDataMap(response.data.data)
+        setEPLData(response.data.data);
     })
     .catch(function (error) {
       setIsLoading(false);
@@ -409,7 +404,7 @@ const EstimateProfitLossPage = () => {
                     <>
                       <Table className="table-borderless">
                           <thead className='text-center text-infoss'>
-                              {/* <tr>
+                              <tr>
                                   <td>Delete</td>
                                   <td>Type</td>
                                   <td>Ctc</td>
@@ -436,24 +431,10 @@ const EstimateProfitLossPage = () => {
                                   <td>Appr Gen PR</td>
                                   <td>Approval MKT</td>
                                   <td>BC Reference</td>
-                              </tr> */}
-
-                              <tr>
-                                {
-                                  Column.length > 0 &&
-                                  Column.map((v, k) => {
-                                    return (
-                                      <th>
-                                        {v.text}
-                                      </th>
-                                    )
-                                  })
-                                }
                               </tr>
-
                           </thead>
-                          {/* <tbody className="text-muted"> */}
-                              {/* <tr>
+                          <tbody className="text-muted">
+                              <tr>
                                   <td>
                                       <select className='form-control col-search-form border-infoss' onChange={(e) => getDataFilter("deleted", e.target.value)}>
                                           <option value="">All</option>
@@ -478,16 +459,16 @@ const EstimateProfitLossPage = () => {
                                       <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("reference", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("shipmentId", e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
                                       <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("prStatus", e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
-                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("approveAcc", e.target.value)} />
+                                      <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
                                   <td>
                                       <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
@@ -540,8 +521,8 @@ const EstimateProfitLossPage = () => {
                                   <td>
                                       <input className="form-control col-search-form border-infoss" onChange={(e) => getDataFilter("", e.target.value)} />
                                   </td>
-                              </tr> */}
-                              {/* {
+                              </tr>
+                              {
                                 EPLDataMap.length ?
                                   EPLDataMap.map((v, k) => {
                                     return (
@@ -560,66 +541,8 @@ const EstimateProfitLossPage = () => {
                                 <tr>
                                     <td colSpan={26} className="text-center py-3 text-muted">Data Empty</td>
                                 </tr>
-                              } */}
+                              }
 
-                          {/* </tbody> */}
-                          
-                          <tbody className="text-muted">
-                            {
-                              EPLData.length > 0 
-                              ?
-                              EPLData.map((el, index) => {
-                                  let tempStyle = 'text-dark'
-                                  if(SelectedData.id === el.id) {
-                                      tempStyle = "bg-infoss text-white"
-                                  } else if(el.rowStatus === 'DEL') {
-                                      tempStyle = "text-danger"
-                                  } else if(el.printing > 0) {
-                                      tempStyle = "text-secondary"
-                                  }
-
-                                  return (
-                                      <tr 
-                                      key={index} 
-                                      onClick={() => setSelectedData(el)}
-                                      className={tempStyle}>
-                                          {
-                                              Column.map((headersEl, indexHeaders) => {
-                                                  let temp = el[headersEl.column]
-                                                  if(headersEl.format === 'date') {
-                                                      if(el[headersEl.column] !== "0001-01-01T00:00:00") {
-                                                          temp = dateFormat(el[headersEl.column])
-                                                      } else {
-                                                          temp = ''
-                                                      }
-                                                  }
-
-                                                  if(el[headersEl.column] === true) {
-                                                      temp = 'Yes'
-                                                  } else if(el[headersEl.column] === false) {
-                                                      temp = 'No'
-                                                  }
-
-                                                  if(headersEl.column === 'rowStatus') {
-                                                      if(el.rowStatus === 'DEL') {
-                                                          temp = "Yes"
-                                                      } else {
-                                                          temp = 'No'
-                                                      }
-                                                  }
-                                                  return (
-                                                      <td key={indexHeaders}>{temp}</td> 
-                                                  )
-                                              }) 
-                                          }
-                                      </tr>
-                                  )       
-                              })
-                              :
-                              <tr>
-                                <td colSpan={15} className="text-center py-3 text-muted">Data Empty</td>
-                              </tr>
-                            }
                           </tbody>
                       </Table>
                       <div className='row mt-2'>
