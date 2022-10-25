@@ -37,6 +37,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios'
 import {API_URL, dateFormat} from '../../../helpers/constant';
 import { NumericFormat } from 'react-number-format';
+import Swal from 'sweetalert2';
 
 function a11yProps(index) {
     return {
@@ -178,8 +179,8 @@ const ViewInvoicePage = () => {
             }
         ).then(response => {
             console.log('data edit', response)
-            setInvoiceDetails(response.data.data.invoiceDetails)
-            let tempDetail = response.data.data.invoiceDetails
+            setInvoiceDetails(response.data.data.invoice.invoiceDetails)
+            let tempDetail = response.data.data.invoice.invoiceDetails
             if(tempDetail.length > 0) {
                 setDetailSequence(tempDetail[tempDetail.length-1].sequence)
             }
@@ -210,6 +211,22 @@ const ViewInvoicePage = () => {
             setRate(temp.rate)
             setKursKMK(temp.kursKMK)
         }).catch(error => console.error(error))
+    }
+
+    const handleNewForm = () => {
+        Swal.fire({
+            title: 'Confirm',
+            text: "Are you sure you want to create NEW Invoice?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                history('/booking/invoice/create')
+            }
+        })
     }
 
     const handleTab = (event, newValue) => {
@@ -257,7 +274,7 @@ const ViewInvoicePage = () => {
                     <Button variant="outlined" startIcon={<PrintIcon />}>
                         print
                     </Button>
-                    <Button variant="outlined" startIcon={<AddToPhotosIcon />}>
+                    <Button variant="outlined" startIcon={<AddToPhotosIcon />} onClick={() => handleNewForm()}>
                         add new
                     </Button>
                     <Button variant="outlined" startIcon={<ApprovalIcon />}>

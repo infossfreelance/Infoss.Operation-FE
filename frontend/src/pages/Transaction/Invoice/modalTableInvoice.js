@@ -14,25 +14,6 @@ import Paper from '@mui/material/Paper';
 import { Dropdown, Pagination } from 'react-bootstrap'
 import axios from 'axios'
 
-// const dummy = [
-//     {
-//         id: 1,
-//         shipmentOrder: 'AMJKT.10.000302-00',
-//         principle: '1 - AR',
-//         etd: 'Apr 22, 2022',
-//         shipper: 'PT. SULFINDO ADIUSAHA',
-//         agent: 'PT. ARCHE MITRA GLOBAL'
-//     },
-//     {
-//         id:2,
-//         shipmentOrder: 'AMJKT.10.000303-00',
-//         principle: '1 - AR',
-//         etd: 'Apr 23, 2022',
-//         shipper: 'PT. SULFINDO ADIUSAHA',
-//         agent: 'PT. ARCHE MITRA GLOBAL'
-//     }
-// ]
-
 const style = {
     position: 'absolute',
     top: '20%',
@@ -48,7 +29,6 @@ const style = {
 const selectedStyle = { bgcolor: (theme) => theme.palette.primary.main }
 
 const ModalTableInvoice = (props) => {
-    // const [dataList, setDataList] = useState(dummy)
     const [selectedData, setSelectedData] = useState({})
     const [rowsCount, setRowsCount] = useState(50)
     const [numPage, setNumPage] = useState(1)
@@ -80,6 +60,8 @@ const ModalTableInvoice = (props) => {
             "companyId": 32,
             "branchId": 12
           }
+
+          //FETCH CUSTOMER DATA
           axios.post(
             `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostById?id=${selectedData.id}`,
             body
@@ -88,6 +70,36 @@ const ModalTableInvoice = (props) => {
             props.setId(res.data.data.shipmentOrder.shipperId)
             props.setName(res.data.data.shipmentOrder.shipperName)
             props.setAddress(res.data.data.shipmentOrder.shipperAddress)
+            props.setAgentId(res.data.data.shipmentOrder.agentId)
+            props.setAgentName(res.data.data.shipmentOrder.agentName)
+            props.setAgentAddress(res.data.data.shipmentOrder.agentAddress)
+          }).catch(error => console.error(error))
+
+          let tempSelected = {...selectedData}
+          //FETCH JOB OWNER ATAU INVHEADER
+          axios.post(
+            `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${tempSelected.jobOwnerId}`,
+            body
+          ).then(res => {
+            console.log('res jow owner by id', res)
+            if(res.data.code === 200) {
+              tempSelected.invHeader = res.data.data.jobOwner.masterCode
+              props.setSelectedData(tempSelected)
+            }
+          }).catch(error => console.error(error))
+
+          //FETCH INVOICE DETAILS FROM EPL
+          axios.post(
+            `http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLoss/estimateProfitLoss/PostById?Id=${selectedData.id}`,
+            body
+          ).then(res => {
+            console.log('res detail epl', res)
+            if(res.data.code === 200) {
+              let temp = res.data.data.estimateProfitLoss.estimateProfitLossDetails
+              props.setDetailSequence(temp[temp.length - 1].sequence)
+              props.setInvoiceDetails(temp)
+              props.setDetailMap(temp)
+            }
           }).catch(error => console.error(error))
         }
 
@@ -103,7 +115,6 @@ const ModalTableInvoice = (props) => {
     const renderPagination = () => {
         let MaxPage = 1
         if(props.bodyData.length > 0) {
-            // MaxPage = Math.ceil( props.bodyData.length / rowsCount )
             MaxPage = props.maxPage
         }
         if (numPage === 1 && numPage !== MaxPage) {
@@ -240,7 +251,10 @@ const ModalTableInvoice = (props) => {
                                         ?
                                         props.bodyData.map(el => {
                                             return (
-                                                <TableRow key={el[identifier]} onClick={() => handleSelect(el)} sx={selectedData[identifier] === el[identifier] ? selectedStyle : {} }>
+                                                <TableRow key={el[identifier]} 
+                                                onClick={() => handleSelect(el)} 
+                                                sx={selectedData[identifier] === el[identifier] ? selectedStyle : {} }
+                                                >
                                                     {
                                                       props.headersData.map((elHeaders, index) => {
                                                         return (
