@@ -22,6 +22,7 @@ import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { NumericFormat } from 'react-number-format';
+import axios from 'axios'
 
 const invoiceDetailTemp = [
     {
@@ -120,7 +121,6 @@ const style = {
 
 function ChildModal(props) {
     const [open, setOpen] = React.useState(false);
-    // const [accountCode, setAccountCode] = useState('')
     let accountData = []
 
     const handleOpen = () => {
@@ -244,6 +244,7 @@ export default function NestedModal(props) {
     const [rate, setRate] = useState(0)
     const [amount, setAmount] = useState(0)
     const [originalUsd, setOriginalUsd] = useState(0)
+    const [masterCode, setMasterCode] = useState('')
 
     useEffect(() => {
         setShipperNo(props.shipperNo)
@@ -252,17 +253,33 @@ export default function NestedModal(props) {
         if(props.edit === true) {
             let temp = props.selected
             setAccountId(temp.accountId)
-            setAccountName(temp.accountName)
             setDescription(temp.description)
-            setCurrencyRadio(temp.type)
+            setCurrencyRadio(temp.amountCrr)
             setChecked(temp.isCostToCost)
             setSignRadio(temp.sign)
             setVat(temp.percentVat)
             setQuantity(temp.quantity)
             setCost(temp.perQty)
             setRate(temp.originalRate)
-            setAmount(temp.amount)
+            setAmount(temp.amount ? temp.amount : 0)
             setOriginalUsd(temp.originalUsd)
+
+            axios.post(
+                `http://stage-master.api.infoss.solusisentraldata.com/account/account/PostById?id=${temp.accountId}`,
+                {
+                    "userCode": "luna",
+                    "countryId": 101,
+                    "companyId": 32,
+                    "branchId": 12
+                }
+            ).then(res => {
+                console.log('account by id res', res)
+                if(res.data.code === 200) {
+                    setMasterCode(res.data.data.account.masterCode)
+                    setAccountName(res.data.data.account.name)
+                }
+            }).catch(error => console.error(error))
+
         }
     }, [props.shipperNo, props.shipperName, props.selected, props.edit])
 
@@ -282,7 +299,9 @@ export default function NestedModal(props) {
         setRate(0)
         setAmount(0)
         setOriginalUsd(0)
+        setMasterCode('')
         
+        props.resetEdit()
         props.close()
     };
 
@@ -377,7 +396,7 @@ export default function NestedModal(props) {
                         <FormLabel id="account-label">Account :</FormLabel>
                     </Grid>
                     <Grid item xs={3}>
-                        <ChildModal setAccountCode={(e) => setAccountId(e)} accountCode={accountId} isEdit={props.edit}/>
+                        <ChildModal setAccountCode={(e) => setMasterCode(e)} accountCode={masterCode} isEdit={props.edit}/>
                     </Grid>
                     <Grid item xs={7}>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1 }}>
