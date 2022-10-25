@@ -68,8 +68,13 @@ const PaymentRequestViewPage = () => {
     
     const [DetailData, setDetailData] = useState({});
 
-    useEffect(() => {
-        getShipmentOrder(10, 1)      
+    const [Header, setHeader] = useState({})
+    const [BFP, setBFP] = useState([])
+
+    // console.log("HEADER", Header)
+    // console.log("BFP", BFP[0])
+
+    useEffect(() => {   
         getDetail()  
     }, []);
 
@@ -82,61 +87,23 @@ const PaymentRequestViewPage = () => {
         }
         axios.post(API_URL + 'PaymentRequest/PostById?id='+ SOId, payload)
         .then((response) => {
-            console.log("res", response.data)
-            getShipmentOrder(response.data.data.shipmentId)
-            setDetailData(response.data.data)
-            setSORate(response.data.data.rate)
+            setHeader(response.data.data.paymentRequest)
+            setBFP(response.data.data.paymentRequestDetails)
+            // setDetailData(response.data.data)
+            // setSORate(response.data.data.rate)
         })
         .catch(function (error) {
           setIsLoading(false);
           NotifAlert('Something Went Wrong!', 'error')
-        //   Swal.fire({
-        //       icon: 'error',
-        //       title: 'Something Went Wrong!',
-        //       text: error,
-        //       customClass: {
-        //           confirmButton: 'btn-infoss px-4'
-        //       }
-        //   });
+          Swal.fire({
+              icon: 'error',
+              title: 'Something Went Wrong!',
+              text: error,
+              customClass: {
+                  confirmButton: 'btn-infoss px-4'
+              }
+          });
         })
-    }
-
-    const getShipmentOrder = (rowsCount = 10, NumPage = 1) => {
-        axios.get(API_URL + `shipmentorder/shipmentorder/${NumPage}/${rowsCount}`)
-        .then((response) => {
-            setIsLoading(false);
-            setLSOData(response.data)
-        })
-        .catch(function (error) {
-          setIsLoading(false);
-          NotifAlert('Something Went Wrong!', 'error')
-        })
-    }
-
-    const handlePrintSO = () => {
-        alert("Print")
-    }
-
-    const handleApproveAccMgr = () => {
-        alert("Approve By Acc Mgr")
-    }
-
-    const handleApproveGeneralPR = () => {
-        alert("Approve General PR")
-    }
-
-    const handleApproveMKT = () => {
-        alert("Approve MKT")
-    }
-
-    const handleAdd = (type) => {
-        if (localStorage.getItem("id") === '') {
-            NotifAlert("Shipment Order Number Can't Be Empty!", "error");
-            return false;
-        }
-        setIsAdd(true)
-        setTabType(type)
-        setShowAddbeingForPayment(true)
     }
 
     const handleClose = (event, reason) => {
@@ -183,20 +150,16 @@ const PaymentRequestViewPage = () => {
                                 name="row-radio-buttons-group"
                               >
                                 <FormControlLabel value="Payment Request"
-                                defaultChecked={true}
+                                checked={!Header.isGeneralPR}
                                 control={
-                                    <Radio
-                                        // onChange={(e) => setCurrency("USD")}
-                                    />
+                                    <Radio disabled/>
                                 }
                                 label="Payment Request"
                                 />
                                 <FormControlLabel value="General Payment Request"
-                                defaultChecked={false}
+                                checked={Header.isGeneralPR}
                                 control={
-                                    <Radio
-                                    // onChange={(e) => setCurrency("IDR")}
-                                    />
+                                    <Radio disabled/>
                                 }
                                 label="General Payment Request"
                                 />          
@@ -206,14 +169,11 @@ const PaymentRequestViewPage = () => {
                         </div>
                         <div className='col-4 pe-3 row'>
                             <div className="col-8">
-                                <TextField id="filled-basic" label="Shipment Order" className='block' variant="standard" size='small' />
-                            </div>
-                            <div className="col-2 text-center pt-3">
-                                <FindInPageIcon className='text-infoss' onClick={() => setShowMLSO(true)} />                                
+                                <TextField id="filled-basic" label="Shipment Order" className='block' variant="standard" size='small' disabled value={Header.prNo} />
                             </div>
                         </div>
                         <div className='col-3 pe-3'>
-                            <TextField id="filled-basic" label="Principle By" className='block' variant="standard" size='small' />
+                            <TextField id="filled-basic" label="Principle By" className='block' variant="standard" size='small' disabled value={Header.prNo} />
                         </div>
                     </div>
 
@@ -229,20 +189,16 @@ const PaymentRequestViewPage = () => {
                                 name="row-radio-buttons-group"
                               >
                                 <FormControlLabel value="Non - Cost To Cost"
-                                  defaultChecked={true}
+                                  checked={!Header.isCostToCost}
                                   control={
-                                      <Radio
-                                          // onChange={(e) => setCurrency("USD")}
-                                      />
+                                      <Radio disabled/>
                                   }
                                   label="Non - Cost To Cost"
                                 />
                                 <FormControlLabel value="Cost To Cost"
-                                  defaultChecked={false}
+                                  checked={Header.isCostToCost}
                                   control={
-                                      <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
-                                      />
+                                      <Radio disabled/>
                                   }
                                   label="Cost To Cost"
                                 />          
@@ -251,7 +207,7 @@ const PaymentRequestViewPage = () => {
                             </div>
                         </div>
                         <div className='col-3 pe-3'>
-                            <TextField id="filled-basic" label="ETD/ETA" className='block' variant="standard" size='small' />
+                            <TextField id="filled-basic" label="ETD/ETA" className='block' variant="standard" size='small' disabled value={Header.prNo} />
                         </div>
                     </div>
 
@@ -259,12 +215,12 @@ const PaymentRequestViewPage = () => {
                         <div className='col-3 pe-5 py-3'>
                             <div className='row'>
                                 <div className='col'>
-                                    <TextField id="filled-basic" label="Payment Request Number" className='block' variant="standard" size='small' />
+                                    <TextField id="filled-basic" label="Payment Request Number" className='block' variant="standard" size='small' disabled value={Header.prNo} />
                                 </div>
                             </div>
                             <div className='row mt-3'>
                                 <div className='col'>
-                                    <TextField id="filled-basic" label="Reference" className='block' variant="standard" size='small' />
+                                    <TextField id="filled-basic" label="Reference" className='block' variant="standard" size='small' disabled value={Header.reference} />
                                 </div>
                             </div>
                         </div>
@@ -279,44 +235,36 @@ const PaymentRequestViewPage = () => {
                               >   
                                 <div className='col-3'>
                                   <FormControlLabel value="SSLine"
-                                    defaultChecked={true}
+                                    checked={true}
                                     control={
-                                      <Radio
-                                          // onChange={(e) => setCurrency("USD")}
-                                      />
+                                      <Radio disabled/>
                                     }
                                     label="SSLine"
                                   />  
                                 </div>
                                 <div className='col-3'>
                                   <FormControlLabel value="EMKL"
-                                    defaultChecked={false}
+                                    checked={false}
                                     control={
-                                      <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
-                                      />
+                                      <Radio disabled/>
                                     }
                                     label="EMKL"
                                   />     
                                 </div>
                                 <div className='col-3'>  
                                   <FormControlLabel value="Rebate"
-                                    defaultChecked={false}
+                                    checked={false}
                                     control={
-                                      <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
-                                      />
+                                      <Radio disabled/>
                                     }
                                     label="Rebate"
                                   />     
                                 </div>
                                 <div className='col-3'> 
                                   <FormControlLabel value="Depo"
-                                    defaultChecked={false}
+                                    checked={false}
                                     control={
-                                      <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
-                                      />
+                                      <Radio disabled/>
                                     }
                                     label="Depo"
                                   />  
@@ -330,10 +278,10 @@ const PaymentRequestViewPage = () => {
                                 <hr />
                                 <div className='row'>
                                     <div className='col-6'>
-                                        <TextField id="filled-basic" label="Rate" className='block' variant="standard" size='small' />
+                                        <TextField id="filled-basic" label="" className='block' variant="standard" size='small' disabled value={Header.rate} />
                                     </div>
                                     <div className='col-6'>
-                                        <TextField id="filled-basic" label="-" className='block' variant="standard" size='small' />
+                                        <TextField id="filled-basic" label="" className='block' variant="standard" size='small' disabled value={Header.rate} />
                                     </div>
                                 </div>
                             </div>
@@ -343,63 +291,63 @@ const PaymentRequestViewPage = () => {
                     <div className='row mt-3'>
                         <div className='col-3 pe-4 row'>
                             <div className='col-5'>
-                                <TextField id="filled-basic" label="Printing" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="Printing" className='block' variant="standard" size='small' disabled value={Header.printing} />
                             </div>
                             <div className='col-7'>
-                                <TextField id="filled-basic" label="-" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label=" " className='block' variant="standard" size='small' disabled value={Header.printing} />
                             </div>
                         </div>
                         <div className='col-7 pe-5 row ms-2'>
                             <div className="col-4">
-                                <TextField id="filled-basic" label="Customer" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="Customer" className='block' variant="standard" size='small' disabled value={Header.prNo} />
                             </div>
                             <div className="col-1 text-center pt-3">
-                                <FindInPageIcon className='text-infoss' onClick={() => setShowAddCustomer(true)} />                                
+                                <FindInPageIcon className='text-infoss' />                                
                             </div>
                             <div className="col-7">
-                                <TextField id="filled-basic" label="-" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label=" " className='block' variant="standard" size='small' disabled value={Header.prNo} />
                             </div>
                         </div>
                     </div>
 
                     <div className='row mt-3'>
                         <div className='col-3 pe-5'>
-                            <TextField id="filled-basic" label="DN Vendor" className='block' variant="standard" size='small' />
+                            <TextField id="filled-basic" label="DN Vendor" className='block' variant="standard" size='small' disabled value={Header.vendorDN} />
                         </div>
                         <div className='col-7 pe-5 row'>
                             <div className="col-4">
-                                <TextField id="filled-basic" label="Personal" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label="Personal" className='block' variant="standard" size='small' disabled value={Header.personalId} />
                             </div>
                             <div className="col-1 text-center pt-3">
-                                <FindInPageIcon className='text-infoss'  onClick={() => setShowAddPersonal(true)} />                                
+                                <FindInPageIcon className='text-infoss' />                                
                             </div>
                             <div className="col-7">
-                                <TextField id="filled-basic" label="-" className='block' variant="standard" size='small' />
+                                <TextField id="filled-basic" label=" " className='block' variant="standard" size='small' disabled value={Header.personalId} />
                             </div>
                         </div>
                     </div>
                                         
                     <div className='row mt-5'>
                         <div className='col'>
-                            <Button variant='outline-infoss me-3' onClick={() => history('/booking/payment-request')}>
+                            <Button disabled variant='outline-infoss me-3'>
                                 <ReplyIcon /> Back
                             </Button>
-                            <Button variant='outline-infoss me-3' disabled={SecondEP}>
+                            <Button disabled variant='outline-infoss me-3'>
                                 <SaveIcon /> Save
                             </Button>
-                            <Button variant='outline-infoss me-3' onClick={() => handlePrintSO()}>
+                            <Button disabled variant='outline-infoss me-3'>
                                 <PrintIcon /> Print PR
                             </Button>
-                            <Button variant='outline-infoss me-3' onClick={() => handlePrintSO()}>
+                            <Button disabled variant='outline-infoss me-3'>
                                 <AddToPhotosIcon /> Add New
                             </Button>
-                            <Button variant='outline-infoss me-3' onClick={() => handleApproveAccMgr()}>
+                            <Button disabled variant='outline-infoss me-3'>
                                 <AssignmentTurnedInIcon /> Approve By Acc Manager
                             </Button>
-                            <Button variant='outline-infoss me-3' onClick={() => handleApproveGeneralPR()}>
+                            <Button disabled variant='outline-infoss me-3'>
                                 <CheckCircleIcon /> Approve General PR
                             </Button>
-                            <Button variant='outline-infoss me-3' onClick={() => handleApproveMKT()}>
+                            <Button disabled variant='outline-infoss me-3'>
                                 <LibraryAddCheckIcon /> Approve MKT
                             </Button>
                         </div>
@@ -437,15 +385,14 @@ const PaymentRequestViewPage = () => {
                                             </thead>
                                             <tbody className="text-muted">
                                                 {
-                                                    IncShipperList.length ?
-                                                        IncShipperList.map((v, k) => {
+                                                    BFP &&
+                                                    BFP.length > 0 ?
+                                                        BFP.map((v, k) => {
                                                             return (
                                                                 <ListTab1
                                                                     key={k}
                                                                     k={k}
                                                                     v={v}
-                                                                    SelectedShipperList={SelectedShipperList.id === v.id ? true : false}
-                                                                    setSelectedShipperList={(e) => setSelectedShipperList(e)}
                                                                 />
                                                             )
                                                         })
@@ -460,7 +407,7 @@ const PaymentRequestViewPage = () => {
                                         
                                         <div className='row px-2 py-3'>
                                             <div className='col-8'>
-                                                <Button variant='outline-infoss me-3' onClick={() => handleAdd("Inc Shipper")}>
+                                                <Button variant='outline-infoss me-3'>
                                                     <AddToPhotosIcon />
                                                 </Button>
                                                 <Button variant='outline-infoss me-3'>
@@ -471,7 +418,7 @@ const PaymentRequestViewPage = () => {
                                                 </Button>
                                             </div>
                                             <div className='col-4 text-end'>
-                                                <Button variant='outline-infoss'>
+                                                <Button variant='outline-infoss' disabled>
                                                     <AddToPhotosIcon /> Add Trucking
                                                 </Button>
                                             </div>
@@ -495,22 +442,18 @@ const PaymentRequestViewPage = () => {
                               >    
                                 <div className='col-5'>
                                   <FormControlLabel value="Paid"
-                                    defaultChecked={true}
+                                    checked={true}
                                     control={
-                                      <Radio
-                                          // onChange={(e) => setCurrency("USD")}
-                                      />
+                                      <Radio disabled/>
                                     }
                                     label="Paid"
                                   />  
                                 </div>
                                 <div className='col-7'>
                                   <FormControlLabel value="Not Paid"
-                                    defaultChecked={false}
+                                    checked={false}
                                     control={
-                                      <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
-                                      />
+                                      <Radio disabled/>
                                     }
                                     label="Not Paid"
                                   />    
@@ -531,22 +474,18 @@ const PaymentRequestViewPage = () => {
                               >    
                                 <div className='col-5'>
                                   <FormControlLabel value="Paid"
-                                    defaultChecked={true}
+                                    checked={true}
                                     control={
-                                      <Radio
-                                          // onChange={(e) => setCurrency("USD")}
-                                      />
+                                      <Radio disabled/>
                                     }
                                     label="Paid"
                                   />  
                                 </div>
                                 <div className='col-7'>
                                   <FormControlLabel value="Not Paid"
-                                    defaultChecked={false}
+                                    checked={false}
                                     control={
-                                      <Radio
-                                      // onChange={(e) => setCurrency("IDR")}
-                                      />
+                                      <Radio disabled/>
                                     }
                                     label="Not Paid"
                                   />    
@@ -560,7 +499,7 @@ const PaymentRequestViewPage = () => {
                             <span className='fw-bolder'>Total USD</span>
                             <hr />
                             <div className='row px-3'>
-                                <TextField id="filled-basic" label="USD" className='block' variant="standard" InputProps={{ readOnly: false }} />
+                                <TextField id="filled-basic" label="USD" className='block' variant="standard" disabled />
                             </div>
                         </div>
                     </div>
@@ -569,7 +508,7 @@ const PaymentRequestViewPage = () => {
                             <span className='fw-bolder'>PPN USD</span>
                             <hr />
                             <div className='row px-3'>
-                                <TextField id="filled-basic" label="USD" className='block' variant="standard" InputProps={{ readOnly: false }} />
+                                <TextField id="filled-basic" label="USD" className='block' variant="standard" disabled />
                             </div>
                         </div>
                     </div>
@@ -578,7 +517,7 @@ const PaymentRequestViewPage = () => {
                             <span className='fw-bolder'>Total IDR</span>
                             <hr />
                             <div className='row px-3'>
-                                <TextField id="filled-basic" label="IDR" className='block' variant="standard" InputProps={{ readOnly: false }} />
+                                <TextField id="filled-basic" label="IDR" className='block' variant="standard" disabled />
                             </div>
                         </div>
                     </div>
@@ -587,7 +526,7 @@ const PaymentRequestViewPage = () => {
                             <span className='fw-bolder'>PPN IDR</span>
                             <hr />
                             <div className='row px-3'>
-                                <TextField id="filled-basic" label="IDR" className='block' variant="standard" InputProps={{ readOnly: false }} />
+                                <TextField id="filled-basic" label="IDR" className='block' variant="standard" disabled />
                             </div>
                         </div>
                     </div>
@@ -596,51 +535,6 @@ const PaymentRequestViewPage = () => {
             </div>
         </section>
 
-        <ModalListShipmentOrder
-            show={showMLSO}
-            onHide={() => setShowMLSO(false)}
-            LSOData={LSOData}
-            setSelectedData={(e) => {setSelectedData(e)}}
-            setdefShipNo={(e) => setdefShipNo(e)}
-            MaxPage={1}
-            NumPage={NumPage}
-            RowsCount={RowsCount}
-            setNumPage={(e) => setNumPage(e)}
-            setRowsCount={(e) => setRowsCount(e)}
-        />
-
-        <AddbeingForPayment
-            show={showAddbeingForPayment}
-            onHide={() => { setShowAddbeingForPayment(false) }}
-            NotifAlert={(e, d) => NotifAlert(e, d)}
-            staticId={staticId}
-            AccountName={AccountName}
-            IsAdd={IsAdd}
-            TabType={TabType}  
-            data={IsAdd ? '' : SelectedShipperList}          
-        />
-
-        <AddCustomer
-            show={showAddCustomer}
-            onHide={() => { setShowAddCustomer(false) }}
-            NotifAlert={(e, d) => NotifAlert(e, d)}
-            staticId={staticId}
-            AccountName={AccountName}
-            IsAdd={IsAdd}
-            TabType={TabType}  
-            data={IsAdd ? '' : SelectedShipperList}          
-        />
-
-        <AddPersonal
-            show={showAddPersonal}
-            onHide={() => { setShowAddPersonal(false) }}
-            NotifAlert={(e, d) => NotifAlert(e, d)}
-            staticId={staticId}
-            AccountName={AccountName}
-            IsAdd={IsAdd}
-            TabType={TabType}  
-            data={IsAdd ? '' : SelectedShipperList}          
-        />
     </>  
     )
 }

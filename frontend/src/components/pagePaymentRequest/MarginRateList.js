@@ -20,7 +20,7 @@ export default function MarginRateList(props) {
   const [showPortList, setShowPortList] = useState(false)
 
   useEffect(() => {
-    getAccountList()
+    // getAccountList()
 }, []);
 
 const getAccountList = () => {
@@ -142,6 +142,7 @@ const getAccountList = () => {
               AccountList.map((v, k) => {
                 return (
                   <MarginRateListRow
+                    key={k}
                     v={v}
                     k={k}
                     setSelectedData={(e) => setSelectedData(e)}

@@ -21,9 +21,16 @@ export default function AddAccountList(props) {
 }, []);
 
 const getAccountList = () => {
-  axios.get(API_URL_MASTER + 'CostSea/costsea/1/5')
+  const payload = {
+    userCode: "luna",
+    countryId: 101,
+    companyId: 32,
+    branchId: 12
+  }
+  axios.post('http://stage-master.api.infoss.solusisentraldata.com/account/account/PostById?id=1', payload)
   .then((response) => {
-    setAccountList(response.data)
+    console.log("ACCOUNT", response)
+    // setAccountList(response.data)
   })
   .catch(function (error) {
     Swal.fire({
@@ -86,6 +93,7 @@ const getAccountList = () => {
               AccountList.map((v, k) => {
                 return (
                   <AddAccountListRow
+                    key={k}
                     v={v}
                     k={k}
                     setSelectedData={(e) => setSelectedData(e)}

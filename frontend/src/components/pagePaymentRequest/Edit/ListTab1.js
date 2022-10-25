@@ -6,17 +6,17 @@ import {
 
 export default function ListTab1(props) {
     return (
-        <tr
-            onClick={(e) => props.setSelectedShipperList(props.v)}
-            className={props.SelectedShipperList ? "bg-infoss text-white" : ( props.v.rowStatus === "DEL" && "text-danger")}
-        >
-            <td>{ props.v.customerId }</td>
+        <tr>
+            <td>-</td>
+            <td>-</td>
             <td>{ props.v.description }</td>
-            <td className="text-right">{ numFormat(props.v.amountUSD) }</td>
-            <td className="text-right">{ numFormat(props.v.amountIDR) }</td>
+            <td className="text-right">{ numFormat(props.v.amount) }</td>
+            <td className="text-right">{ numFormat(props.v.amount) }</td>
             <td>{ props.v.isCostToCost ? "Yes" : "No" }</td>
-            <td>{ props.v.isAdditional ? "Yes" : "No" }</td>
-            <td>{ props.v.isIgnoreItem ? "Yes" : "No" }</td>
+            <td className="text-right">{ numFormat(props.v.persenPpn) }</td>
+            <td>{ props.v.fakturNo ? props.v.fakturNo : "-" }</td>
+            <td>{ props.v.kendaraanNopol ? props.v.kendaraanNopol : "-" }</td>
+            <td>{ props.v.fakturNo ? props.v.fakturNo : "-" }</td>
         </tr>
     )
 }
