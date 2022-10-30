@@ -82,7 +82,6 @@ const InvoicePage = () => {
         // axios.post(`https://localhost:7160/Invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload) //FILTER READY
         axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         .then((response) => {
-            console.log('response fetch invoice', response)
             if(response.data.code === 200) {
                 setSelectedData({})
                 setInvoices(response.data.data.invoices);
@@ -113,7 +112,6 @@ const InvoicePage = () => {
     const printFunction = () => {
         if(SelectedData.id) {
             setLoading(true)
-            console.log('print', SelectedData)
             let printCount = SelectedData.printing
             let canPrint = false
             if(SelectedData.printing === 0) {
@@ -126,7 +124,6 @@ const InvoicePage = () => {
                 }
             }
             if(canPrint === true) {
-                console.log('count', printCount)
                 const payload = {
                     "rowStatus": SelectedData.rowStatus,
                     "countryId": 101,
@@ -137,10 +134,8 @@ const InvoicePage = () => {
                     "printing": printCount,
                     "user": "luna"
                 }
-                console.log(payload)
                 axios.put('https://localhost:7160/Invoice/UpdateStatusPrint', payload)
                 .then(response => {
-                    console.log('hasil api print', response)
                     if(response.data.code === 200) {
                         fetchInvoices(numPage, rowsCount)
                         succesAlert('Data berhasil di print')
@@ -221,7 +216,6 @@ const InvoicePage = () => {
                         }
                         axios.put('https://localhost:7160/Invoice/UpdateStatusRePrint', payload)
                         .then(response => {
-                            console.log('response re print', response)
                             if(response.data.code === 200) {
                                 fetchInvoices(numPage, rowsCount)
                                 succesAlert('Print ulang sudah di setujui')
@@ -272,7 +266,6 @@ const InvoicePage = () => {
                                 "user": "luna"
                             }
                         ).then(response => {
-                            console.log('res delete', response)
                             Swal.fire(
                                 'Deleted!',
                                 'Your file has been deleted.',
@@ -369,9 +362,7 @@ const InvoicePage = () => {
         setLoading(true)
         if(modalType === 'credit') {
             setLoading(false)
-            console.log('save approval credit', payload)
         } else {
-            console.log('save delivered', payload)
             let body = {
                 "rowStatus": "ACT",
                 "countryId": 101,
@@ -394,7 +385,6 @@ const InvoicePage = () => {
                 } else {
                     ErrorAlert(response.data.message, true)
                 }
-                console.log('res deliv', response)
             }).catch(error => {
                 setLoading(false)
                 console.error(error)
@@ -407,7 +397,6 @@ const InvoicePage = () => {
         if(!SelectedData.id) {
             ErrorAlert("Please Select Data!")
         } else {
-            console.log(SelectedData)
             setModalType('credit')
             setOpenModal(true)
         }

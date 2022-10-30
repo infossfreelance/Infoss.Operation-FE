@@ -23,6 +23,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { NumericFormat } from 'react-number-format';
 import axios from 'axios'
+import { Dropdown, Pagination } from 'react-bootstrap'
 
 const invoiceDetailTemp = [
     {
@@ -30,6 +31,7 @@ const invoiceDetailTemp = [
       "countryId": 101,
       "companyId": 32,
       "branchId": 12,
+      id: 0,
       "invoiceId": 0,
       "sequence": 0,
       "debetCredit": "D",
@@ -119,18 +121,82 @@ const style = {
   overflowY: "scroll",
 };
 
+const selectedStyle = { bgcolor: (theme) => theme.palette.primary.main }
+
 function ChildModal(props) {
     const [open, setOpen] = React.useState(false);
-    let accountData = []
+    const [selectedData, setSelectedData] = useState({})
+    const [rowsCount, setRowsCount] = useState(50)
+    const [numPage, setNumPage] = useState(1)
 
     const handleOpen = () => {
         if(props.isEdit === false) {
             setOpen(true);
         }
     };
+
     const handleClose = () => {
+        setSelectedData({})
+        setRowsCount(50)
+        setNumPage(1)
+        props.fetchData(1, 50)
         setOpen(false);
     };
+    
+    const handleSelected = () => {
+        props.handleSelected(selectedData)
+        handleClose()
+    }
+
+    const renderPagination = () => {
+        const MaxPage = props.totalPage
+        
+        if (numPage === 1 && numPage !== MaxPage) {
+          return (
+            <div style={{ display: 'inline-block' }}>
+              <Pagination>
+                <Pagination.Item active>
+                  {numPage}
+                </Pagination.Item>
+                <Pagination.Next onClick={() => { props.fetchData(numPage + 1, rowsCount); setNumPage(numPage + 1) }} />
+              </Pagination>
+            </div>
+          )
+        } else if (numPage === 1 && numPage === MaxPage) {
+          return (
+            <div style={{ display: 'inline-block' }}>
+              <Pagination>
+                <Pagination.Item active>
+                  {numPage}
+                </Pagination.Item>
+              </Pagination>
+            </div>
+          )
+        } else if (numPage === MaxPage) {
+          return (
+            <div style={{ display: 'inline-block' }}>
+              <Pagination>
+                <Pagination.Prev onClick={() => { props.fetchData(numPage - 1, rowsCount); setNumPage(numPage - 1) }} />
+                <Pagination.Item active>
+                  {numPage}
+                </Pagination.Item>
+              </Pagination>
+            </div>
+          )
+        } else {
+          return (
+            <div style={{ display: 'inline-block' }}>
+              <Pagination>
+                <Pagination.Prev onClick={() => { props.fetchData(numPage - 1, rowsCount); setNumPage(numPage - 1) }} />
+                <Pagination.Item active>
+                  {numPage}
+                </Pagination.Item>
+                <Pagination.Next onClick={() => { props.fetchData(numPage + 1, rowsCount); setNumPage(numPage + 1) }} />
+              </Pagination>
+            </div>
+          )
+        }
+    }
 
     return (
         <React.Fragment>
@@ -155,62 +221,95 @@ function ChildModal(props) {
                     <Grid container flexDirection={'column'} spacing={2} alignItems='center'>
                         <Grid item container spacing={2} flexDirection='row'>
                             <Grid item>
-                                <Button variant='contained'>Select Data</Button>
+                                <Button variant='contained' onClick={handleSelected}>Select Data</Button>
                             </Grid>
                             <Grid item>
                                 <Button onClick={handleClose} variant='outlined'>Close Window</Button>
                             </Grid> 
                         </Grid>
                         <Grid item>
-                            <Box sx={{ border: 1, borderRadius: 1, overflow: 'hidden', maxHeight: 450 }}>
+                            <Box sx={{ border: 1, borderRadius: 1, overflow: 'hidden', maxHeight: 450, maxWidth: 1150 }}>
                                 <TableContainer component={Paper} sx={{ maxHeight: 390 }}>
                                     <Table sx={{ minWidth: 600 }} aria-label="sticky table" stickyHeader>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell>Code</TableCell>
-                                                <TableCell>Name</TableCell>
-                                                <TableCell>Crr</TableCell>
-                                                <TableCell>Payment</TableCell>
-                                                <TableCell>Type</TableCell>
-                                                <TableCell>Ctc</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell>
-                                                    <input className="form-control col-search-form border-infoss" />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <input className="form-control col-search-form border-infoss" />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <input className="form-control col-search-form border-infoss" />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <input className="form-control col-search-form border-infoss" />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <input className="form-control col-search-form border-infoss" />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <input className="form-control col-search-form border-infoss" />
-                                                </TableCell>
+                                                {
+                                                    props.accountHeaders.length > 0
+                                                    ?
+                                                    props.accountHeaders.map((el, index) => {
+                                                        return (
+                                                            <TableCell key={index}>{el.text}</TableCell>
+                                                        )
+                                                    })
+                                                    :
+                                                    <>
+                                                        <TableCell>Code</TableCell>
+                                                        <TableCell>Name</TableCell>
+                                                        <TableCell>Crr</TableCell>
+                                                        <TableCell>Payment</TableCell>
+                                                        <TableCell>Type</TableCell>
+                                                        <TableCell>Ctc</TableCell>
+                                                    </>
+                                                }
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
+                                            <TableRow>
+                                                {
+                                                    props.accountHeaders.length > 0
+                                                    ?
+                                                    props.accountHeaders.map((el, index) => {
+                                                        return (
+                                                            <TableCell key={index}>
+                                                                <input className="form-control col-search-form border-infoss" />
+                                                            </TableCell>
+                                                        )
+                                                    })
+                                                    :
+                                                    <>
+                                                        <TableCell>
+                                                            <input className="form-control col-search-form border-infoss" />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <input className="form-control col-search-form border-infoss" />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <input className="form-control col-search-form border-infoss" />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <input className="form-control col-search-form border-infoss" />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <input className="form-control col-search-form border-infoss" />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <input className="form-control col-search-form border-infoss" />
+                                                        </TableCell>
+                                                    </>
+                                                }
+                                            </TableRow>
                                             {
-                                                accountData.length > 0
+                                                props.accountList.length > 0 && props.accountHeaders.length > 0
                                                 ?
-                                                accountData.map(el => {
-                                                    return (
-                                                        <TableRow key={el.id}>
-                                                            <TableCell>{el.code}</TableCell>
-                                                            <TableCell>{el.name}</TableCell>
-                                                            <TableCell>{el.crr}</TableCell>
-                                                            <TableCell>{el.payment}</TableCell>
-                                                            <TableCell>{el.type}</TableCell>
-                                                            <TableCell>{el.ctc}</TableCell>
-                                                        </TableRow>
-                                                    )
-                                                })
+                                                    props.accountList.map((data, index) => {
+                                                        return (
+                                                            <TableRow 
+                                                            key={index}
+                                                            onClick={() => setSelectedData(data)} 
+                                                            sx={selectedData.id === data.id ? selectedStyle : {} }
+                                                            >
+                                                                {
+                                                                    props.accountHeaders.map((el, index) => {
+                                                                        return (
+                                                                            <TableCell key={index}>
+                                                                                {data[el.column]}
+                                                                            </TableCell>
+                                                                        )
+                                                                    })
+                                                                }
+                                                            </TableRow>
+                                                        )
+                                                    })
                                                 :
                                                 <TableRow>
                                                     <TableCell colSpan={6} sx={{ textAlign: 'center' }}>Data Empty</TableCell>
@@ -219,6 +318,26 @@ function ChildModal(props) {
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
+                                <div className='row mt-2'>
+                                    <div>
+                                        <div>
+                                            <div className='mx-4' style={{ display: 'inline-block' }}>
+                                                {renderPagination()}
+                                            </div>
+
+                                            <Dropdown style={{ display: 'inline-block' }} className='mx-2'>
+                                                <Dropdown.Toggle variant="outline-infoss sm" id="dropdown-basic">
+                                                    {rowsCount} Rows
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(50); setNumPage(1); props.fetchData(1, 50) }}>50 Rows</Dropdown.Item>
+                                                    <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(100); setNumPage(1); props.fetchData(1, 100) }}>100 Rows</Dropdown.Item>
+                                                    <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(150); setNumPage(1); props.fetchData(1, 150) }}>150 Rows</Dropdown.Item>
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </div>
+                                    </div>
+                                </div>
                             </Box>
                         </Grid>
                     </Grid>
@@ -231,8 +350,8 @@ function ChildModal(props) {
 export default function NestedModal(props) {
     const [shipperNo, setShipperNo] = useState('')
     const [shipperName, setShipperName] = useState('')
-    const [accountRadio, setAccountRadio] = useState('ALL')
-    const [accountId, setAccountId] = useState('')
+    const [accountRadio, setAccountRadio] = useState(0)
+    const [accountId, setAccountId] = useState(0)
     const [accountName, setAccountName] = useState('')
     const [description, setDescription] = useState('')
     const [currencyRadio, setCurrencyRadio] = useState(1)
@@ -245,8 +364,15 @@ export default function NestedModal(props) {
     const [amount, setAmount] = useState(0)
     const [originalUsd, setOriginalUsd] = useState(0)
     const [masterCode, setMasterCode] = useState('')
+    const [codingQuantity, setCodingQuantity] = useState(false)
+    const [eplDetailId, setEplDetailId] = useState(0)
+    const [accountList, setAccountList] = useState([])
+    const [accountHeaders, setAccountHeaders] = useState([])
+    const [totalPage, setTotalPage] = useState(1)
 
     useEffect(() => {
+        fetchAccount(1, 50)
+
         setShipperNo(props.shipperNo)
         setShipperName(props.shipperName)
 
@@ -254,6 +380,7 @@ export default function NestedModal(props) {
             let temp = props.selected
             setAccountId(temp.accountId)
             setDescription(temp.description)
+            setAccountRadio(temp.type)
             setCurrencyRadio(temp.amountCrr)
             setChecked(temp.isCostToCost)
             setSignRadio(temp.sign)
@@ -261,8 +388,10 @@ export default function NestedModal(props) {
             setQuantity(temp.quantity)
             setCost(temp.perQty)
             setRate(temp.originalRate)
-            setAmount(temp.amount ? temp.amount : 0)
+            setAmount(temp.amount)
             setOriginalUsd(temp.originalUsd)
+            setEplDetailId(temp.eplDetailId)
+            setCodingQuantity(temp.codingQuantity)
 
             axios.post(
                 `http://stage-master.api.infoss.solusisentraldata.com/account/account/PostById?id=${temp.accountId}`,
@@ -273,7 +402,6 @@ export default function NestedModal(props) {
                     "branchId": 12
                 }
             ).then(res => {
-                console.log('account by id res', res)
                 if(res.data.code === 200) {
                     setMasterCode(res.data.data.account.masterCode)
                     setAccountName(res.data.data.account.name)
@@ -283,11 +411,27 @@ export default function NestedModal(props) {
         }
     }, [props.shipperNo, props.shipperName, props.selected, props.edit])
 
+    const fetchAccount = (page = 1, row = 50) => {
+        axios.post(
+            `http://stage-master.api.infoss.solusisentraldata.com/account/account/PostByPage?pageNumber=${page}&pageSize=${row}`,
+            {
+                "userCode": "luna",
+                "countryId": 101,
+                "companyId": 32,
+                "branchId": 12
+            }
+        ).then(res => {
+            if(res.data.code === 200) {
+                setAccountList(res.data.data.account)
+                setAccountHeaders(res.data.data.columns)
+                setTotalPage(res.data.totalPage)
+            }
+        }).catch(error => console.error(error))
+    }
+
     const handleClose = () => {
-        setShipperNo('')
-        setShipperName('')
-        setAccountRadio('ALL')
-        setAccountId('')
+        setAccountRadio(0)
+        setAccountId(0)
         setAccountName('')
         setDescription('')
         setCurrencyRadio(1)
@@ -300,6 +444,8 @@ export default function NestedModal(props) {
         setAmount(0)
         setOriginalUsd(0)
         setMasterCode('')
+        setEplDetailId(0)
+        setCodingQuantity(false)
         
         props.resetEdit()
         props.close()
@@ -321,10 +467,12 @@ export default function NestedModal(props) {
         payload.accountId = accountId
         payload.accountName = accountName
         payload.description = description
-        payload.type = currencyRadio
+        payload.type = accountRadio
+        payload.amountCrr = Number(currencyRadio)
         payload.isCostToCost = checked
         payload.sign = signRadio
         payload.percentVat = tempVat
+        payload.amountVat = (tempVat / 100) * amount
         payload.quantity = quantity
         payload.perQty = cost
         payload.originalRate = rate
@@ -334,9 +482,20 @@ export default function NestedModal(props) {
         payload.invoiceDetailStorages = []
         payload.user = 'luna'
         payload.sequence = sequence
+        payload.debetCredit = props.dcStatus
+        payload.codingQuantity = codingQuantity
+        payload.eplDetailId = eplDetailId
         
         props.saveDetail(payload)
         handleClose()
+    }
+
+    const handleSelectedAccount = (data) => {
+        setAccountId(data.id)
+        setAccountName(data.name)
+        setDescription(data.remarks)
+        setCodingQuantity(data.quantity)
+        setMasterCode(data.masterCode)
     }
 
     return (
@@ -396,16 +555,24 @@ export default function NestedModal(props) {
                         <FormLabel id="account-label">Account :</FormLabel>
                     </Grid>
                     <Grid item xs={3}>
-                        <ChildModal setAccountCode={(e) => setMasterCode(e)} accountCode={masterCode} isEdit={props.edit}/>
+                        <ChildModal 
+                        setAccountCode={(e) => setMasterCode(e)} accountCode={masterCode} 
+                        isEdit={props.edit}
+                        accountList={accountList}
+                        accountHeaders={accountHeaders}
+                        handleSelected={e => handleSelectedAccount(e)}
+                        fetchData={(page, row) => fetchAccount(page, row)}
+                        totalPage={totalPage}
+                        />
                     </Grid>
                     <Grid item xs={7}>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1 }}>
                             <RadioGroup row name="account-radio" value={accountRadio} onChange={e => setAccountRadio(e.target.value)}>
-                                <FormControlLabel value={'20'} control={<Radio />} label="20" disabled />
-                                <FormControlLabel value={'40'} control={<Radio />} label="40" disabled />
-                                <FormControlLabel value={'45'} control={<Radio />} label="45" disabled />
-                                <FormControlLabel value={'M3'} control={<Radio />} label="M3" disabled />
-                                <FormControlLabel value={'ALL'} control={<Radio />} label="ALL" disabled />
+                                <FormControlLabel value={20} control={<Radio />} label="20" disabled />
+                                <FormControlLabel value={40} control={<Radio />} label="40" disabled />
+                                <FormControlLabel value={45} control={<Radio />} label="45" disabled />
+                                <FormControlLabel value={50} control={<Radio />} label="M3" disabled />
+                                <FormControlLabel value={0} control={<Radio />} label="ALL" disabled />
                             </RadioGroup>
                         </Box>
                     </Grid>
@@ -451,7 +618,7 @@ export default function NestedModal(props) {
                     <Grid item>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1 }}>
                             <FormGroup>
-                                <FormControlLabel disabled control={<Checkbox checked={checked} onChange={e => setChecked(e.target.checked)} />} label="Cost To Cost" />
+                                <FormControlLabel control={<Checkbox checked={checked} onChange={e => setChecked(e.target.checked)} />} label="Cost To Cost" />
                             </FormGroup>
                         </Box>
                     </Grid>
@@ -464,7 +631,6 @@ export default function NestedModal(props) {
                         <NumericFormat 
                         customInput={TextField} 
                         thousandSeparator="," 
-                        suffix={'.00'} 
                         onValueChange={(values, sourceInfo) => {
                             setQuantity(values.floatValue)
                         }}
@@ -482,7 +648,6 @@ export default function NestedModal(props) {
                         <NumericFormat 
                         customInput={TextField} 
                         thousandSeparator="," 
-                        suffix={'.00'} 
                         onValueChange={(values, sourceInfo) => {
                             setCost(values.floatValue)
                         }}
@@ -498,7 +663,6 @@ export default function NestedModal(props) {
                         <NumericFormat 
                         customInput={TextField} 
                         thousandSeparator="," 
-                        suffix={'.00'} 
                         onValueChange={(values, sourceInfo) => {
                             setRate(values.floatValue)
                         }}
@@ -516,7 +680,6 @@ export default function NestedModal(props) {
                         <NumericFormat 
                         customInput={TextField} 
                         thousandSeparator="," 
-                        suffix={'.00'} 
                         onValueChange={(values, sourceInfo) => {
                             setAmount(values.floatValue)
                         }}
@@ -538,7 +701,6 @@ export default function NestedModal(props) {
                         <NumericFormat 
                         customInput={TextField} 
                         thousandSeparator="," 
-                        suffix={'.00'} 
                         onValueChange={(values, sourceInfo) => {
                             setOriginalUsd(values.floatValue)
                         }}

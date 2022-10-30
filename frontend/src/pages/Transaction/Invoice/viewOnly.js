@@ -124,14 +124,13 @@ TabPanel.propTypes = {
     value: PropTypes.number.isRequired,
 };
 
-const selectedStyle = { bgcolor: (theme) => theme.palette.primary.main }
+const deletedDetailStyle = { bgcolor: (theme) => theme.palette.text.disabled }
 
 const ViewInvoicePage = () => {
     const { invId } = useParams()
     const history = useNavigate()
     const [tabValue, setTabValue] = useState(0);
     const [shipmentData, setShipmentData] = useState({})
-    const [isInvoice, setIsInvoice] = useState(true)
     const [isCTC, setIsCTC] = useState(false)
     const [invoiceNo, setInvoiceNo] = useState('')
     const [printing, setPrinting] = useState(0)
@@ -162,13 +161,17 @@ const ViewInvoicePage = () => {
     const [openContacts, setOpenContacts] = useState(false)
     const [detailSequence, setDetailSequence] = useState(0)
     const [selectedDetail, setSelectedDetail] = useState({})
+    const [jenisInvoices, setJenisInvoices] = useState('I')
+    const [etd, setEtd] = useState('')
+    const [eta, setEta] = useState('')
+    const [shipmentNo, setShipmentNo] = useState('')
+    const [jobOwnerId, setJobOwnerId] = useState(0)
 
     useEffect(() => {
         fetchEditData(invId)
     }, [invId]);
 
     const fetchEditData = (invId) => {
-        console.log('invoice id', invId)
         axios.post(
             `http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/PostById?id=${invId}`,
             {
@@ -178,7 +181,6 @@ const ViewInvoicePage = () => {
                 "branchId": 12
             }
         ).then(response => {
-            console.log('data edit', response)
             setInvoiceDetails(response.data.data.invoice.invoiceDetails)
             let tempDetail = response.data.data.invoice.invoiceDetails
             if(tempDetail.length > 0) {
@@ -210,6 +212,12 @@ const ViewInvoicePage = () => {
             setPaidOn(temp.paidOn)
             setRate(temp.rate)
             setKursKMK(temp.kursKMK)
+            setEFaktur(temp.sfpReference)
+            setJobOwnerId(temp.invHeader)
+            setShipmentNo(temp.shipmentNo)
+            setEtd(temp.etd)
+            setEta(temp.eta)
+            setJenisInvoices(temp.jenisInvoices)
         }).catch(error => console.error(error))
     }
 
@@ -234,7 +242,7 @@ const ViewInvoicePage = () => {
     };
 
     const renderStamp = () => {
-        if(isStampDuty === 'true') {
+        if(isStampDuty.toString() === 'true') {
             return (
                 <NumericFormat 
                 customInput={TextField} 
@@ -243,6 +251,7 @@ const ViewInvoicePage = () => {
                 label='Amount'
                 value={stampDutyAmount}
                 id="invoice-stamp-duty"
+                disabled
                 />
             )
         } else {
@@ -294,11 +303,11 @@ const ViewInvoicePage = () => {
                             row 
                             name="payment-from-label"
                             aria-labelledby="payment-from-label"
-                            value={isInvoice}
-                            onChange={e => setIsInvoice(e.target.value)}
+                            value={jenisInvoices}
+                            onChange={e => setJenisInvoices(e.target.value)}
                             >
-                                <FormControlLabel value={true} control={<Radio />} label="Invoices" disabled />
-                                <FormControlLabel value={false} control={<Radio />} label="General Invoices" disabled />
+                                <FormControlLabel value={'I'} control={<Radio />} label="Invoices" disabled />
+                                <FormControlLabel value={'G'} control={<Radio />} label="General Invoices" disabled />
                             </RadioGroup>
 
                             <FormLabel id="invoice-type-label">Type</FormLabel>
@@ -526,16 +535,16 @@ const ViewInvoicePage = () => {
                                             return (
                                                 <TableRow 
                                                 key={el.sequence} 
-                                                sx={selectedDetail.sequence === el.sequence ? selectedStyle : {}}>
+                                                sx={el.rowStatus === 'DEL' ? deletedDetailStyle : {}}>
                                                     <TableCell>{el.sequence}</TableCell>
                                                     <TableCell>{el.description}</TableCell>
                                                     <TableCell>
-                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                        {el.amountCrr === 0 ? new Intl.NumberFormat().format(el.amount) : 0}.00
                                                     </TableCell>
                                                     <TableCell>
-                                                        {new Intl.NumberFormat().format(el.amount)}.00
+                                                        {el.amountCrr === 1 ? new Intl.NumberFormat().format(el.amount) : 0}.00
                                                     </TableCell>
-                                                    <TableCell>{el.percentVat}%</TableCell>
+                                                    <TableCell>{el.percentVat ? el.percentVat : 0}%</TableCell>
                                                     <TableCell>{el.sign === true ? '+' : '-'}</TableCell>
                                                     <TableCell>{el.isCostToCost === true ? 'Yes' : 'No'}</TableCell>
                                                 </TableRow>

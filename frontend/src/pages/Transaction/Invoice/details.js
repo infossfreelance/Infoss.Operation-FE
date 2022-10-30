@@ -225,220 +225,130 @@ let templateInvoice = {
       "branchId": 12,
       "id": 0,
       "ticketId": 0,
-      "invoiceNo": 0,
-      "debetCredit": "D",
+      "invoiceNo": 6666,
+      "debetCredit": "string",
       "shipmentId": 0,
-      "contactTypeId": 2,
+      "shipmentNo": "string",
+      "etd": "2022-10-26T08:10:09.848Z",
+      "eta": "2022-10-26T08:10:09.848Z",
+      "customerTypeId": 0,
       "customerId": 0,
-      "customerName": "dicoba hayo dicoba",
-      "customerAddress": "s",
+      "customerName": "string",
+      "customerAddress": "string",
       "billId": 0,
-      "billName": "s",
-      "billAddress": "s",
-      "invoicesTo": "s",
+      "billName": "string",
+      "billAddress": "string",
+      "invoicesTo": "string",
       "invoiceStatus": 0,
       "paymentUSD": 0,
       "paymentIDR": 0,
       "totalVatUSD": 0,
       "totalVatIDR": 0,
       "rate": 0,
-      "exRateDate": "2022-09-26T04:48:42.216Z",
+      "exRateDate": "2022-10-26T08:10:09.848Z",
       "period": 0,
       "yearPeriod": 0,
-      "invoicesAgent": "s",
-      "invoicesEdit": "s",
-      "jenisInvoices": "s",
-      "linkTo": "s",
+      "invoicesAgent": "string",
+      "invoicesEdit": "string",
+      "jenisInvoices": "string",
+      "linkTo": "string",
       "dueDate": 0,
-      "paid": false,
-      "paidOn": "2022-09-26T04:48:42.216Z",
+      "paid": true,
+      "paidOn": "2022-10-26T08:10:09.848Z",
       "saveOR": true,
       "badDebt": true,
-      "badDebtOn": "2022-09-26T04:48:42.216Z",
+      "badDebtOn": "2022-10-26T08:10:09.848Z",
       "reBadDebt": true,
-      "dateReBadDebt": "2022-09-26T04:48:42.216Z",
+      "dateReBadDebt": "2022-10-26T08:10:09.848Z",
       "printing": 0,
-      "printedOn": "2022-09-26T04:48:42.216Z",
+      "printedOn": "2022-10-26T08:10:09.848Z",
       "deleted": true,
-      "deletedOn": "2022-09-26T04:48:42.216Z",
-      "invoiceNo2": "s",
+      "deletedOn": "2022-10-26T08:10:09.848Z",
+      "invoiceNo2": "string",
       "invHeader": 0,
       "exRateId": 0,
-      "rePrintApproved": false,
-      "rePrintApprovedOn": "2022-09-26T04:48:42.216Z",
-      "rePrintApprovedBy": "s",
-      "deletedRemarks": "s",
+      "rePrintApproved": true,
+      "rePrintApprovedOn": "2022-10-26T08:10:09.848Z",
+      "rePrintApprovedBy": "string",
+      "deletedRemarks": "string",
       "idLama": 0,
       "isCostToCost": true,
       "sfpId": 0,
-      "sfpNoFormat": "s",
+      "sfpNoFormat": "string",
       "sfpDetailId": 0,
-      "uniqueKeySFP": "s",
-      "uniqueKeyInvoice": "s",
+      "uniqueKeySFP": "string",
+      "uniqueKeyInvoice": "string",
       "deleteType": 0,
       "deleteTypeRefInvId": 0,
       "kursKMK": 0,
       "kursKMKId": 0,
-      "isDelivered": false,
-      "deliveredOn": "2022-09-26T04:48:42.216Z",
-      "deliveredRemarks": "s",
-      "sfpReference": "s",
+      "isDelivered": true,
+      "deliveredOn": "2022-10-26T08:10:09.848Z",
+      "deliveredRemarks": "string",
+      "sfpReference": "string",
       "approvedCredit": true,
       "approvedCreditBy": 0,
-      "approvedCreditOn": "2022-09-26T04:48:42.216Z",
-      "approvedCreditRemarks": "s",
-      "packingListNo": "s",
-      "siCustomerNo": "s",
-      "reference": "s",
+      "approvedCreditOn": "2022-10-26T08:10:09.848Z",
+      "approvedCreditRemarks": "string",
+      "packingListNo": "string",
+      "siCustomerNo": "string",
+      "reference": "string",
       "isStampDuty": true,
       "stampDutyAmount": 0,
       "pejkpNumber": 0,
-      "pejkpReference": "s",
+      "pejkpReference": "string",
+      "transactionOn": "2022-10-26T08:10:09.848Z",
       "user": "luna"
     },
-    // "invoiceDetails": [
-    //   {
-    //     "rowStatus": "ACT",
-    //     "countryId": 101,
-    //     "companyId": 32,
-    //     "branchId": 12,
-    //     "invoiceId": 0,
-    //     "sequence": 0,
-    //     "debetCredit": "D",
-    //     "accountId": 0,
-    //     "description": "s",
-    //     "type": 0,
-    //     "codingQuantity": true,
-    //     "quantity": 0,
-    //     "perQty": 0,
-    //     "sign": true,
-    //     "amountCrr": 0,
-    //     "amount": 0,
-    //     "percentVat": 0,
-    //     "amountVat": 0,
-    //     "eplDetailId": 0,
-    //     "vatId": 0,
-    //     "idLama": 0,
-    //     "isCostToCost": true,
-    //     "originalUsd": 0,
-    //     "originalRate": 0,
-    //     "user": "s",
-    //     "invoiceDetailProfitShares": [
-    //       {
-    //         "rowStatus": "s",
-    //         "countryId": 0,
-    //         "companyId": 0,
-    //         "branchId": 0,
-    //         "invoiceDetilId": 0,
-    //         "sequence": 0,
-    //         "sFeet20": 0,
-    //         "sFeet40": 0,
-    //         "sFeetHQ": 0,
-    //         "sFeetM3": 0,
-    //         "sRate20": 0,
-    //         "sRate40": 0,
-    //         "sRateHQ": 0,
-    //         "sRateM3": 0,
-    //         "bFeet20": 0,
-    //         "bFeet40": 0,
-    //         "bFeetHQ": 0,
-    //         "bFeetM3": 0,
-    //         "bRate20": 0,
-    //         "bRate40": 0,
-    //         "bRateHQ": 0,
-    //         "bRateM3": 0,
-    //         "percentage": 0,
-    //         "idLama": 0,
-    //         "user": "s"
-    //       }
-    //     ],
-    //     "invoiceDetailStorages": [
-    //       {
-    //         "rowStatus": "s",
-    //         "countryId": 0,
-    //         "companyId": 0,
-    //         "branchId": 0,
-    //         "invoiceDetailId": 0,
-    //         "sequence": 0,
-    //         "fromDate": "2022-09-26T04:48:42.216Z",
-    //         "toDate": "2022-09-26T04:48:42.216Z",
-    //         "totalDays": 0,
-    //         "storageDetailId": 0,
-    //         "amountIDR": 0,
-    //         "amountUSD": 0,
-    //         "storageId": 0,
-    //         "user": "s"
-    //       }
-    //     ]
-    //   }
-    // ],
-    // "invoiceReqDels": [
-    //   {
-    //     "rowStatus": "s",
-    //     "countryId": 0,
-    //     "companyId": 0,
-    //     "branchId": 0,
-    //     "id": 0,
-    //     "reference": "s",
-    //     "isNonJob": true,
-    //     "invoiceId": 0,
-    //     "deleteType": 0,
-    //     "remarks": "s",
-    //     "approvedStatus": 0,
-    //     "approvedRemarks": "s",
-    //     "approvedBy": "s",
-    //     "approvedOn": "2022-09-26T04:48:42.217Z",
-    //     "deleted": true,
-    //     "deletedOn": "2022-09-26T04:48:42.217Z",
-    //     "modifiedBy": "s",
-    //     "modifiedOn": "2022-09-26T04:48:42.217Z",
-    //     "createdBy": "s",
-    //     "createdOn": "2022-09-26T04:48:42.217Z"
-    //   }
-    // ],
-    // "invoiceExportEJKPs": [
-    //   {
-    //     "rowStatus": "s",
-    //     "countryId": 0,
-    //     "companyId": 0,
-    //     "branchId": 0,
-    //     "invoiceId": 0,
-    //     "sequence": 0,
-    //     "pejkpNumber": 0,
-    //     "isExported": true,
-    //     "exportedOn": "2022-09-26T04:48:42.217Z",
-    //     "exportedBy": "s",
-    //     "isUploaded": true,
-    //     "uploadedOn": "2022-09-26T04:48:42.217Z",
-    //     "uploadedBy": "s",
-    //     "modifiedBy": "s",
-    //     "modifiedOn": "2022-09-26T04:48:42.217Z",
-    //     "createdBy": "s",
-    //     "createdOn": "2022-09-26T04:48:42.217Z"
-    //   }
-    // ],
-    // "invoiceExportFakturs": [
-    //   {
-    //     "rowStatus": "s",
-    //     "countryId": 0,
-    //     "companyId": 0,
-    //     "branchId": 0,
-    //     "invoiceId": 0,
-    //     "sequence": 0,
-    //     "isInvoiceNonJob": true,
-    //     "isExported": true,
-    //     "exportedOn": "2022-09-26T04:48:42.217Z",
-    //     "exportedBy": "s",
-    //     "isUploaded": true,
-    //     "uploadedOn": "2022-09-26T04:48:42.217Z",
-    //     "uploadedBy": "s",
-    //     "modifiedBy": "s",
-    //     "modifiedOn": "2022-09-26T04:48:42.217Z",
-    //     "createdBy": "s",
-    //     "createdOn": "2022-09-26T04:48:42.217Z"
-    //   }
-    // ]
-  }
+    "invoiceDetails": [
+      {
+        "rowStatus": "string",
+        "countryId": 0,
+        "companyId": 0,
+        "branchId": 0,
+        "id": 0,
+        "invoiceId": 0,
+        "sequence": 0,
+        "debetCredit": "string",
+        "accountId": 0,
+        "description": "string",
+        "type": 0,
+        "codingQuantity": true,
+        "quantity": 0,
+        "perQty": 0,
+        "sign": true,
+        "amountCrr": 0,
+        "amount": 0,
+        "percentVat": 0,
+        "amountVat": 0,
+        "eplDetailId": 0,
+        "vatId": 0,
+        "idLama": 0,
+        "isCostToCost": true,
+        "originalUsd": 0,
+        "originalRate": 0,
+        "user": "string",
+        "invoiceDetailStorages": [
+          {
+            "rowStatus": "string",
+            "countryId": 0,
+            "companyId": 0,
+            "branchId": 0,
+            "invoiceDetailId": 0,
+            "sequence": 0,
+            "fromDate": "2022-10-26T08:10:09.849Z",
+            "toDate": "2022-10-26T08:10:09.849Z",
+            "totalDays": 0,
+            "storageDetailId": 0,
+            "amountIDR": 0,
+            "amountUSD": 0,
+            "storageId": 0,
+            "user": "string"
+          }
+        ]
+      }
+    ]
+}
 
 let revisedHeadersDummy = [
     {
@@ -492,10 +402,11 @@ const CreateInvoicePage = () => {
     const [shipmentNo, setShipmentNo] = useState('')
     const [shipmentId, setShipmentId] = useState(0)
     const [etd, setEtd] = useState('')
+    const [eta, setEta] = useState('')
     const [openMLSO, setOpenMLSO] = useState(false)
     const [LSOHeaders, setLSOHeaders] = useState([])
     const [LSOData, setLSOData] = useState([])
-    const [jenisInvoices, setJenisInvoices] = useState('Invoice')
+    const [jenisInvoices, setJenisInvoices] = useState('I')
     const [isCTC, setIsCTC] = useState(false)
     const [invoiceNo, setInvoiceNo] = useState('')
     const [printing, setPrinting] = useState(0)
@@ -564,15 +475,14 @@ const CreateInvoicePage = () => {
     const [jobOwners, setJobOwners] = useState([])
     const [openModal, setOpenModal] = useState(false)
     const [modalType, setModalType] = useState('')
-    
+    const [jobOwnerId, setJobOwnerId] = useState(0)
+    const [allVat, setAllVat] = useState(0)
 
     useEffect(() => {
         if(invId) {
-            console.log('mode edit', invId)
             setIsDisabled(true)
             fetchEditData(invId)
         } else {
-            console.log('mode create')
             fetchRevised(50, 1)
             fetchJobOwners()
             getShipmentOrder(50, 1)
@@ -591,7 +501,6 @@ const CreateInvoicePage = () => {
             'http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostByPage?pageNumber=1&pageSize=5',
             body
         ).then(res => {
-            console.log('response job owners', res)
             setJobOwners(res.data.data.jobOwner)
         }).catch(error => {
             console.error(error);
@@ -615,7 +524,6 @@ const CreateInvoicePage = () => {
     }
 
     const fetchEditData = (invId) => {
-        console.log('invoice id', invId)
         let body = {
             "userCode": "luna",
             "countryId": 101,
@@ -627,7 +535,6 @@ const CreateInvoicePage = () => {
             `http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/PostById?id=${invId}`,
             body
         ).then(response => {
-            console.log('data edit', response)
             setInvoiceDetails(response.data.data.invoice.invoiceDetails)
 
             let tempDetail = response.data.data.invoice.invoiceDetails
@@ -663,6 +570,11 @@ const CreateInvoicePage = () => {
             setRate(temp.rate)
             setKursKMK(temp.kursKMK)
             setEFaktur(temp.sfpReference)
+            setJobOwnerId(temp.invHeader)
+            setShipmentNo(temp.shipmentNo)
+            setEtd(temp.etd)
+            setEta(temp.eta)
+            setJenisInvoices(temp.jenisInvoices)
 
             return axios.post(
                 `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${temp.invHeader}`,
@@ -688,7 +600,6 @@ const CreateInvoicePage = () => {
         .then((response) => {
             setLSOHeaders(response.data.data.columns.headerColumns)
             setLSOData(response.data.data.shipmentOrder)
-            console.log('data ship list', response)
         })
         .catch(function (error) {
           console.error(error)
@@ -703,11 +614,36 @@ const CreateInvoicePage = () => {
             "companyId": 32,
             "branchId": 12
         }).then(response => {
-            console.log('response contact', response)
-            setDataContacts(response.data.data.contact)
-            setHeaderContacts(response.data.data.columns)
-            setMaxPageContacts(response.data.totalPage)
+            if(response.data.code === 200) {
+                setDataContacts(response.data.data.contact)
+                setHeaderContacts(response.data.data.columns)
+                setMaxPageContacts(response.data.totalPage)
+            }
         }).catch(error => console.error(error))
+    }
+
+    const handleAllVat = (value) => {
+        let cast = Number(value)
+        setAllVat(cast)
+        if(detailMap.length > 0) {
+            let tempIdr = 0
+            let tempUsd = 0
+            detailMap.forEach(el => {
+                if(el.rowStatus !== 'DEL') {
+                    let calculation = Number(el.amount) * (cast/100)
+                    el.percentVat = cast
+                    el.amountVat = calculation
+    
+                    if(el.amountCrr === 0) {
+                        tempUsd += calculation
+                    } else {
+                        tempIdr += calculation
+                    }
+                }
+            })
+            setTotalVATIDR( Number( tempIdr.toFixed(2) ) )
+            setTotalVATUSD( Number( tempUsd.toFixed(2) ) )
+        }
     }
 
     const handleTab = (event, newValue) => {
@@ -720,20 +656,26 @@ const CreateInvoicePage = () => {
                 invoice : editInvoice,
                 invoiceDetails : detailMap
             }
+
+            delete payload.invoice.invoiceDetails
+
             payload.invoice.shipmentId = shipmentId
             payload.invoice.customerAddress = customerAddress
-            payload.invoice.invHeader = shipmentData.jobOwnerId
+            payload.invoice.invHeader = jobOwnerId
             payload.invoice.packingListNo = packingListNo
             payload.invoice.siCustomerNo = siCustomerNo
-            payload.invoice.isStampDuty = isStampDuty
-            payload.invoice.stampDutyAmount = stampDutyAmount
-            console.log('payload edit', payload)
+            payload.invoice.isStampDuty = isStampDuty.toString() === 'true' ? true : false
+            payload.invoice.stampDutyAmount = isStampDuty.toString() === 'true' ? stampDutyAmount : 0
+            payload.invoice["paymentUSD"]= paymentUSD
+            payload.invoice["paymentIDR"]= paymentIDR
+            payload.invoice["totalVatUSD"]= totalVATUSD
+            payload.invoice["totalVatIDR"]= totalVATIDR
+            payload.invoice.invoicesAgent = invoiceAgent
+
             axios.put(
                 'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Update',
                 payload
-            ).then(response => {
-                console.log('res update', response)
-                
+            ).then(response => {                
                 Swal.fire({
                     position: 'center',
                     icon: 'success',
@@ -752,40 +694,60 @@ const CreateInvoicePage = () => {
                     'info'
                 )
             } else {
-                let payload = templateInvoice
-                
-                payload.invoice.sfpReference = eFaktur
-                payload.invoice["debetCredit"] = debetCredit
-                payload.invoice["shipmentId"]= shipmentData.id
-                payload.invoice["contactTypeId"]= contactTypeId
-                payload.invoice["customerId"]= customerId
-                payload.invoice["customerName"]= customerName
-                payload.invoice["customerAddress"]= customerAddress
-                payload.invoice["customerTypeId"]= customerTypeId
-                payload.invoice["paymentUSD"]= paymentUSD
-                payload.invoice["paymentIDR"]= paymentIDR
-                payload.invoice["totalVatUSD"]= totalVATUSD
-                payload.invoice["totalVatIDR"]= totalVATIDR
-                payload.invoice["rate"]= rate
-                payload.invoice["paid"]= paid
-                payload.invoice["paidOn"]= paidOn
-                payload.invoice["invHeader"]= invHeader
-                payload.invoice["isCostToCost"]= isCTC
-                payload.invoice["kursKMK"]= kursKMK
-                payload.invoice["packingListNo"]= packingListNo
-                payload.invoice["siCustomerNo"]= siCustomerNo
-                payload.invoice["isStampDuty"]= isStampDuty == 'true' ? true : false
-                payload.invoice["stampDutyAmount"]= isStampDuty === true ? stampDutyAmount : 0
-                // payload.invoice["transactionDate"]= new Date().toISOString()
-                payload.invoiceDetails= detailMap
-                
-                console.log('create payload', payload)
                 axios.post(
-                    'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
-                    payload
-                ).then(response => {
-                    console.log('res create', response)
+                    'https://localhost:7160/Invoice/PostAutoNoInvoice',
+                    {
+                        "userCode": "luna",
+                        "countryId": 101,
+                        "companyId": 32,
+                        "branchId": 12
+                    }
+                ).then(res => {
+                    if(res.data.code === 200) {
+                        let payload = templateInvoice
+                        
+                        payload.invoice.invoiceNo = res.data.data.invoiceNo
+                        payload.invoice.invoiceNo2 = res.data.data.invoiceNo2
+                        payload.invoice.sfpId = res.data.data.sfpId
+                        payload.invoice["sfpNoFormat"] =  res.data.data.sfpNoFormat
+                        payload.invoice["sfpDetailId"] = res.data.data.sfpDetailId
+                        payload.invoice["uniqueKeySFP"] = res.data.data.uniqueKeySFP
+                        payload.invoice["uniqueKeyInvoice"] = res.data.data.uniqueKeyInvoice
+                        payload.invoice.sfpReference = eFaktur
+                        payload.invoice["debetCredit"] = debetCredit
+                        payload.invoice["shipmentId"]= shipmentData.id
+                        payload.invoice["contactTypeId"]= contactTypeId
+                        payload.invoice["customerId"]= customerId
+                        payload.invoice["customerName"]= customerName
+                        payload.invoice["customerAddress"]= customerAddress
+                        payload.invoice["customerTypeId"]= customerTypeId
+                        payload.invoice["paymentUSD"]= paymentUSD
+                        payload.invoice["paymentIDR"]= paymentIDR
+                        payload.invoice["totalVatUSD"]= totalVATUSD
+                        payload.invoice["totalVatIDR"]= totalVATIDR
+                        payload.invoice["rate"]= rate
+                        payload.invoice["paid"]= paid
+                        payload.invoice["paidOn"]= paidOn === '' ? new Date('1753-01-01') : paidOn
+                        payload.invoice["invHeader"]= shipmentData.jobOwnerId ? shipmentData.jobOwnerId : 0
+                        payload.invoice["isCostToCost"]= isCTC
+                        payload.invoice["kursKMK"]= kursKMK
+                        payload.invoice["packingListNo"]= packingListNo
+                        payload.invoice["siCustomerNo"]= siCustomerNo
+                        payload.invoice["isStampDuty"]= isStampDuty.toString() === 'true' ? true : false
+                        payload.invoice["stampDutyAmount"]= isStampDuty.toString() === 'true' ? stampDutyAmount : 0
+                        payload.invoice.shipmentNo = shipmentNo
+                        payload.invoice.eta = eta
+                        payload.invoice.etd = etd
+                        payload.invoice.jenisInvoices = jenisInvoices
+                        // payload.invoice["transactionDate"]= new Date().toISOString()
+                        payload.invoiceDetails= detailMap
 
+                        return axios.post(
+                            'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
+                            payload
+                        )
+                    }
+                }).then(response => {
                     Swal.fire({
                         position: 'center',
                         icon: 'success',
@@ -802,8 +764,6 @@ const CreateInvoicePage = () => {
     }
 
     const handleSelectContact = (value, type) => {
-        console.log('select contact', value)
-        console.log('contact type', type)
         if(type === 'shipper-customer') {
             if(contactTypeId == 2) {
                 setCustomerId(value.contactId)
@@ -834,7 +794,7 @@ const CreateInvoicePage = () => {
     }
     
     const renderStamp = () => {
-        if(isStampDuty === 'true') {
+        if(isStampDuty.toString() === 'true') {
             return (
                 <NumericFormat 
                 customInput={TextField} 
@@ -862,7 +822,7 @@ const CreateInvoicePage = () => {
     }
 
     const handleDetailAdd = () => {
-        if(!shipmentData.shipmentNo) {
+        if(!shipmentNo) {
             Swal.fire(
                 'Information',
                 "Shipment Order Number can't be empty...!!",
@@ -874,10 +834,25 @@ const CreateInvoicePage = () => {
     }
 
     const saveDetail = (payload) => {
+        let sumUsd = 0
+        let sumIdr = 0
+        let vatUsd = 0
+        let vatIdr = 0
+
         if(detailEdit === true) {
-            const newArr = invoiceDetails.slice()
+            const newArr = detailMap.slice()
             newArr.forEach(el =>  {
                 if(el.sequence === payload.sequence) {
+                    if(el.rowStatus !== 'DEL') {
+                        if(payload.amountCrr === 1) {
+                            sumIdr += payload.amount
+                            vatIdr += payload.amountVat
+                        } else {
+                            sumUsd += payload.amount
+                            vatUsd += payload.amountVat
+                        }
+                    }
+
                     el.accountId = payload.accountId
                     el.accountName = payload.accountName
                     el.description = payload.description
@@ -885,13 +860,31 @@ const CreateInvoicePage = () => {
                     el.isCostToCost = payload.isCostToCost
                     el.sign = payload.sign
                     el.percentVat = payload.percentVat
+                    el.amountVat = payload.amountVat
                     el.quantity = payload.quantity
                     el.perQty = payload.perQty
                     el.originalRate = payload.originalRate
                     el.amount = payload.amount
                     el.originalUsd = payload.originalUsd
+                    el.codingQuantity = payload.codingQuantity
+                    el.amountCrr = payload.amountCrr
+                } else {
+                    if(el.rowStatus !== 'DEL') {
+                        if(el.amountCrr === 1) {
+                            sumIdr += el.amount
+                            vatIdr += el.amountVat
+                        } else {
+                            sumUsd += el.amount
+                            vatUsd += el.amountVat
+                        }
+                    }
                 }
             })
+
+            setPaymentIDR(Number(sumIdr.toFixed(2)))
+            setPaymentUSD(Number(sumUsd.toFixed(2)))
+            setTotalVATIDR(Number(vatIdr.toFixed(2)))
+            setTotalVATUSD(Number(vatUsd.toFixed(2)))
 
             setDetailMap(newArr)
 
@@ -899,7 +892,25 @@ const CreateInvoicePage = () => {
             setSelectedDetail({})
         } else {
             setDetailSequence(payload.sequence)
-            setDetailMap(arr => [...arr, payload])
+
+            let arrDetail = [...detailMap, payload]
+            arrDetail.forEach(el => {
+                if(el.rowStatus !== 'DEL') {
+                    if(el.amountCrr === 1) {
+                        sumIdr += el.amount
+                        vatIdr += el.amountVat
+                    } else {
+                        sumUsd += el.amount
+                        vatUsd += el.amountVat
+                    }
+                }
+            })
+            setPaymentIDR(Number(sumIdr.toFixed(2)))
+            setPaymentUSD(Number(sumUsd.toFixed(2)))
+            setTotalVATIDR(Number(vatIdr.toFixed(2)))
+            setTotalVATUSD(Number(vatUsd.toFixed(2)))
+
+            setDetailMap(arrDetail)
         }
     }
 
@@ -911,8 +922,10 @@ const CreateInvoicePage = () => {
                 'info'
             )
         } else {
-            setDetailEdit(true)
-            setOpenModalDetail(true)
+            if(selectedDetail.rowStatus !== 'DEL'){
+                setDetailEdit(true)
+                setOpenModalDetail(true)
+            }
         }
     }
 
@@ -924,20 +937,37 @@ const CreateInvoicePage = () => {
                 'info'
             )
         } else {
+            let sumUsd = 0
+            let sumIdr = 0
+            let vatUsd = 0
+            let vatIdr = 0
+
             let tempSequence = selectedDetail.sequence
 
-            let fromEpl = false
+            // let fromEpl = false
             
-            invoiceDetails.forEach(el =>  {
-                if(el.sequence === tempSequence) {
-                    fromEpl = true
-                }
-            })
+            // invoiceDetails.forEach(el =>  {
+            //     if(el.sequence === tempSequence) {
+            //         fromEpl = true
+            //     }
+            // })
+            if(selectedDetail.eplDetailId != 0) {
+                sumUsd = paymentUSD
+                sumIdr = paymentIDR
+                vatUsd = totalVATUSD
+                vatIdr = totalVATIDR
 
-            if(fromEpl === true) {
                 detailMap.forEach(el => {
                     if(el.sequence === tempSequence) {
-                        el.rowStatus = 'DED'
+                        el.rowStatus = 'DEL'
+                        
+                        if(el.amountCrr === 1) {
+                            sumIdr -= el.amount
+                            vatIdr -= el.amountVat
+                        } else {
+                            sumUsd -= el.amount
+                            vatUsd -= el.amountVat
+                        }
                     }
                 })
             } else {
@@ -945,23 +975,39 @@ const CreateInvoicePage = () => {
                     return invoices.sequence !== tempSequence
                 }
                 const result = detailMap.filter(deleteFunction)
-                
-                tempSequence = invoiceDetails[invoiceDetails.length - 1].sequence
-                if(invoiceDetails.length === result.length) {
-                    setDetailSequence(tempSequence)
-                } else {
-                    result.forEach((el, index) => {
-                        if(index > invoiceDetails.length - 1) {
+                if(result.length > 0) {
+                    tempSequence = 0
+                    result.forEach((el) => {
+                        if(el.rowStatus !== 'DEL') {
+                            if(el.amountCrr === 1) {
+                                sumIdr += el.amount
+                                vatIdr += el.amountVat
+                            } else {
+                                sumUsd += el.amount
+                                vatUsd += el.amountVat
+                            }
+                        }
+
+                        if(el.eplDetailId != 0) {
+                            tempSequence = el.sequence
+                        } else {
                             tempSequence += 1
                             el.sequence = tempSequence
                         }
                     })
-                    
+
                     setDetailSequence(tempSequence)
+                } else {
+                    setDetailSequence(0)
                 }
                 
                 setDetailMap(result)
             }
+
+            setPaymentIDR(Number(sumIdr.toFixed(2)))
+            setPaymentUSD(Number(sumUsd.toFixed(2)))
+            setTotalVATIDR(Number(vatIdr.toFixed(2)))
+            setTotalVATUSD(Number(vatUsd.toFixed(2)))
 
             setSelectedDetail({})
         }
@@ -1130,6 +1176,7 @@ const CreateInvoicePage = () => {
         setShipmentNo(data.shipmentNo)
         setShipmentId(data.id)
         setEtd(data.etd)
+        setEta(data.eta)
         setShipmentData(data)
     }
 
@@ -1193,6 +1240,12 @@ const CreateInvoicePage = () => {
                 setInvoiceDetails={e => setInvoiceDetails(e)}
                 setDetailMap={e => setDetailMap(e)}
                 setDetailSequence={e => setDetailSequence(e)}
+                dcStatus={debetCredit}
+                setPaymentIDR={e => setPaymentIDR(e)}
+                setPaymentUSD={e => setPaymentUSD(e)}
+                setTotalVATIDR={e => setTotalVATIDR(e)}
+                setTotalVATUSD={e => setTotalVATUSD(e)}
+                setAllVat={e => setAllVat(e)}
                 />
 
                 <ModalTableInvoice 
@@ -1261,6 +1314,7 @@ const CreateInvoicePage = () => {
                 edit={detailEdit}
                 resetEdit={() => setDetailEdit(false)}
                 selected={selectedDetail}
+                dcStatus={debetCredit}
                 />
 
                 <Grid container item spacing={3} direction="row">
@@ -1274,8 +1328,8 @@ const CreateInvoicePage = () => {
                             value={jenisInvoices}
                             onChange={e => setJenisInvoices(e.target.value)}
                             >
-                                <FormControlLabel value={'Invoice'} control={<Radio />} label="Invoices" disabled={isDisabled} />
-                                <FormControlLabel value={'General'} control={<Radio />} label="General Invoices" disabled={isDisabled} />
+                                <FormControlLabel value={'I'} control={<Radio />} label="Invoices" disabled={isDisabled} />
+                                <FormControlLabel value={'G'} control={<Radio />} label="General Invoices" disabled={isDisabled} />
                             </RadioGroup>
 
                             <FormLabel id="invoice-type-label">Type</FormLabel>
@@ -1335,7 +1389,7 @@ const CreateInvoicePage = () => {
                             label="ETD / ETA" 
                             variant="filled" 
                             margin="normal" 
-                            value={etd}
+                            value={etd.length > 0 ? dateFormat(etd) : ''}
                             onChange={e => setEtd(e.target.value)}
                             disabled
                             />
@@ -1551,9 +1605,12 @@ const CreateInvoicePage = () => {
                             <Grid item>
                                 <RadioGroup 
                                 row 
-                                name="vat-radio">
-                                    <FormControlLabel value="11" control={<Radio />} label="ALL - VAT 11%" />
-                                    <FormControlLabel value="1,1" control={<Radio />} label="ALL - VAT 1,1%" />
+                                name="vat-radio"
+                                value={allVat}
+                                onChange={e => handleAllVat(e.target.value)}
+                                >
+                                    <FormControlLabel value={11} control={<Radio />} label="ALL - VAT 11%" />
+                                    <FormControlLabel value={1.1} control={<Radio />} label="ALL - VAT 1,1%" />
                                 </RadioGroup>
                             </Grid>
                         </Grid>
@@ -1579,15 +1636,15 @@ const CreateInvoicePage = () => {
                                                 <TableRow 
                                                 key={el.sequence} 
                                                 onClick={() => setSelectedDetail(el)} 
-                                                sx={selectedDetail.sequence === el.sequence ? selectedStyle : el.rowStatus === 'DED' ? deletedDetailStyle : {}}
+                                                sx={selectedDetail.sequence === el.sequence ? selectedStyle : el.rowStatus === 'DEL' ? deletedDetailStyle : {}}
                                                 >
-                                                    <TableCell sx={{color: 'text.primary'}}>{el.sequence}</TableCell>
+                                                    <TableCell>{el.sequence}</TableCell>
                                                     <TableCell>{el.description}</TableCell>
                                                     <TableCell>
-                                                        {new Intl.NumberFormat().format(el.amountUSD ? el.amountUSD : 0)}.00
+                                                        {el.amountCrr === 0 ? new Intl.NumberFormat().format(el.amount) : 0}
                                                     </TableCell>
                                                     <TableCell>
-                                                        {new Intl.NumberFormat().format(el.amountIDR ? el.amountIDR : 0)}.00
+                                                        {el.amountCrr === 1 ? new Intl.NumberFormat().format(el.amount) : 0}
                                                     </TableCell>
                                                     <TableCell>{el.percentVat ? el.percentVat : 0}%</TableCell>
                                                     <TableCell>{el.sign === true ? '+' : '-'}</TableCell>
@@ -1669,7 +1726,6 @@ const CreateInvoicePage = () => {
                         <NumericFormat 
                         customInput={TextField} 
                         thousandSeparator="," 
-                        suffix={'.00'} 
                         label='Payment USD'
                         onValueChange={(values, sourceInfo) => {
                             setPaymentUSD(values.floatValue)
@@ -1684,7 +1740,6 @@ const CreateInvoicePage = () => {
                         <NumericFormat 
                         customInput={TextField} 
                         thousandSeparator="," 
-                        suffix={'.00'} 
                         label='Payment IDR'
                         onValueChange={(values, sourceInfo) => {
                             setPaymentIDR(values.floatValue)
@@ -1699,7 +1754,6 @@ const CreateInvoicePage = () => {
                         <NumericFormat 
                         customInput={TextField} 
                         thousandSeparator="," 
-                        suffix={'.00'} 
                         label='Total Vat USD'
                         onValueChange={(values, sourceInfo) => {
                             setTotalVATUSD(values.floatValue)
@@ -1714,7 +1768,6 @@ const CreateInvoicePage = () => {
                         <NumericFormat 
                         customInput={TextField} 
                         thousandSeparator="," 
-                        suffix={'.00'} 
                         label='Total Vat IDR'
                         onValueChange={(values, sourceInfo) => {
                             setTotalVATIDR(values.floatValue)
