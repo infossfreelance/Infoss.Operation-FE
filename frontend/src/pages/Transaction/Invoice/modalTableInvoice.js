@@ -34,14 +34,12 @@ const ModalTableInvoice = (props) => {
     const [numPage, setNumPage] = useState(1)
     let identifier = 'id'
     if(props.type === 'contact') identifier = 'contactId'
-
-    const handleSelect = (rowValue) => {
-        console.log(rowValue)
-        setSelectedData(rowValue)
-    }
     
     const handleClose = () => {
         setSelectedData({})
+        setRowsCount(50)
+        setNumPage(1)
+        props.fetchData(50, 1)
         props.onClose()
     }
 
@@ -54,6 +52,15 @@ const ModalTableInvoice = (props) => {
         }
 
         if(props.type === 'shipment') {
+          props.setInvoiceDetails([])
+          props.setDetailMap([])
+          props.setDetailSequence(0)
+          props.setPaymentIDR(0)
+          props.setPaymentUSD(0)
+          props.setTotalVATIDR(0)
+          props.setTotalVATUSD(0)
+          props.setAllVat(0)
+
           let body = {
             "userCode": "luna",
             "countryId": 101,
@@ -66,13 +73,14 @@ const ModalTableInvoice = (props) => {
             `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostById?id=${selectedData.id}`,
             body
           ).then(res => {
-            console.log('SO detail', res)
-            props.setId(res.data.data.shipmentOrder.shipperId)
-            props.setName(res.data.data.shipmentOrder.shipperName)
-            props.setAddress(res.data.data.shipmentOrder.shipperAddress)
-            props.setAgentId(res.data.data.shipmentOrder.agentId)
-            props.setAgentName(res.data.data.shipmentOrder.agentName)
-            props.setAgentAddress(res.data.data.shipmentOrder.agentAddress)
+            if(res.data.code === 200) {
+              props.setId(res.data.data.shipmentOrder.shipperId)
+              props.setName(res.data.data.shipmentOrder.shipperName)
+              props.setAddress(res.data.data.shipmentOrder.shipperAddress)
+              props.setAgentId(res.data.data.shipmentOrder.agentId)
+              props.setAgentName(res.data.data.shipmentOrder.agentName)
+              props.setAgentAddress(res.data.data.shipmentOrder.agentAddress)
+            }
           }).catch(error => console.error(error))
 
           let tempSelected = {...selectedData}
@@ -81,7 +89,6 @@ const ModalTableInvoice = (props) => {
             `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${tempSelected.jobOwnerId}`,
             body
           ).then(res => {
-            console.log('res jow owner by id', res)
             if(res.data.code === 200) {
               tempSelected.invHeader = res.data.data.jobOwner.masterCode
               props.setSelectedData(tempSelected)
@@ -93,12 +100,53 @@ const ModalTableInvoice = (props) => {
             `http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLoss/estimateProfitLoss/PostById?Id=${selectedData.id}`,
             body
           ).then(res => {
-            console.log('res detail epl', res)
             if(res.data.code === 200) {
               let temp = res.data.data.estimateProfitLoss.estimateProfitLossDetails
               props.setDetailSequence(temp[temp.length - 1].sequence)
-              props.setInvoiceDetails(temp)
-              props.setDetailMap(temp)
+
+              let sumUsd = 0
+              let sumIdr = 0
+              const remapedDetails = temp.map(el => {
+                sumUsd += el.amountUSD
+                sumIdr += el.amountIDR
+
+                let templateDetail = {
+                  "rowStatus": "ACT",
+                  "countryId": 101,
+                  "companyId": 32,
+                  "branchId": 12,
+                  id: 0,
+                  "invoiceId": 0,
+                  "sequence": el.sequence,
+                  "debetCredit": props.dcStatus,
+                  "accountId": el.accountId,
+                  "description": el.description,
+                  "type": el.type,
+                  "codingQuantity": el.codingQuantity,
+                  "quantity": el.quantity,
+                  "perQty": el.perQty,
+                  "sign": el.sign,
+                  "amountCrr": el.amountCrr,
+                  "amount": el.amountCrr === 1 ? el.amountIDR : el.amountUSD,
+                  "percentVat": 0,
+                  "amountVat": 0,
+                  "eplDetailId": el.id,
+                  "vatId": 0,
+                  "idLama": 0,
+                  "isCostToCost": el.isCostToCost,
+                  "originalUsd": el.originalUsd,
+                  "originalRate": el.originalRate,
+                  "user": "luna",
+                }
+
+                return templateDetail
+              })
+
+              props.setPaymentIDR(Number(sumIdr.toFixed(2)))
+              props.setPaymentUSD(Number(sumUsd.toFixed(2)))
+              
+              props.setInvoiceDetails(remapedDetails)
+              props.setDetailMap(remapedDetails)
             }
           }).catch(error => console.error(error))
         }
@@ -209,7 +257,7 @@ const ModalTableInvoice = (props) => {
                     </Grid>
                 </Grid>
                 <Grid item>
-                    <Box sx={{ border: 1, borderRadius: 1, p: 1, overflow: 'hidden', maxHeight: 450 }}>
+                    <Box sx={{ border: 1, borderRadius: 1, p: 1, overflow: 'hidden', maxHeight: 450, maxWidth: 1270 }}>
                         <TableContainer component={Paper} sx={{ maxHeight: 390 }}>
                             <Table sx={{ minWidth: 650 }} aria-label="sticky table" stickyHeader>
                                 <TableHead>
@@ -252,7 +300,7 @@ const ModalTableInvoice = (props) => {
                                         props.bodyData.map(el => {
                                             return (
                                                 <TableRow key={el[identifier]} 
-                                                onClick={() => handleSelect(el)} 
+                                                onClick={() => setSelectedData(el)} 
                                                 sx={selectedData[identifier] === el[identifier] ? selectedStyle : {} }
                                                 >
                                                     {
@@ -274,26 +322,25 @@ const ModalTableInvoice = (props) => {
                             </Table>
                         </TableContainer>
                         <div className='row mt-2'>
-                        <div>
                             <div>
-                                <div className='mx-4' style={{ display: 'inline-block' }}>
-                                    {renderPagination()}
+                                <div>
+                                    <div className='mx-4' style={{ display: 'inline-block' }}>
+                                        {renderPagination()}
+                                    </div>
+
+                                    <Dropdown style={{ display: 'inline-block' }} className='mx-2'>
+                                        <Dropdown.Toggle variant="outline-infoss sm" id="dropdown-basic">
+                                            {rowsCount} Rows
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(50); setNumPage(1); props.fetchData(50, 1) }}>50 Rows</Dropdown.Item>
+                                            <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(100); setNumPage(1); props.fetchData(100, 1) }}>100 Rows</Dropdown.Item>
+                                            <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(150); setNumPage(1); props.fetchData(150, 1) }}>150 Rows</Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
                                 </div>
-
-                                <Dropdown style={{ display: 'inline-block' }} className='mx-2'>
-                                    <Dropdown.Toggle variant="outline-infoss sm" id="dropdown-basic">
-                                        {rowsCount} Rows
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(50); setNumPage(1); props.fetchData(50, 1) }}>50 Rows</Dropdown.Item>
-                                        <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(100); setNumPage(1); props.fetchData(100, 1) }}>100 Rows</Dropdown.Item>
-                                        <Dropdown.Item className='dropdown-list' onClick={() => { setRowsCount(150); setNumPage(1); props.fetchData(150, 1) }}>150 Rows</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-
                             </div>
                         </div>
-                    </div>
                     </Box>
                 </Grid>
             </Grid>
