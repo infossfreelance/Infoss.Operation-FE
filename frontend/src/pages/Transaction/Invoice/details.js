@@ -694,71 +694,74 @@ const CreateInvoicePage = () => {
                     'info'
                 )
             } else {
-                axios.post(
-                    'https://localhost:7160/Invoice/PostAutoNoInvoice',
-                    {
-                        "userCode": "luna",
-                        "countryId": 101,
-                        "companyId": 32,
-                        "branchId": 12
-                    }
-                ).then(res => {
-                    if(res.data.code === 200) {
-                        let payload = templateInvoice
-                        
-                        payload.invoice.invoiceNo = res.data.data.invoiceNo
-                        payload.invoice.invoiceNo2 = res.data.data.invoiceNo2
-                        payload.invoice.sfpId = res.data.data.sfpId
-                        payload.invoice["sfpNoFormat"] =  res.data.data.sfpNoFormat
-                        payload.invoice["sfpDetailId"] = res.data.data.sfpDetailId
-                        payload.invoice["uniqueKeySFP"] = res.data.data.uniqueKeySFP
-                        payload.invoice["uniqueKeyInvoice"] = res.data.data.uniqueKeyInvoice
-                        payload.invoice.sfpReference = eFaktur
-                        payload.invoice["debetCredit"] = debetCredit
-                        payload.invoice["shipmentId"]= shipmentData.id
-                        payload.invoice["contactTypeId"]= contactTypeId
-                        payload.invoice["customerId"]= customerId
-                        payload.invoice["customerName"]= customerName
-                        payload.invoice["customerAddress"]= customerAddress
-                        payload.invoice["customerTypeId"]= customerTypeId
-                        payload.invoice["paymentUSD"]= paymentUSD
-                        payload.invoice["paymentIDR"]= paymentIDR
-                        payload.invoice["totalVatUSD"]= totalVATUSD
-                        payload.invoice["totalVatIDR"]= totalVATIDR
-                        payload.invoice["rate"]= rate
-                        payload.invoice["paid"]= paid
-                        payload.invoice["paidOn"]= paidOn === '' ? new Date('1753-01-01') : paidOn
-                        payload.invoice["invHeader"]= shipmentData.jobOwnerId ? shipmentData.jobOwnerId : 0
-                        payload.invoice["isCostToCost"]= isCTC
-                        payload.invoice["kursKMK"]= kursKMK
-                        payload.invoice["packingListNo"]= packingListNo
-                        payload.invoice["siCustomerNo"]= siCustomerNo
-                        payload.invoice["isStampDuty"]= isStampDuty.toString() === 'true' ? true : false
-                        payload.invoice["stampDutyAmount"]= isStampDuty.toString() === 'true' ? stampDutyAmount : 0
-                        payload.invoice.shipmentNo = shipmentNo
-                        payload.invoice.eta = eta
-                        payload.invoice.etd = etd
-                        payload.invoice.jenisInvoices = jenisInvoices
-                        // payload.invoice["transactionDate"]= new Date().toISOString()
-                        payload.invoiceDetails= detailMap
+                let payload = templateInvoice
+                
+                payload.invoice.invoiceNo = 0
+                payload.invoice.invoiceNo2 = ""
+                payload.invoice.sfpId = 0
+                payload.invoice["sfpNoFormat"] =  ""
+                payload.invoice["sfpDetailId"] = 0
+                payload.invoice["uniqueKeySFP"] = ""
+                payload.invoice["uniqueKeyInvoice"] = ""
+                payload.invoice.sfpReference = eFaktur
+                payload.invoice["debetCredit"] = debetCredit
+                payload.invoice["shipmentId"]= shipmentData.id
+                payload.invoice["contactTypeId"]= contactTypeId
+                payload.invoice["customerId"]= customerId
+                payload.invoice["customerName"]= customerName
+                payload.invoice["customerAddress"]= customerAddress
+                payload.invoice["customerTypeId"]= customerTypeId
+                payload.invoice["paymentUSD"]= paymentUSD
+                payload.invoice["paymentIDR"]= paymentIDR
+                payload.invoice["totalVatUSD"]= totalVATUSD
+                payload.invoice["totalVatIDR"]= totalVATIDR
+                payload.invoice["rate"]= rate
+                payload.invoice["paid"]= paid
+                payload.invoice["paidOn"]= paidOn === '' ? new Date('1753-01-01') : paidOn
+                payload.invoice["invHeader"]= shipmentData.jobOwnerId ? shipmentData.jobOwnerId : 0
+                payload.invoice["isCostToCost"]= isCTC
+                payload.invoice["kursKMK"]= kursKMK
+                payload.invoice["packingListNo"]= packingListNo
+                payload.invoice["siCustomerNo"]= siCustomerNo
+                payload.invoice["isStampDuty"]= isStampDuty.toString() === 'true' ? true : false
+                payload.invoice["stampDutyAmount"]= isStampDuty.toString() === 'true' ? stampDutyAmount : 0
+                payload.invoice.shipmentNo = shipmentNo
+                payload.invoice.eta = eta
+                payload.invoice.etd = etd
+                payload.invoice.jenisInvoices = jenisInvoices
+                payload.invoiceDetails= detailMap
 
-                        return axios.post(
-                            'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
-                            payload
+                axios.post(
+                    'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
+                    payload
+                ).then(response => {
+                    console.log(response)
+                    if(response.data.code === 200) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Create Data Success',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+    
+                        history('/booking/invoice')
+                    } else {
+                        Swal.fire(
+                            'Submit Failed',
+                            response.data.message,
+                            'error'
                         )
                     }
-                }).then(response => {
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Create Data Success',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-
-                    history('/booking/invoice')
                 })
-                .catch(error => console.error(error))
+                .catch(error => {
+                    console.error(error)
+                    Swal.fire(
+                        'Submit Failed',
+                        error.message,
+                        'error'
+                    )
+                })
             }
         }
     }
