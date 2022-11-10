@@ -55,6 +55,10 @@ import {
     PaymentHeadersDummy
 } from "./model";
 import {ButtonBase} from "@mui/material";
+import AddCustomer from "../../../components/pagePaymentRequest/AddCustomer";
+import AddPersonal from "../../../components/pagePaymentRequest/AddPersonal";
+import ModalListShipmentOrder from "../../../components/pagePaymentRequest/ModalListShipmentOrder";
+import AddbeingForPayment from "../../../components/pagePaymentRequest/AddbeingForPayment";
 
 
 function Img(props) {
@@ -391,11 +395,11 @@ const CrudPaymentRequestPage = () => {
 
     const handleSelectedShipment = (value) => {
         const f = {...formPayment};
-        f.idPaymentRequest = value['paymentrequestId'];
-        f.shipmentId = value['shipperId'];
+        f.Id = value['paymentrequestId'];
+        f.ShipmentId = value['shipperId'];
         f.etd = value.etd;
         f.eta = value.eta;
-        f.principleBy = value.agentName;
+        f.PrincipleBy = value.agentName;
         setFormPayment(f);
 
         console.log('valueShipment', value)
@@ -409,7 +413,7 @@ const CrudPaymentRequestPage = () => {
 
     const handleSetPaymentTo = (value) => {
         const f = {...formPayment};
-        f.paymentTo = value;
+        f.PaymentTo = value;
         setFormPayment(f);
 
         console.log('paymentTo', value)
@@ -736,13 +740,65 @@ const CrudPaymentRequestPage = () => {
                     type={'revised'}
                 />
 
+                {/*<ModalListShipmentOrder*/}
+                {/*    show={showMLSO}*/}
+                {/*    onHide={() => setShowMLSO(false)}*/}
+                {/*    LSOData={LSOData}*/}
+                {/*    setSelectedData={(e) => {*/}
+                {/*        setSelectedData(e)*/}
+                {/*    }}*/}
+                {/*    setdefShipNo={(e) => setdefShipNo(e)}*/}
+                {/*    MaxPage={1}*/}
+                {/*    NumPage={NumPage}*/}
+                {/*    RowsCount={RowsCount}*/}
+                {/*    setNumPage={(e) => setNumPage(e)}*/}
+                {/*    setRowsCount={(e) => setRowsCount(e)}*/}
+                {/*/>*/}
+
+                {/*<AddbeingForPayment*/}
+                {/*    show={showAddbeingForPayment}*/}
+                {/*    onHide={() => {*/}
+                {/*        setShowAddbeingForPayment(false)*/}
+                {/*    }}*/}
+                {/*    NotifAlert={(e, d) => NotifAlert(e, d)}*/}
+                {/*    staticId={staticId}*/}
+                {/*    AccountName={AccountName}*/}
+                {/*    IsAdd={IsAdd}*/}
+                {/*    data={IsAdd ? '' : SelectedShipperList}*/}
+                {/*    IncShipperList={IncShipperList}*/}
+                {/*    setIncShipperList={(e) => setIncShipperList(e)}*/}
+                {/*/>*/}
+
+                {/*<AddCustomer*/}
+                {/*    show={showAddCustomer}*/}
+                {/*    onHide={() => {*/}
+                {/*        setShowAddCustomer(false)*/}
+                {/*    }}*/}
+                {/*    NotifAlert={(e, d) => NotifAlert(e, d)}*/}
+                {/*    staticId={staticId}*/}
+                {/*    AccountName={AccountName}*/}
+                {/*    data={IsAdd ? '' : SelectedShipperList}*/}
+                {/*/>*/}
+
+                {/*<AddPersonal*/}
+                {/*    show={showAddPersonal}*/}
+                {/*    onHide={() => {*/}
+                {/*        setShowAddPersonal(false)*/}
+                {/*    }}*/}
+                {/*    NotifAlert={(e, d) => NotifAlert(e, d)}*/}
+                {/*    staticId={staticId}*/}
+                {/*    AccountName={AccountName}*/}
+                {/*    IsAdd={IsAdd}*/}
+                {/*    data={IsAdd ? '' : SelectedShipperList}*/}
+                {/*/>*/}
+
                 <Grid container spacing={3} direction="row">
                     <Grid item xs={5}>
                         <div className='border border-secondary rounded p-3'>
                             <FormLabel id="payment-form-label">Payment Form</FormLabel>
                             <RadioGroup
                                 row
-                                name="IsGeneralPayment"
+                                name={"IsGeneralPayment"}
                                 aria-labelledby="payment-form-label"
                                 value={formPayment.IsGeneralPayment}
                                 onChange={change}
@@ -756,7 +812,7 @@ const CrudPaymentRequestPage = () => {
                             <FormLabel id="payment-type-label">Type</FormLabel>
                             <RadioGroup
                                 row
-                                name="CTCType"
+                                name={"CTCType"}
                                 aria-labelledby="payment-type-label"
                                 value={formPayment.CTCType}
                                 onChange={change}
@@ -774,8 +830,9 @@ const CrudPaymentRequestPage = () => {
                                 id="principle"
                                 label="Principle By"
                                 variant="filled"
+                                name={"PrincipleBy"}
                                 onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
-                                value={formPayment.principleBy}
+                                value={formPayment.PrincipleBy}
                                 disabled={isEditDisabled}
                             />
                         </div>
@@ -784,44 +841,50 @@ const CrudPaymentRequestPage = () => {
                                 id="etd-eta-number"
                                 label="ETD/ETA"
                                 variant="filled"
+                                name={"etd/eta"}
                                 onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
-                                value={formPayment.shipmentId ? `${dateFormat(formPayment.etd)} - ${dateFormat(formPayment.eta)}` : ""}
+                                value={formPayment.etd && formPayment.eta ? `${dateFormat(formPayment.etd)} - ${dateFormat(formPayment.eta)}` : ""}
                                 disabled={isEditDisabled}
                             />
                         </div>
                     </Grid>
                     <Grid item xs={3}>
-                        <div className='col mt-3'>
-                            <TextField
-                                id="shipment-order-number"
-                                label="Shipment Order Number"
-                                variant="filled"
-                                onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
-                                value={formPayment.shipmentId}
-                                disabled={isEditDisabled}
-                            />
-                            <FindInPageIcon className='text-infoss m-3' onClick={() => setOpenMLSO(true)}/>
+                        <div className='row'>
+                            <div className="col-8">
+                                <TextField id="shipment-order-number" label="Shipment Order" name={"ShipmentId"} value={formPayment.ShipmentId}
+                                           onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)} className='block'
+                                           variant="standard" size='small' disabled={isEditDisabled}/>
+                            </div>
+                            <div className="col-4 pt-3">
+                                <FindInPageIcon className='text-infoss' onClick={() => setOpenMLSO(true)}/>
+                            </div>
                         </div>
                     </Grid>
                 </Grid>
-                <Grid container spacing={3} sx={{ marginTop: 0 }} direction="row">
+                <Grid container spacing={3} sx={{ marginTop: 5 }} direction="row">
                     <Grid item xs={4} className='row'>
-                        <TextField
-                            id="principle"
-                            label="Payment Request Number"
-                            variant="filled"
-                            onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
-                            value={formPayment.principleBy}
-                            disabled={isEditDisabled}
-                        />
-                        <TextField
-                            id="principle"
-                            label="Reference"
-                            variant="filled"
-                            onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
-                            value={formPayment.principleBy}
-                            disabled={isEditDisabled}
-                        />
+                        <div>
+                            <TextField className='block'
+                                id="principle"
+                                label="Payment Request No"
+                                variant="filled"
+                                name={"PaymentRequestNo"}
+                                onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
+                                value={formPayment.PaymentRequestNo}
+                                disabled={isEditDisabled}
+                            />
+                        </div>
+                        <div>
+                            <TextField className='block'
+                                id="principle"
+                                label="Reference"
+                                variant="filled"
+                                name={"ReferenceId"}
+                                onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
+                                value={formPayment.ReferenceId}
+                                disabled={isEditDisabled}
+                            />
+                        </div>
                     </Grid>
                     <Grid item xs={4}>
                         <div className='border border-secondary rounded p-3'>
@@ -830,9 +893,9 @@ const CrudPaymentRequestPage = () => {
                             <div className='row mt-4'>
                                 <RadioGroup
                                     row
-                                    name="row-radio-buttons-group"
+                                    name={"PaymentTo"}
                                     aria-labelledby="demo-row-radio-buttons-group-label"
-                                    value={formPayment.paymentTo}
+                                    value={formPayment.PaymentTo}
                                     onChange={(e) => handleSetPaymentTo(e.target.value)}
                                 >
                                     <FormControlLabel value="SSLine" control={<Radio/>} label="SSLine"
@@ -852,46 +915,49 @@ const CrudPaymentRequestPage = () => {
                             <span>Rate</span>
                             <hr/>
                             <div className='row'>
-                                <div className='col-6'>
-                                    <TextField id="filled-basic" label="Rate" name="rate" value={formPayment.rate}
+                                <div className='col-5'>
+                                    <TextField id="filled-basic" name={"KursKMK"} value={formPayment.KursKMK}
                                                onChange={change} className='block'
-                                               variant="standard" size='small' disabled/>
+                                               variant="filled" size='small' disabled/>
                                 </div>
-                                <div className='col-6'>
-                                    <TextField id="filled-basic" label="-" name="rate" value={formPayment.rate}
+                                <div className='col-7'>
+                                    <TextField id="filled-basic" name={"Currency"} value={formPayment.Currency}
                                                onChange={change} className='block'
-                                               variant="standard" size='small' disabled/>
+                                               variant="filled" size='small' disabled/>
                                 </div>
                             </div>
                         </div>
                     </Grid>
                 </Grid>
-                <Grid container spacing={3} sx={{ marginTop: 0 }} direction="row">
+                <Grid container spacing={3} sx={{ marginTop: 2 }} direction="row">
                     <Grid item xs={4} className='row'>
                         <div className='col-5'>
-                            <TextField id="filled-basic" label="Printing"
-                                       onChange={(e) => handleApprove(e.target.value)} className='block'
-                                       variant="standard" size='small' disabled/>
+                            <TextField id="principle" label="Printing" name={"PrintingL"} value={formPayment.PrintingL}
+                                       onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)} className='block'
+                                       variant="filled" disabled={isEditDisabled}/>
                         </div>
                         <div className='col-7'>
-                            <TextField id="filled-basic" label="-"
-                                       onChange={(e) => handleApprove(e.target.value)} className='block'
-                                       variant="standard" size='small' disabled/>
+                            <TextField id="filled-basic" label="-" name={"PrintingR"} value={formPayment.PrintingR}
+                                       onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)} className='block'
+                                       variant="filled" disabled={isEditDisabled}/>
                         </div>
 
-                        <TextField className='mt-3'
-                            id="principle"
-                            label="DN Vendor"
-                            variant="filled"
-                            onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
-                            value={formPayment.principleBy}
-                            disabled={isEditDisabled}
-                        />
+                        <div className='col-12 mt-3'>
+                            <TextField className='block'
+                                       id="principle"
+                                       label="DN Vendor"
+                                       variant="standard"
+                                       name={"DNVendor"}
+                                       onClick={change}
+                                       value={formPayment.DNVendor}
+                                       disabled={isEditDisabled}
+                            />
+                        </div>
                     </Grid>
                     <Grid item xs={8}>
                         <div className='row'>
                             <div className="col-4">
-                                <TextField id="filled-basic" label="Customer"
+                                <TextField id="filled-basic" label="Customer" name={"CustomerId"} value={formPayment.CustomerId}
                                            onChange={(e) => handleApprove(e.target.value)} className='block'
                                            variant="standard" size='small' disabled/>
                             </div>
@@ -899,14 +965,14 @@ const CrudPaymentRequestPage = () => {
                                 <FindInPageIcon className='text-infoss' onClick={() => handleApprove(true)}/>
                             </div>
                             <div className="col-7">
-                                <TextField id="filled-basic" label="Customer Name"
+                                <TextField id="filled-basic" label="Customer Name" name={"CustomerName"} value={formPayment.CustomerName}
                                            onChange={(e) => handleApprove(e.target.value)} className='block'
-                                           variant="standard" size='small' disabled/>
+                                           variant="filled" size='small' disabled/>
                             </div>
                         </div>
                         <div className='row mt-3'>
                             <div className="col-4">
-                                <TextField id="filled-basic" label="Personal"
+                                <TextField id="filled-basic" label="Personal" name={"PersonalId"} value={formPayment.PersonalId}
                                            onChange={(e) => handleApprove(e.target.value)} className='block'
                                            variant="standard" size='small' disabled/>
                             </div>
@@ -914,14 +980,14 @@ const CrudPaymentRequestPage = () => {
                                 <FindInPageIcon className='text-infoss' onClick={() => handleApprove(true)}/>
                             </div>
                             <div className="col-7">
-                                <TextField id="filled-basic" label="Personal Name"
+                                <TextField id="filled-basic" label="Personal Name" name={"PersonalName"} value={formPayment.PersonalName}
                                            onChange={(e) => handleApprove(e.target.value)} className='block'
-                                           variant="standard" size='small' disabled/>
+                                           variant="filled" size='small' disabled/>
                             </div>
                         </div>
                     </Grid>
                 </Grid>
-                <Grid item>
+                <Grid item sx={{ marginTop: 10 }}>
                     <Box sx={{ border: 1, borderRadius: 1, p: 1, mt: 3 }}>
                         <Grid
                             container
@@ -934,17 +1000,17 @@ const CrudPaymentRequestPage = () => {
                                     Being For Payment
                                 </Typography>
                             </Grid>
-                            <Grid item>
-                                <RadioGroup
-                                    row
-                                    name="vat-radio"
-                                    value={formPayment.vat}
-                                    onChange={change}
-                                >
-                                    <FormControlLabel value={11} control={<Radio />} label="ALL - VAT 11%" />
-                                    <FormControlLabel value={1.1} control={<Radio />} label="ALL - VAT 1,1%" />
-                                </RadioGroup>
-                            </Grid>
+                            {/*<Grid item>*/}
+                            {/*    <RadioGroup*/}
+                            {/*        row*/}
+                            {/*        name={"taxPercent"}*/}
+                            {/*        value={formPayment.taxPercent}*/}
+                            {/*        onChange={change}*/}
+                            {/*    >*/}
+                            {/*        <FormControlLabel value={11} control={<Radio />} label="ALL - VAT 11%" />*/}
+                            {/*        <FormControlLabel value={1.1} control={<Radio />} label="ALL - VAT 1,1%" />*/}
+                            {/*    </RadioGroup>*/}
+                            {/*</Grid>*/}
                         </Grid>
                         <TableContainer>
                             <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -1045,12 +1111,22 @@ const CrudPaymentRequestPage = () => {
                         </Grid>
                     </Box>
                 </Grid>
-                <Grid container spacing={2} flexDirection="row" alignItems="center">
+                <Grid container spacing={2} sx={{ marginTop: 2 }} flexDirection="row" alignItems="center">
                     <Grid item>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1, mt: 1 }}>
-                            <RadioGroup id="paid-radio" name="paid" value={formPayment.paid} onChange={change}>
-                                <FormControlLabel value={true} control={<Radio />} label="Paid" disabled/>
-                                <FormControlLabel value={false} control={<Radio />} label="Not Paid" disabled/>
+                            <FormLabel id="paid-usd-radio">Payment USD</FormLabel>
+                            <RadioGroup aria-labelledby="paid-usd-radio" name={"paidUSD"} value={formPayment.paidUSD} onChange={change} row>
+                                <FormControlLabel value={true} control={<Radio />} label="Paid" disabled={isEditDisabled}/>
+                                <FormControlLabel value={false} control={<Radio />} label="Not Paid" disabled={isEditDisabled}/>
+                            </RadioGroup>
+                        </Box>
+                    </Grid>
+                    <Grid item>
+                        <Box sx={{ border: 1, borderRadius: 1, p: 1, mt: 1 }}>
+                            <FormLabel id="paid-idr-radio">Payment IDR</FormLabel>
+                            <RadioGroup aria-labelledby="paid-idr-radio" name={"paidIDR"} value={formPayment.paidIDR} onChange={change} row>
+                                <FormControlLabel value={true} control={<Radio />} label="Paid" disabled={isEditDisabled}/>
+                                <FormControlLabel value={false} control={<Radio />} label="Not Paid" disabled={isEditDisabled}/>
                             </RadioGroup>
                         </Box>
                     </Grid>
@@ -1058,10 +1134,10 @@ const CrudPaymentRequestPage = () => {
                         <NumericFormat
                             customInput={TextField}
                             thousandSeparator=","
-                            label='Payment USD'
+                            label='Total USD'
                             onValueChange={change}
-                            value={formPayment.paymentUSD}
-                            name="paymentUSD"
+                            value={formPayment.totalUSD}
+                            name={"totalUSD"}
                             id="payment-usd"
                             variant="filled"
                             disabled
@@ -1071,10 +1147,10 @@ const CrudPaymentRequestPage = () => {
                         <NumericFormat
                             customInput={TextField}
                             thousandSeparator=","
-                            label='Payment IDR'
+                            label='Total IDR'
                             onValueChange={change}
-                            value={formPayment.paymentIDR}
-                            name="paymentIDR"
+                            value={formPayment.totalIDR}
+                            name={"totalIDR"}
                             id="payment-idr"
                             variant="filled"
                             disabled
@@ -1086,8 +1162,8 @@ const CrudPaymentRequestPage = () => {
                             thousandSeparator=","
                             label='Total Vat USD'
                             onValueChange={change}
-                            value={formPayment.totalVATUSD}
-                            name="totalVATUSD"
+                            value={formPayment.taxUSD}
+                            name={"taxUSD"}
                             id="vat-usd"
                             variant="filled"
                             disabled
@@ -1099,24 +1175,24 @@ const CrudPaymentRequestPage = () => {
                             thousandSeparator=","
                             label='Total Vat IDR'
                             onValueChange={change}
-                            value={formPayment.totalVATIDR}
-                            name="totalVATIDR"
+                            value={formPayment.taxIDR}
+                            name={"taxIDR"}
                             id="vat-idr"
                             variant="filled"
                             disabled
                         />
                     </Grid>
                 </Grid>
-                <Grid container spacing={2} flexDirection="row" alignItems="center">
+                {/*<Grid container spacing={2} flexDirection="row" alignItems="center">
                     <Grid item>
                         <Box sx={{ border: 1, borderRadius: 1, p: 1, mt: 1 }}>
                             <FormLabel id="invoice-rate-label">Rate</FormLabel>
                             <Grid container item spacing={2} direction="row">
                                 <Grid item>
-                                    <TextField value={formPayment.rate} onChange={change} name="rate" id="rate-amount" label="Amount" variant="filled" aria-labelledby="invoice-rate-label" disabled />
+                                    <TextField value={formPayment.KursKMK} onChange={change} name={"KursKMK"} id="rate-amount" label="Amount" variant="filled" aria-labelledby="invoice-rate-label" disabled />
                                 </Grid>
                                 <Grid item>
-                                    <TextField value={formPayment.paidOn !== '' ? dateFormat(formPayment.paidOn) : formPayment.paidOn} onChange={change} name="paidOn" id="rate-date" label="Date" variant="filled" aria-labelledby="invoice-rate-label" disabled />
+                                    <TextField value={formPayment.KursDate !== '' ? dateFormat(formPayment.KursDate) : formPayment.KursDate} onChange={change} name={"KursDate"} id="rate-date" label="Date" variant="filled" aria-labelledby="invoice-rate-label" disabled />
                                 </Grid>
                             </Grid>
                         </Box>
@@ -1127,8 +1203,8 @@ const CrudPaymentRequestPage = () => {
                             <Select
                                 labelId="invoice-currency-label"
                                 id="invoice-currency-select"
-                                name="currency"
-                                value={formPayment.currency}
+                                name={"Currency"}
+                                value={formPayment.Currency}
                                 label="Invoice Currency"
                                 onChange={change}
                                 disabled={isEditDisabled}
@@ -1140,9 +1216,9 @@ const CrudPaymentRequestPage = () => {
                         </FormControl>
                     </Grid>
                     <Grid item>
-                        <TextField value={formPayment.kursKMK} onChange={change} name="kursKMK" id="kurs-kmk" label="Kurs KMK" variant="filled" disabled />
+                        <TextField value={formPayment.KursKMK} onChange={change} name={"KursKMK"} id="kurs-kmk" label="Kurs KMK" variant="filled" disabled />
                     </Grid>
-                </Grid>
+                </Grid>*/}
             </Paper>
         </Grid>
     </>)

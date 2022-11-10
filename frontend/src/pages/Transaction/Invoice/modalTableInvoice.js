@@ -306,7 +306,8 @@ const ModalTableInvoice = (props) => {
                                                     {
                                                       props.headersData.map((elHeaders, index) => {
                                                         return (
-                                                          <TableCell key={index}>{el[elHeaders.column]}</TableCell>
+                                                            /* Failed prop type: Invalid prop `children` supplied to `ForwardRef(TableCell)`, expected a ReactNode */
+                                                          <TableCell key={index}>{`${el[elHeaders.column]}`}</TableCell>
                                                         )
                                                       })
                                                     }
