@@ -36,7 +36,7 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModalTableInvoice from './modalTableInvoice'
 import axios from 'axios'
-import {API_URL, dateFormat} from '../../../helpers/constant';
+import {API_URL, dateFormat, API_URL_MASTER} from '../../../helpers/constant';
 import Swal from 'sweetalert2';
 import NestedModal from "./modalInvoiceDetails";
 import { NumericFormat } from 'react-number-format';
@@ -498,7 +498,7 @@ const CreateInvoicePage = () => {
             "branchId": 12
         }
         axios.post(
-            'http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostByPage?pageNumber=1&pageSize=5',
+            API_URL_MASTER + 'jobowner/jobowner/PostByPage?pageNumber=1&pageSize=5',
             body
         ).then(res => {
             setJobOwners(res.data.data.jobOwner)
@@ -532,7 +532,7 @@ const CreateInvoicePage = () => {
         }
 
         axios.post(
-            `http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/PostById?id=${invId}`,
+            `${API_URL}invoice/invoice/PostById?id=${invId}`,
             body
         ).then(response => {
             setInvoiceDetails(response.data.data.invoice.invoiceDetails)
@@ -577,7 +577,7 @@ const CreateInvoicePage = () => {
             setJenisInvoices(temp.jenisInvoices)
 
             return axios.post(
-                `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${temp.invHeader}`,
+                `${API_URL_MASTER}jobowner/jobowner/PostById?id=${temp.invHeader}`,
                 body
             )
         }).then(job => {
@@ -589,7 +589,7 @@ const CreateInvoicePage = () => {
 
     const getShipmentOrder = (rowsCount = 50, NumPage = 1) => {
         axios.post(
-            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=PAGE&pageNumber=${NumPage}&pageSize=${rowsCount}`,
+            `${API_URL}shipmentorder/shipmentorder/PostByPage?columnCode=PAGE&pageNumber=${NumPage}&pageSize=${rowsCount}`,
             {
                 "userCode": "luna",
                 "countryId": 101,
@@ -607,7 +607,7 @@ const CreateInvoicePage = () => {
     }
 
     const fetchContact = (rows = 50, page = 1) => {
-        axios.post(`http://stage-master.api.infoss.solusisentraldata.com/regcontact/regcontact/PostByPage?contactTypeId=1&pageNumber=${page}&pageSize=${rows}`,
+        axios.post(`${API_URL_MASTER}regcontact/regcontact/PostByPage?contactTypeId=1&pageNumber=${page}&pageSize=${rows}`,
         {
             "userCode": "luna",
             "countryId": 101,
@@ -673,7 +673,7 @@ const CreateInvoicePage = () => {
             payload.invoice.invoicesAgent = invoiceAgent
 
             axios.put(
-                'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Update',
+                API_URL + 'invoice/invoice/Update',
                 payload
             ).then(response => {                
                 Swal.fire({
@@ -732,10 +732,9 @@ const CreateInvoicePage = () => {
                 payload.invoiceDetails= detailMap
 
                 axios.post(
-                    'http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Create',
+                    API_URL + 'invoice/invoice/Create',
                     payload
                 ).then(response => {
-                    console.log(response)
                     if(response.data.code === 200) {
                         Swal.fire({
                             position: 'center',

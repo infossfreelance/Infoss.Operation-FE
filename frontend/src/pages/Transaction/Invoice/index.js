@@ -78,7 +78,7 @@ const InvoicePage = () => {
             "branchId": 12,
             filter: filter
         }
-        // axios.post(`https://localhost:7160/Invoice/PostByPageAll?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
+
         // axios.post(`https://localhost:7160/Invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload) //FILTER READY
         axios.post(API_URL + `invoice/invoice/PostByPage?pageNumber=${pageNumber}&pageSize=${pageSize}`, payload)
         .then((response) => {
@@ -257,7 +257,7 @@ const InvoicePage = () => {
                     if (result.isConfirmed) {
                         setLoading(true)
                         axios.put(
-                            `http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/Delete?id=${SelectedData.id}`,
+                            `${API_URL}invoice/invoice/Delete?id=${SelectedData.id}`,
                             {
                                 "rowStatus": "ACT",
                                 "countryId": 101,

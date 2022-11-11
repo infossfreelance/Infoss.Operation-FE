@@ -173,7 +173,7 @@ const ViewInvoicePage = () => {
 
     const fetchEditData = (invId) => {
         axios.post(
-            `http://stage-operation.api.infoss.solusisentraldata.com/invoice/invoice/PostById?id=${invId}`,
+            `${API_URL}invoice/invoice/PostById?id=${invId}`,
             {
                 "userCode": "luna",
                 "countryId": 101,
