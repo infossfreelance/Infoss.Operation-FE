@@ -24,6 +24,8 @@ import Select from '@mui/material/Select';
 import { NumericFormat } from 'react-number-format';
 import axios from 'axios'
 import { Dropdown, Pagination } from 'react-bootstrap'
+import Swal from 'sweetalert2';
+import { API_URL_MASTER } from '../../../helpers/constant'
 
 const invoiceDetailTemp = [
     {
@@ -394,7 +396,7 @@ export default function NestedModal(props) {
             setCodingQuantity(temp.codingQuantity)
 
             axios.post(
-                `http://stage-master.api.infoss.solusisentraldata.com/account/account/PostById?id=${temp.accountId}`,
+                `${API_URL_MASTER}account/account/PostById?id=${temp.accountId}`,
                 {
                     "userCode": "luna",
                     "countryId": 101,
@@ -413,7 +415,7 @@ export default function NestedModal(props) {
 
     const fetchAccount = (page = 1, row = 50) => {
         axios.post(
-            `http://stage-master.api.infoss.solusisentraldata.com/account/account/PostByPage?pageNumber=${page}&pageSize=${row}`,
+            `${API_URL_MASTER}account/account/PostByPage?pageNumber=${page}&pageSize=${row}`,
             {
                 "userCode": "luna",
                 "countryId": 101,
@@ -452,42 +454,51 @@ export default function NestedModal(props) {
     };
 
     const handleSave = () => {
-        let payload = {...invoiceDetailTemp[0]}
-        
-        let tempVat = 0
-        if(vat === 11 || vat === 1.1) tempVat = vat
-
-        let sequence = 1
-        if(props.edit === true) {
-            sequence = props.selected.sequence
+        if(accountId === undefined || accountId === 0) {
+            handleClose()
+            Swal.fire(
+                'Information',
+                'Invalid Account Id',
+                'info'
+            )
         } else {
-            if(props.sequence > 0) sequence = props.sequence + 1
-        }
-
-        payload.accountId = accountId
-        payload.accountName = accountName
-        payload.description = description
-        payload.type = accountRadio
-        payload.amountCrr = Number(currencyRadio)
-        payload.isCostToCost = checked
-        payload.sign = signRadio
-        payload.percentVat = tempVat
-        payload.amountVat = (tempVat / 100) * amount
-        payload.quantity = quantity
-        payload.perQty = cost
-        payload.originalRate = rate
-        payload.amount = amount
-        payload.originalUsd = originalUsd
-        payload.invoiceDetailProfitShares = []
-        payload.invoiceDetailStorages = []
-        payload.user = 'luna'
-        payload.sequence = sequence
-        payload.debetCredit = props.dcStatus
-        payload.codingQuantity = codingQuantity
-        payload.eplDetailId = eplDetailId
+            let payload = {...invoiceDetailTemp[0]}
+            
+            let tempVat = 0
+            if(vat === 11 || vat === 1.1) tempVat = vat
+    
+            let sequence = 1
+            if(props.edit === true) {
+                sequence = props.selected.sequence
+            } else {
+                if(props.sequence > 0) sequence = props.sequence + 1
+            }
+    
+            payload.accountId = accountId
+            payload.accountName = accountName
+            payload.description = description
+            payload.type = accountRadio
+            payload.amountCrr = Number(currencyRadio)
+            payload.isCostToCost = checked
+            payload.sign = signRadio
+            payload.percentVat = tempVat
+            payload.amountVat = Math.floor((tempVat / 100) * amount)
+            payload.quantity = quantity
+            payload.perQty = cost
+            payload.originalRate = rate
+            payload.amount = amount
+            payload.originalUsd = originalUsd
+            payload.invoiceDetailProfitShares = []
+            payload.invoiceDetailStorages = []
+            payload.user = 'luna'
+            payload.sequence = sequence
+            payload.debetCredit = props.dcStatus
+            payload.codingQuantity = codingQuantity
+            payload.eplDetailId = eplDetailId
         
-        props.saveDetail(payload)
-        handleClose()
+            props.saveDetail(payload)
+            handleClose()
+        }
     }
 
     const handleSelectedAccount = (data) => {
@@ -632,7 +643,9 @@ export default function NestedModal(props) {
                         customInput={TextField} 
                         thousandSeparator="," 
                         onValueChange={(values, sourceInfo) => {
-                            setQuantity(values.floatValue)
+                            let temp = values.floatValue !== undefined ? values.floatValue : 0
+                            setQuantity(temp)
+                            setAmount(temp * cost)
                         }}
                         value={quantity}
                         id="quantity"
@@ -649,7 +662,9 @@ export default function NestedModal(props) {
                         customInput={TextField} 
                         thousandSeparator="," 
                         onValueChange={(values, sourceInfo) => {
-                            setCost(values.floatValue)
+                            let temp = values.floatValue !== undefined ? values.floatValue : 0
+                            setCost(temp)
+                            setAmount(temp * quantity)
                         }}
                         value={cost}
                         id="unit-cost"
@@ -664,7 +679,8 @@ export default function NestedModal(props) {
                         customInput={TextField} 
                         thousandSeparator="," 
                         onValueChange={(values, sourceInfo) => {
-                            setRate(values.floatValue)
+                            let temp = values.floatValue !== undefined ? values.floatValue : 0
+                            setRate(temp)
                         }}
                         value={rate}
                         id="original-rate"
@@ -681,11 +697,13 @@ export default function NestedModal(props) {
                         customInput={TextField} 
                         thousandSeparator="," 
                         onValueChange={(values, sourceInfo) => {
-                            setAmount(values.floatValue)
+                            let temp = values.floatValue !== undefined ? values.floatValue : 0
+                            setAmount(temp)
                         }}
                         value={amount}
                         id="amount"
                         variant='standard'
+                        disabled
                         />
                     </Grid>
                     <Grid item xs={3}>
@@ -702,7 +720,13 @@ export default function NestedModal(props) {
                         customInput={TextField} 
                         thousandSeparator="," 
                         onValueChange={(values, sourceInfo) => {
-                            setOriginalUsd(values.floatValue)
+                            let temp = values.floatValue !== undefined ? values.floatValue : 0
+                            setOriginalUsd(temp)
+
+                            let tempCost = temp * rate
+                            setCost(tempCost)
+                            
+                            setAmount(tempCost * quantity)
                         }}
                         value={originalUsd}
                         id="original-usd"

@@ -10,7 +10,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-// import { dateFormat } from '../../../helpers/constant';
+import { API_URL, API_URL_MASTER } from '../../../helpers/constant';
 import { Dropdown, Pagination } from 'react-bootstrap'
 import axios from 'axios'
 
@@ -70,7 +70,7 @@ const ModalTableInvoice = (props) => {
 
           //FETCH CUSTOMER DATA
           axios.post(
-            `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostById?id=${selectedData.id}`,
+            `${API_URL}shipmentorder/shipmentorder/PostById?id=${selectedData.id}`,
             body
           ).then(res => {
             if(res.data.code === 200) {
@@ -86,7 +86,7 @@ const ModalTableInvoice = (props) => {
           let tempSelected = {...selectedData}
           //FETCH JOB OWNER ATAU INVHEADER
           axios.post(
-            `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${tempSelected.jobOwnerId}`,
+            `${API_URL_MASTER}jobowner/jobowner/PostById?id=${tempSelected.jobOwnerId}`,
             body
           ).then(res => {
             if(res.data.code === 200) {
@@ -97,7 +97,7 @@ const ModalTableInvoice = (props) => {
 
           //FETCH INVOICE DETAILS FROM EPL
           axios.post(
-            `http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLoss/estimateProfitLoss/PostById?Id=${selectedData.id}`,
+            `${API_URL}estimateProfitLoss/estimateProfitLoss/PostById?Id=${selectedData.id}`,
             body
           ).then(res => {
             if(res.data.code === 200) {
