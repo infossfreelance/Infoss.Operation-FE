@@ -37,7 +37,7 @@ const EstimateProfitLossPage = () => {
 
   const ErrorAlert = (string, isError = false) => {
     let icon = 'warning';
-    let title = 'Peringatan';
+    let title = 'Warning';
     if (isError === true) {
       icon = 'error';
       title = 'Something went wrong';
@@ -176,33 +176,36 @@ const EstimateProfitLossPage = () => {
 
   const handleEdit = () => {
     if (SelectedData.id === undefined) {
-      NotifAlert('Please Select Data!', 'warning');
-    }
-
-    if (SelectedData.printing === 0) {
-      history('/booking/payment-request/edit/' + SelectedData.id);
+      ErrorAlert('Please Select Data!', 'Warning');
     } else {
-      Swal.fire({
-        icon: 'question',
-        title: 'Payment Request has been printed!',
-        text: 'Edit will make contra and new Payment Request automatically!',
-        showCancelButton: true,
-        showDenyButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonText: 'Ok',
-        denyButtonText: `View Only`,
-        customClass: {
-          confirmButton: 'btn btn-infoss px-4',
-          cancelButton: 'btn btn-outline-infoss px-4',
-          denyButton: 'btn btn-infoss px-4',
-        },
-      }).then((result) => {
-        if (result.isConfirmed === true) {
-          history('/booking/payment-request/create');
-        } else if (result.isDenied === true) {
-          history('/booking/payment-request/view/' + SelectedData.id);
-        }
-      });
+      if (SelectedData.rowStatus === 'DEL') {
+        ErrorAlert('Record Has Been Deleted');
+      }
+      if (SelectedData.printing === 0) {
+        history('/booking/payment-request/edit/' + SelectedData.id);
+      } else {
+        Swal.fire({
+          icon: 'question',
+          title: 'Payment Request has been printed!',
+          text: 'Edit will make contra and new Payment Request automatically!',
+          showCancelButton: true,
+          showDenyButton: true,
+          cancelButtonText: 'Cancel',
+          confirmButtonText: 'Ok',
+          denyButtonText: `View Only`,
+          customClass: {
+            confirmButton: 'btn btn-infoss px-4',
+            cancelButton: 'btn btn-outline-infoss px-4',
+            denyButton: 'btn btn-infoss px-4',
+          },
+        }).then((result) => {
+          if (result.isConfirmed === true) {
+            history('/booking/payment-request/create');
+          } else if (result.isDenied === true) {
+            history('/booking/payment-request/view/' + SelectedData.id);
+          }
+        });
+      }
     }
   };
 
@@ -236,7 +239,11 @@ const EstimateProfitLossPage = () => {
           branchId: 12,
         };
         axios
-          .put(API_URL + `PaymentRequest/Delete?id=${SelectedData.id}`, payload)
+          .put(
+            API_URL +
+              `paymentRequest/paymentRequest/Delete?id=${SelectedData.id}`,
+            payload
+          )
           .then((response) => {
             setSelectedData({});
             NotifAlert('Data Deleted!', 'success');

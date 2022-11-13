@@ -29,7 +29,6 @@ const style = {
 const selectedStyle = {bgcolor: (theme) => theme.palette.primary.main};
 
 const ModalTableInvoice = (props) => {
-  console.log(props, '<<<props');
   const [selectedData, setSelectedData] = useState({});
   const [rowsCount, setRowsCount] = useState(50);
   const [numPage, setNumPage] = useState(1);
@@ -168,8 +167,8 @@ const ModalTableInvoice = (props) => {
   };
 
   const filterTable = (key, val) => {
-    console.log('key', key);
-    console.log('value', val);
+    // console.log('key', key);
+    // console.log('value', val);
   };
 
   const renderPagination = () => {
@@ -298,7 +297,7 @@ const ModalTableInvoice = (props) => {
                   <TableRow>
                     {props.headersData.length > 0 ? (
                       props.headersData.map((el, index) => {
-                        console.log(el, '<<<elHeader');
+                        // console.log(el, '<<<elHeader');
                         return <TableCell key={index}>{el.text}</TableCell>;
                       })
                     ) : (
@@ -330,7 +329,7 @@ const ModalTableInvoice = (props) => {
                   </TableRow>
                   {props.bodyData.length > 0 ? (
                     props.bodyData.map((el) => {
-                      console.log(el, '<<<el');
+                      // console.log(el, '<<<el');
                       return (
                         <TableRow
                           key={el[identifier]}
@@ -342,7 +341,7 @@ const ModalTableInvoice = (props) => {
                           }
                         >
                           {props.headersData.map((elHeaders, index) => {
-                            console.log(elHeaders.column, '<<elHeaders');
+                            // console.log(elHeaders.column, '<<elHeaders');
                             return (
                               /* Failed prop type: Invalid prop `children` supplied to `ForwardRef(TableCell)`, expected a ReactNode */
                               <TableCell key={index}>{`${

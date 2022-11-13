@@ -183,19 +183,41 @@ const CrudPaymentRequestPage = () => {
   const [IncShipperHeaders, setIncShipperHeaders] =
     useState(PaymentHeadersDummy);
   const [IncShipperData, setIncShipperData] = useState([]);
+
+  const [editInvoice, setEditInvoice] = useState({});
   const [selectedDetail, setSelectedDetail] = useState({});
   const [paymentRequestNo, setPaymentRequestNo] = useState('');
   const [paymentRequestDetails, setPaymentRequestDetail] = useState([]);
+  const [IsGeneralPR, setIsGeneralPR] = useState(false);
+  const [isCostToCost, setIsCostToCost] = useState(false);
+  const [statePRNo, setStatePRNo] = useState(0);
+  const [statePRNo2, setStatePRNo2] = useState('');
+  const [statePRRef, setStatePRRef] = useState('');
   const selectedStyle = {bgcolor: (theme) => theme.palette.primary.main};
   const deletedDetailStyle = {bgcolor: (theme) => theme.palette.text.disabled};
   const [invHeader, setInvHeader] = useState('');
+  const [detailMap, setDetailMap] = useState([]);
+  const [detailSequence, setDetailSequence] = useState(0);
+  const [jobOwnerId, setJobOwnerId] = useState(0);
+  const [customerId, setCustomerId] = useState(0);
+  const [customerName, setCustomerName] = useState('');
+  const [statePersonalName, setStatePersonalName] = useState('');
   const [shipmentNo, setShipmentNo] = useState('');
   const [shipmentId, setShipmentId] = useState(0);
   const [shipmentData, setShipmentData] = useState({});
+  const [stateRate, setStateRate] = useState(0);
   const [etd, setEtd] = useState('');
   const [eta, setEta] = useState('');
+  const [stateDN, setStateDN] = useState('');
   const [formPayment, setFormPayment] = useState(new PaymentRequestFormModel());
-  console.log(formPayment, '<<<formPayment');
+  const [statePaidIDR, setStatePaidIDR] = useState(false);
+  const [statePaidUSD, setStatePaidUSD] = useState(false);
+  const [statePaymentUSD, setStatePaymentUSD] = useState(0);
+  const [statePaymentIDR, setStatePaymentIDR] = useState(0);
+  const [statePPNUSD, setStatePPNUSD] = useState(0);
+  const [statePPNIDR, setStatePPNIDR] = useState(0);
+  const [stateStatusPrint, setStatusStatePrint] = useState(0);
+  const [statePrint, setStatePrint] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -229,19 +251,40 @@ const CrudPaymentRequestPage = () => {
         body
       )
       .then((response) => {
-        setPaymentRequestDetail(response.data.data.invoice.invoiceDetails);
-
-        let tempDetail = response.data.data.invoice.invoiceDetails;
-
-        // setDetailMap(tempDetail)
+        setPaymentRequestDetail(
+          response.data.data.paymentRequest.paymentRequestDetails
+        );
+        let tempDetail =
+          response.data.data.paymentRequest.paymentRequestDetails;
+        setDetailMap(tempDetail);
 
         if (tempDetail.length > 0) {
-          // setDetailSequence(tempDetail[tempDetail.length - 1].sequence)
+          setDetailSequence(tempDetail[tempDetail.length - 1].sequence);
         }
+        setEditInvoice(response.data.data.paymentRequest);
 
-        // setEditInvoice(response.data.data.invoice)
-
-        let temp = response.data.data.invoice;
+        let temp = response.data.data.paymentRequest;
+        setIsGeneralPR(temp.isGeneralPR);
+        setIsCostToCost(temp.isCostToCost);
+        setEtd(temp.etd);
+        setShipmentNo(temp.shipmentNo);
+        setJobOwnerId(temp.jobOwnerId);
+        setStatePRNo(temp.prNo);
+        setStatePRNo2(temp.prNo2);
+        setStatePRRef(temp.reference);
+        setCustomerId(temp.customerId);
+        setCustomerName(temp.customerName);
+        setStateRate(temp.rate);
+        setStateDN(temp.vendorDN);
+        setStatePersonalName(temp.PersonalName);
+        setStatePaidIDR(temp.paidIDR);
+        setStatePaidUSD(temp.paidUSD);
+        setStatePaymentUSD(temp.paymentUSD);
+        setStatePaymentIDR(temp.paymentIDR);
+        setStatePPNIDR(temp.totalPpnIDR);
+        setStatePPNUSD(temp.totalPpnUSD);
+        setStatusStatePrint(temp.prStatus);
+        setStatePrint(temp.printing);
         // setIsCTC(temp.isCostToCost)
         // setInvoiceNo(temp.invoiceNo)
         // setPrinting(temp.printing)
@@ -249,7 +292,6 @@ const CrudPaymentRequestPage = () => {
         // setPackingListNo(temp.packingListNo)
         // setSiCustomerNo(temp.siCustomerNo)
         // setCustomerTypeId(temp.customerTypeId)
-        // setCustomerId(temp.customerId)
         // setCustomerName(temp.customerName)
         // setCustomerAddress(temp.customerAddress)
         // setDebetCredit(temp.debetCredit === '' ? 'D' : temp.debetCredit)
@@ -265,19 +307,18 @@ const CrudPaymentRequestPage = () => {
         // setKursKMK(temp.kursKMK)
         // setEFaktur(temp.sfpReference)
         // setJobOwnerId(temp.invHeader)
-        // setShipmentNo(temp.shipmentNo)
         // setEtd(temp.etd)
         // setEta(temp.eta)
         // setJenisInvoices(temp.jenisInvoices)
 
         return axios.post(
-          `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${temp.invHeader}`,
+          `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${jobOwnerId}`,
           body
         );
       })
       .then((job) => {
         if (job.data.code === 200) {
-          // setInvHeader(job.data.data.jobOwner.masterCode)
+          setInvHeader(job.data.data.jobOwner.masterCode);
         }
       })
       .catch((error) => console.error(error));
@@ -433,7 +474,7 @@ const CrudPaymentRequestPage = () => {
             timer: 1500,
           });
 
-          history('/booking/invoice');
+          history('/booking/payment-request');
         })
         .catch((error) => console.error(error));
     } else {
@@ -455,13 +496,13 @@ const CrudPaymentRequestPage = () => {
         payload.paymentRequest['customerId'] = 0;
         payload.paymentRequest['customerTypeId'] = 0;
         payload.paymentRequest.personalId = 0;
-        payload.paymentRequest['paymentUSD'] = 0;
-        payload.paymentRequest['paymentIDR'] = 0;
+        payload.paymentRequest['paymentUSD'] = statePaymentUSD;
+        payload.paymentRequest['paymentIDR'] = statePaymentIDR;
         payload.paymentRequest['prContraStatus'] = 'string';
         payload.paymentRequest['prContraNo'] = 0;
-        payload.paymentRequest['paidUSD'] = true;
+        payload.paymentRequest['paidUSD'] = statePaidUSD;
         payload.paymentRequest['datePaidUSD'] = '2022-11-12T09:42:20.162Z';
-        payload.paymentRequest['paidIDR'] = true;
+        payload.paymentRequest['paidIDR'] = statePaidIDR;
         payload.paymentRequest['datePaidIDR'] = '2022-11-12T09:42:20.162Z';
         payload.paymentRequest['deleted'] = true;
         payload.paymentRequest['deletedOn'] = '2022-11-12T09:42:20.162Z';
@@ -478,8 +519,8 @@ const CrudPaymentRequestPage = () => {
         payload.paymentRequest.deletedRemarks = 'string';
         payload.paymentRequest['idLama'] = 0;
         payload.paymentRequest['isCostToCost'] = true;
-        payload.paymentRequest['totalPpnUSD'] = 0;
-        payload.paymentRequest['totalPpnIDR'] = 0;
+        payload.paymentRequest['totalPpnUSD'] = statePPNUSD;
+        payload.paymentRequest['totalPpnIDR'] = statePPNIDR;
         payload.paymentRequest['uniqueKeyPR'] = 'string';
         payload.paymentRequest['packingListNo'] = 'string';
         payload.paymentRequest['siCustomerNo'] = 'string';
@@ -500,7 +541,6 @@ const CrudPaymentRequestPage = () => {
             payload
           )
           .then((response) => {
-            console.log(response, '<<<response');
             Swal.fire({
               position: 'center',
               icon: 'success',
@@ -508,10 +548,9 @@ const CrudPaymentRequestPage = () => {
               showConfirmButton: false,
               timer: 1500,
             });
-            history('/booking/invoice');
+            history('/booking/payment-request');
           })
           .catch((error) => {
-            console.log(error.response.data.title, '<<<error');
             const titleError =
               `${error.response.data.title}` || 'Something went wrong!';
             Swal.fire(`Error`, `${titleError}`, 'error');
@@ -590,7 +629,6 @@ const CrudPaymentRequestPage = () => {
   };
 
   const handleSelectedShipment = (value) => {
-    console.log(value, '<<<value');
     const f = {...formPayment};
     f.Id = value['paymentrequestId'];
     f.ShipmentId = value['shipperId'];
@@ -600,10 +638,11 @@ const CrudPaymentRequestPage = () => {
     setFormPayment(f);
     setInvHeader(value.invHeader);
     setShipmentNo(value.shipmentNo);
+
     setShipmentId(value.shipmentId);
     setEta(value.eta);
+    setEtd(value.etd);
     setShipmentData(value);
-
     // setInvHeader(value.invHeader)
     // setShipmentNo(value.shipmentNo)
     // setShipmentId(value.id)
@@ -616,8 +655,6 @@ const CrudPaymentRequestPage = () => {
     const f = {...formPayment};
     f.PaymentTo = value;
     setFormPayment(f);
-
-    console.log('paymentTo', value);
   };
 
   const handlePrint = () => {
@@ -971,6 +1008,7 @@ const CrudPaymentRequestPage = () => {
             fetchData={(r, p) => getShipmentOrder(r, p)}
             maxPage={1}
             type={'revised'}
+            setId={(e) => setCustomerId(e)}
           />
 
           {/*<ModalListShipmentOrder*/}
@@ -1033,17 +1071,17 @@ const CrudPaymentRequestPage = () => {
                   row
                   name={'IsGeneralPayment'}
                   aria-labelledby="payment-form-label"
-                  value={formPayment.IsGeneralPayment}
-                  onChange={change}
+                  value={IsGeneralPR}
+                  onChange={(e) => setIsGeneralPR(e.target.value)}
                 >
                   <FormControlLabel
-                    value="P"
+                    value={false}
                     control={<Radio />}
                     label="Payment Request"
                     disabled={isEditDisabled}
                   />
                   <FormControlLabel
-                    value="G"
+                    value={true}
                     control={<Radio />}
                     label="General Payment Request"
                     disabled={isEditDisabled}
@@ -1053,10 +1091,10 @@ const CrudPaymentRequestPage = () => {
                 <FormLabel id="payment-type-label">Type</FormLabel>
                 <RadioGroup
                   row
-                  name={'CTCType'}
+                  name={'isCostToCost'}
                   aria-labelledby="payment-type-label"
-                  value={formPayment.CTCType}
-                  onChange={change}
+                  value={isCostToCost}
+                  onChange={(e) => setIsCostToCost(e.target.value)}
                 >
                   <FormControlLabel
                     value={false}
@@ -1083,7 +1121,8 @@ const CrudPaymentRequestPage = () => {
                   onClick={() =>
                     !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)
                   }
-                  value={formPayment.PrincipleBy}
+                  onChange={(e) => setInvHeader(e.target.value)}
+                  value={invHeader || '-'}
                   disabled={isEditDisabled}
                 />
               </div>
@@ -1096,13 +1135,8 @@ const CrudPaymentRequestPage = () => {
                   onClick={() =>
                     !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)
                   }
-                  value={
-                    formPayment.etd && formPayment.eta
-                      ? `${dateFormat(formPayment.etd)} - ${dateFormat(
-                          formPayment.eta
-                        )}`
-                      : ''
-                  }
+                  value={etd.length > 0 ? dateFormat(etd) : ''}
+                  onChange={(e) => setEtd(e.target.value)}
                   disabled={isEditDisabled}
                 />
               </div>
@@ -1114,13 +1148,14 @@ const CrudPaymentRequestPage = () => {
                     id="shipment-order-number"
                     label="Shipment Order"
                     name={'ShipmentId'}
-                    value={formPayment.ShipmentId}
+                    value={shipmentNo || '-'}
                     onClick={() =>
                       !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)
                     }
                     className="block"
                     variant="standard"
                     size="small"
+                    onChange={(e) => setShipmentNo(e.target.value)}
                     disabled={isEditDisabled}
                   />
                 </div>
@@ -1145,7 +1180,7 @@ const CrudPaymentRequestPage = () => {
                   onClick={() =>
                     !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)
                   }
-                  value={formPayment.PaymentRequestNo}
+                  value={statePRNo || 0}
                   onChange={(e) => setPaymentRequestNo(e.target.value)}
                   disabled={isEditDisabled}
                 />
@@ -1160,7 +1195,8 @@ const CrudPaymentRequestPage = () => {
                   onClick={() =>
                     !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)
                   }
-                  value={formPayment.ReferenceId}
+                  value={statePRRef || '-'}
+                  onChange={(e) => setStatePRRef(e.target.value)}
                   disabled={isEditDisabled}
                 />
               </div>
@@ -1214,8 +1250,8 @@ const CrudPaymentRequestPage = () => {
                     <TextField
                       id="filled-basic"
                       name={'KursKMK'}
-                      value={formPayment.KursKMK}
-                      onChange={change}
+                      value={stateRate || 0}
+                      onChange={(e) => setStateRate(e.target.value)}
                       className="block"
                       variant="filled"
                       size="small"
@@ -1245,10 +1281,11 @@ const CrudPaymentRequestPage = () => {
                   id="principle"
                   label="Printing"
                   name={'PrintingL'}
-                  value={formPayment.PrintingL}
+                  value={stateStatusPrint}
                   onClick={() =>
                     !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)
                   }
+                  onChange={(e) => setStatusStatePrint(e.target.value)}
                   className="block"
                   variant="filled"
                   disabled={isEditDisabled}
@@ -1259,13 +1296,14 @@ const CrudPaymentRequestPage = () => {
                   id="filled-basic"
                   label="-"
                   name={'PrintingR'}
-                  value={formPayment.PrintingR}
+                  value={statePrint}
                   onClick={() =>
                     !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)
                   }
                   className="block"
                   variant="filled"
                   disabled={isEditDisabled}
+                  onChange={(e) => setStatePrint(e.target.value)}
                 />
               </div>
 
@@ -1276,8 +1314,8 @@ const CrudPaymentRequestPage = () => {
                   label="DN Vendor"
                   variant="standard"
                   name={'DNVendor'}
-                  onClick={change}
-                  value={formPayment.DNVendor}
+                  onClick={(e) => setStateDN(e.target.value)}
+                  value={stateDN || '-'}
                   disabled={isEditDisabled}
                 />
               </div>
@@ -1308,8 +1346,8 @@ const CrudPaymentRequestPage = () => {
                     id="filled-basic"
                     label="Customer Name"
                     name={'CustomerName'}
-                    value={formPayment.CustomerName}
-                    onChange={(e) => handleApprove(e.target.value)}
+                    value={customerName || '-'}
+                    onChange={(e) => setCustomerName(e.target.value)}
                     className="block"
                     variant="filled"
                     size="small"
@@ -1342,8 +1380,8 @@ const CrudPaymentRequestPage = () => {
                     id="filled-basic"
                     label="Personal Name"
                     name={'PersonalName'}
-                    value={formPayment.PersonalName}
-                    onChange={(e) => handleApprove(e.target.value)}
+                    value={statePersonalName || '-'}
+                    onChange={(e) => setStatePersonalName(e.target.value)}
                     className="block"
                     variant="filled"
                     size="small"
@@ -1540,8 +1578,8 @@ const CrudPaymentRequestPage = () => {
                 <RadioGroup
                   aria-labelledby="paid-usd-radio"
                   name={'paidUSD'}
-                  value={formPayment.paidUSD}
-                  onChange={change}
+                  value={statePaidUSD}
+                  onChange={(e) => setStatePaidUSD(e.target.value)}
                   row
                 >
                   <FormControlLabel
@@ -1565,8 +1603,8 @@ const CrudPaymentRequestPage = () => {
                 <RadioGroup
                   aria-labelledby="paid-idr-radio"
                   name={'paidIDR'}
-                  value={formPayment.paidIDR}
-                  onChange={change}
+                  value={statePaidIDR}
+                  onChange={(e) => setStatePaidIDR(e.target.value)}
                   row
                 >
                   <FormControlLabel
@@ -1589,8 +1627,8 @@ const CrudPaymentRequestPage = () => {
                 customInput={TextField}
                 thousandSeparator=","
                 label="Total USD"
-                onValueChange={change}
-                value={formPayment.totalUSD}
+                onValueChange={(e) => setStatePaymentUSD(e.target.value)}
+                value={statePaymentUSD}
                 name={'totalUSD'}
                 id="payment-usd"
                 variant="filled"
@@ -1602,8 +1640,8 @@ const CrudPaymentRequestPage = () => {
                 customInput={TextField}
                 thousandSeparator=","
                 label="Total IDR"
-                onValueChange={change}
-                value={formPayment.totalIDR}
+                onValueChange={(e) => setStatePaymentIDR(e.target.value)}
+                value={statePaymentIDR}
                 name={'totalIDR'}
                 id="payment-idr"
                 variant="filled"
@@ -1615,8 +1653,8 @@ const CrudPaymentRequestPage = () => {
                 customInput={TextField}
                 thousandSeparator=","
                 label="Total Vat USD"
-                onValueChange={change}
-                value={formPayment.taxUSD}
+                onValueChange={(e) => setStatePPNUSD(e.target.value)}
+                value={statePPNUSD}
                 name={'taxUSD'}
                 id="vat-usd"
                 variant="filled"
@@ -1628,8 +1666,8 @@ const CrudPaymentRequestPage = () => {
                 customInput={TextField}
                 thousandSeparator=","
                 label="Total Vat IDR"
-                onValueChange={change}
-                value={formPayment.taxIDR}
+                onValueChange={(e) => setStatePPNIDR(e.target.value)}
+                value={statePPNIDR}
                 name={'taxIDR'}
                 id="vat-idr"
                 variant="filled"
