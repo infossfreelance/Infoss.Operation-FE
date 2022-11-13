@@ -34,10 +34,13 @@ import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import ButtonBase from "@mui/material/ButtonBase";
 import RadioGroup from '@mui/material/RadioGroup';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import TableCell from '@mui/material/TableCell';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import Radio from '@mui/material/Radio';
 
 import "jspdf-autotable";
@@ -49,44 +52,46 @@ import {dateFormat} from '../../../helpers/constant';
 import NestedModal from "../Invoice/modalInvoiceDetails";
 import ModalTableInvoice from "../Invoice/modalTableInvoice";
 import ModalInvoiceUtilities from "../Invoice/modalInvoiceUtilities";
+import AddCustomer from "../../../components/pagePaymentRequest/AddCustomer";
+import AddPersonal from "../../../components/pagePaymentRequest/AddPersonal";
+import ModalListShipmentOrder from "../../../components/pagePaymentRequest/ModalListShipmentOrder";
+import AddbeingForPayment from "../../../components/pagePaymentRequest/AddbeingForPayment";
 import {
     PaymentRequestFormModel,
     PaymentRequestFormTableModel,
     PaymentHeadersDummy
 } from "./model";
-import {ButtonBase} from "@mui/material";
-import AddCustomer from "../../../components/pagePaymentRequest/AddCustomer";
-import AddPersonal from "../../../components/pagePaymentRequest/AddPersonal";
-import ModalListShipmentOrder from "../../../components/pagePaymentRequest/ModalListShipmentOrder";
-import AddbeingForPayment from "../../../components/pagePaymentRequest/AddbeingForPayment";
 
 
-function Img(props) {
-    return null;
-}
-
-Img.propTypes = {
-    src: PropTypes.string,
-    alt: PropTypes.string
-};
-const CrudPaymentRequestPage = () => {
+const FormPaymentRequestPage = () => {
     const {prId} = useParams()
     const history = useNavigate()
-    const [isEditDisabled, setIsEditDisabled] = useState(false)
 
+    // Snackbar
+    const [OpenAlert, setOpenAlert] = useState(false);
+    const [TextAlert, setTextAlert] = useState("");
+    const [ColorAlert, setColorAlert] = useState("success");
+    const vertical = 'top'
+    const horizontal = 'right'
+
+    // Customer & Personal Dialog
+    const [showAddCustomer, setShowAddCustomer] = useState(false)
+    const [showAddPersonal, setShowAddPersonal] = useState(false)
     // Shipment Order Dialog
-    const [openMLSO, setOpenMLSO] = useState(false)
+    const [showDLSO, setShowDLSO] = useState(false)
     const [LSOHeaders, setLSOHeaders] = useState([])
     const [LSOData, setLSOData] = useState([])
+
     // Payment Trucking Table
     const [openModalPayment, setOpenModalPayment] = useState(false)
     const [IncShipperHeaders, setIncShipperHeaders] = useState(PaymentHeadersDummy)
     const [IncShipperData, setIncShipperData] = useState([])
     const [selectedDetail, setSelectedDetail] = useState({})
-
     const selectedStyle = {bgcolor: (theme) => theme.palette.primary.main}
     const deletedDetailStyle = {bgcolor: (theme) => theme.palette.text.disabled}
 
+    // Form Data
+    const [isEditDisabled, setIsEditDisabled] = useState(false)
     const [formPayment, setFormPayment] = useState(new PaymentRequestFormModel())
 
     useEffect(() => {
@@ -220,11 +225,18 @@ const CrudPaymentRequestPage = () => {
     //#endregion: API handling
 
     //#region: Form handling
-    const successAlert = (text) => {
-        Swal.fire({
-            position: 'center', icon: 'success', title: text, showConfirmButton: false, timer: 1500
-        })
-    }
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenAlert(false);
+    };
+
+    const NotifAlert = (text, color) => {
+        setTextAlert(text)
+        setColorAlert(color)
+        setOpenAlert(true)
+    };
 
     const handleSubmit = () => {
         if (prId) {
@@ -446,7 +458,13 @@ const CrudPaymentRequestPage = () => {
                 .then(response => {
                     if (response.data.code === 200) {
                         fetchEditData(prId)
-                        successAlert('Data berhasil di print')
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Data berhasil di print',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
                     } else {
                         Swal.fire('Print Failed', `${response.data.message}`, 'error')
                     }
@@ -462,7 +480,13 @@ const CrudPaymentRequestPage = () => {
     const handleRePrint = () => {
         if (prId) {
             if (IncShipperData.rePrintApproved === true) {
-                successAlert('Print ulang sudah di setujui')
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Print ulang sudah di setujui',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
             } else {
                 Swal.fire({
                     title: 'Are you sure?',
@@ -488,7 +512,13 @@ const CrudPaymentRequestPage = () => {
                         axios.put('https://localhost:7160/Invoice/UpdateStatusRePrint', payload)
                             .then(response => {
                                 if (response.data.code === 200) {
-                                    successAlert('Print ulang sudah di setujui')
+                                    Swal.fire({
+                                        position: 'center',
+                                        icon: 'success',
+                                        title: 'Print ulang sudah di setujui',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    })
                                 } else {
                                     Swal.fire('Approval Error', `${response.data.message}`, 'error')
                                 }
@@ -692,6 +722,19 @@ const CrudPaymentRequestPage = () => {
 
     const change = ((e) => setFormPayment({...formPayment, [e.target.name]: e.target.value}))
     return (<>
+        <section>
+            <Snackbar
+                open={OpenAlert}
+                autoHideDuration={5000}
+                onClose={handleClose}
+                anchorOrigin={{vertical, horizontal}}
+                key={vertical + horizontal}
+            >
+                <Alert onClose={handleClose} severity={ColorAlert} sx={{width: '100%'}} className='p-3'>
+                    {TextAlert}
+                </Alert>
+            </Snackbar>
+        </section>
         <Grid container spacing={2} direction="column">
             <Grid item xs={12}>
                 {
@@ -729,24 +772,22 @@ const CrudPaymentRequestPage = () => {
                 </Stack>
             </Grid>
             <Paper variant="outlined" sx={{m: 2, p: 2}}>
-                <ModalTableInvoice
-                    open={openMLSO}
-                    onClose={() => setOpenMLSO(false)}
-                    setSelectedData={(e) => handleSelectedShipment(e)}
-                    headersData={LSOHeaders}
-                    bodyData={LSOData}
-                    fetchData={(r, p) => getShipmentOrder(r, p)}
-                    maxPage={1}
-                    type={'revised'}
-                />
+                {/*<ModalTableInvoice*/}
+                {/*    open={openDLSO}*/}
+                {/*    onClose={() => setOpenDLSO(false)}*/}
+                {/*    setSelectedData={(e) => handleSelectedShipment(e)}*/}
+                {/*    headersData={LSOHeaders}*/}
+                {/*    bodyData={LSOData}*/}
+                {/*    fetchData={(r, p) => getShipmentOrder(r, p)}*/}
+                {/*    maxPage={1}*/}
+                {/*    type={'revised'}*/}
+                {/*/>*/}
 
                 {/*<ModalListShipmentOrder*/}
-                {/*    show={showMLSO}*/}
-                {/*    onHide={() => setShowMLSO(false)}*/}
+                {/*    show={showDLSO}*/}
+                {/*    onHide={() => setShowDLSO(false)}*/}
                 {/*    LSOData={LSOData}*/}
-                {/*    setSelectedData={(e) => {*/}
-                {/*        setSelectedData(e)*/}
-                {/*    }}*/}
+                {/*    setSelectedData={(e) => handleSelectedShipment(e)}*/}
                 {/*    setdefShipNo={(e) => setdefShipNo(e)}*/}
                 {/*    MaxPage={1}*/}
                 {/*    NumPage={NumPage}*/}
@@ -754,7 +795,7 @@ const CrudPaymentRequestPage = () => {
                 {/*    setNumPage={(e) => setNumPage(e)}*/}
                 {/*    setRowsCount={(e) => setRowsCount(e)}*/}
                 {/*/>*/}
-
+                
                 {/*<AddbeingForPayment*/}
                 {/*    show={showAddbeingForPayment}*/}
                 {/*    onHide={() => {*/}
@@ -768,7 +809,7 @@ const CrudPaymentRequestPage = () => {
                 {/*    IncShipperList={IncShipperList}*/}
                 {/*    setIncShipperList={(e) => setIncShipperList(e)}*/}
                 {/*/>*/}
-
+                
                 {/*<AddCustomer*/}
                 {/*    show={showAddCustomer}*/}
                 {/*    onHide={() => {*/}
@@ -779,7 +820,7 @@ const CrudPaymentRequestPage = () => {
                 {/*    AccountName={AccountName}*/}
                 {/*    data={IsAdd ? '' : SelectedShipperList}*/}
                 {/*/>*/}
-
+                
                 {/*<AddPersonal*/}
                 {/*    show={showAddPersonal}*/}
                 {/*    onHide={() => {*/}
@@ -831,7 +872,7 @@ const CrudPaymentRequestPage = () => {
                                 label="Principle By"
                                 variant="filled"
                                 name={"PrincipleBy"}
-                                onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
+                                onClick={() => !isEditDisabled ? setOpenDLSO(true) : setOpenDLSO(false)}
                                 value={formPayment.PrincipleBy}
                                 disabled={isEditDisabled}
                             />
@@ -842,7 +883,7 @@ const CrudPaymentRequestPage = () => {
                                 label="ETD/ETA"
                                 variant="filled"
                                 name={"etd/eta"}
-                                onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
+                                onClick={() => !isEditDisabled ? setOpenDLSO(true) : setOpenDLSO(false)}
                                 value={formPayment.etd && formPayment.eta ? `${dateFormat(formPayment.etd)} - ${dateFormat(formPayment.eta)}` : ""}
                                 disabled={isEditDisabled}
                             />
@@ -852,11 +893,11 @@ const CrudPaymentRequestPage = () => {
                         <div className='row'>
                             <div className="col-8">
                                 <TextField id="shipment-order-number" label="Shipment Order" name={"ShipmentId"} value={formPayment.ShipmentId}
-                                           onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)} className='block'
+                                           onClick={() => !isEditDisabled ? setOpenDLSO(true) : setOpenDLSO(false)} className='block'
                                            variant="standard" size='small' disabled={isEditDisabled}/>
                             </div>
                             <div className="col-4 pt-3">
-                                <FindInPageIcon className='text-infoss' onClick={() => setOpenMLSO(true)}/>
+                                <FindInPageIcon className='text-infoss' onClick={() => setOpenDLSO(true)}/>
                             </div>
                         </div>
                     </Grid>
@@ -869,7 +910,7 @@ const CrudPaymentRequestPage = () => {
                                 label="Payment Request No"
                                 variant="filled"
                                 name={"PaymentRequestNo"}
-                                onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
+                                onClick={() => !isEditDisabled ? setOpenDLSO(true) : setOpenDLSO(false)}
                                 value={formPayment.PaymentRequestNo}
                                 disabled={isEditDisabled}
                             />
@@ -880,7 +921,7 @@ const CrudPaymentRequestPage = () => {
                                 label="Reference"
                                 variant="filled"
                                 name={"ReferenceId"}
-                                onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)}
+                                onClick={() => !isEditDisabled ? setOpenDLSO(true) : setOpenDLSO(false)}
                                 value={formPayment.ReferenceId}
                                 disabled={isEditDisabled}
                             />
@@ -933,12 +974,12 @@ const CrudPaymentRequestPage = () => {
                     <Grid item xs={4} className='row'>
                         <div className='col-5'>
                             <TextField id="principle" label="Printing" name={"PrintingL"} value={formPayment.PrintingL}
-                                       onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)} className='block'
+                                       onClick={() => !isEditDisabled ? setOpenDLSO(true) : setOpenDLSO(false)} className='block'
                                        variant="filled" disabled={isEditDisabled}/>
                         </div>
                         <div className='col-7'>
                             <TextField id="filled-basic" label="-" name={"PrintingR"} value={formPayment.PrintingR}
-                                       onClick={() => !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)} className='block'
+                                       onClick={() => !isEditDisabled ? setOpenDLSO(true) : setOpenDLSO(false)} className='block'
                                        variant="filled" disabled={isEditDisabled}/>
                         </div>
 
@@ -1224,4 +1265,4 @@ const CrudPaymentRequestPage = () => {
     </>)
 }
 
-export default CrudPaymentRequestPage
+export default FormPaymentRequestPage

@@ -44,7 +44,7 @@ import InvoicePage from '../pages/Transaction/Invoice';
 import InvoiceDetailsPage from '../pages/Transaction/Invoice/details';
 import ViewInvoicePage from '../pages/Transaction/Invoice/viewOnly';
 import PaymentRequestPage from '../pages/Transaction/PaymentRequest';
-import CrudPaymentRequestPage from '../pages/Transaction/PaymentRequest/crud';
+import FormPaymentRequestPage from '../pages/Transaction/PaymentRequest/form';
 import PaymentRequestAddPage from "../pages/Transaction/PaymentRequest/detail";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
@@ -579,9 +579,9 @@ export default function MiniDrawer() {
                     <Route path="/epl/edit/:SOId" element={<><EstimateProfitLossEditPage /></>} />
                     <Route path="/payment-request" element={<><PaymentRequestPage /></>} />
                     <Route path="/payment-request/createe" element={<><PaymentRequestAddPage /></>} />
-                    <Route path="/payment-request/create" element={<><CrudPaymentRequestPage /></>} />
-                    <Route path="/payment-request/edit/:prId" element={<><CrudPaymentRequestPage /></>} />
-                    <Route path="/payment-request/view/:prId" element={<><CrudPaymentRequestPage /></>} />
+                    <Route path="/payment-request/create" element={<><FormPaymentRequestPage /></>} />
+                    <Route path="/payment-request/edit/:prId" element={<><FormPaymentRequestPage /></>} />
+                    <Route path="/payment-request/view/:prId" element={<><FormPaymentRequestPage /></>} />
                     <Route path="/invoice" element={<><InvoicePage /></>} />
                     <Route path='/invoice/create' element={<><InvoiceDetailsPage /></>} />
                     <Route path='/invoice/edit/:invId' element={<><InvoiceDetailsPage /></>} />
