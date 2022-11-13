@@ -44,7 +44,7 @@ import InvoicePage from '../pages/Transaction/Invoice';
 import InvoiceDetailsPage from '../pages/Transaction/Invoice/details';
 import ViewInvoicePage from '../pages/Transaction/Invoice/viewOnly';
 import PaymentRequestPage from '../pages/Transaction/PaymentRequest';
-import CrudPaymentRequestPage from '../pages/Transaction/PaymentRequest/crud';
+import CrudPaymentRequestPage from '../pages/Transaction/PaymentRequest/create-edit-page';
 import PaymentRequestAddPage from "../pages/Transaction/PaymentRequest/detail";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({

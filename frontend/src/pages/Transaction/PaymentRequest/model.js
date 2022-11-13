@@ -1,132 +1,131 @@
 export class PaymentRequestFormModel {
-  IsGeneralPayment = 'P'
-  CTCType = true
+  IsGeneralPayment = 'P';
+  CTCType = true;
 
-  ShipmentId = ''
-  PrincipleBy = ''
-  etd = ''
-  eta = ''
+  ShipmentId = 0;
 
-  PaymentRequestNo = ''
-  ReferenceId = ''
-  PaymentTo = 'SSLine'
-  KursDate = ''
-  KursKMK = null
-  Currency = null
+  PrincipleBy = '';
+  etd = '';
+  eta = '';
 
-  PrintingL = ''
-  PrintingR = ''
-  DNVendor = ''
-  CustomerId = 0
-  CustomerName = ''
-  PersonalId = 0
-  PersonalName = ''
+  PaymentRequestNo = '';
+  ReferenceId = '';
+  PaymentTo = 'SSLine';
+  KursDate = '';
+  KursKMK = null;
+  Currency = null;
 
-  IncShipperList = []
-  paidUSD = false
-  paidIDR = false
-  paidDate = null
-  totalUSD = 0
-  totalIDR = 0
-  taxUSD = 0
-  taxIDR = 0
-  taxPercent = 0
+  PrintingL = '';
+  PrintingR = '';
+  DNVendor = '';
+  CustomerId = 0;
+  CustomerName = '';
+  PersonalId = 0;
+  PersonalName = '';
 
-  Id = 0  // PaymentRequestId
-  ContactTypeId = 2
+  IncShipperList = [];
+  paidUSD = false;
+  paidIDR = false;
+  paidDate = null;
+  totalUSD = 0;
+  totalIDR = 0;
+  taxUSD = 0;
+  taxIDR = 0;
+  taxPercent = 0;
+
+  Id = 0; // PaymentRequestId
+  ContactTypeId = 2;
 
   static convertFromJson(json) {
-    let value = new PaymentRequestFormModel()
-    const parsedJSON = json ? JSON.parse(json.toString()) : {}
+    let value = new PaymentRequestFormModel();
+    const parsedJSON = json ? JSON.parse(json.toString()) : {};
 
-    return value
+    return value;
   }
 
   static convertToJson(value = new PaymentRequestFormModel()) {
-    return {
-    }
+    return {};
   }
 }
 
 export class PaymentRequestFormTableModel {
-  Code = null
-  Paid = null
-  Description = null
-  AmountUSD = null
-  AmountIDR = null
-  CostToCost = null
-  VAT = null
-  NoFaktur = null
-  NoPol = null
-  Driver = null
+  Code = null;
+  Paid = null;
+  Description = null;
+  AmountUSD = null;
+  AmountIDR = null;
+  CostToCost = null;
+  VAT = null;
+  NoFaktur = null;
+  NoPol = null;
+  Driver = null;
 
   static convertFromJson(json) {
-    let value = new PaymentRequestFormTableModel()
-    const parsedJSON = json ? JSON.parse(json.toString()) : {}
+    let value = new PaymentRequestFormTableModel();
+    const parsedJSON = json ? JSON.parse(json.toString()) : {};
 
-    return value
+    return value;
   }
 
   static convertToJson(value = new PaymentRequestFormTableModel()) {
-    return {
-    }
+    return {};
   }
 }
 
 export let PaymentHeadersDummy = [
   {
-    "column": "id",
-    "text": "Id",
-    "format": ""
+    column: 'id',
+    text: 'Id',
+    format: '',
   },
   {
-    "column": "code",
-    "text": "Code",
-    "format": ""
+    column: 'code',
+    text: 'Code',
+    format: '',
   },
   {
-    "column": "paid",
-    "text": "Paid",
-    "format": ""
+    column: 'paid',
+    text: 'Paid',
+    format: '',
   },
   {
-    "column": "description",
-    "text": "Description",
-    "format": ""
+    column: 'description',
+    text: 'Description',
+    format: '',
   },
   {
-    "column": "amountUSD",
-    "text": "Amount USD",
-    "format": ""
+    column: 'amountUSD',
+    text: 'Amount USD',
+    format: '',
   },
   {
-    "column": "amountIDR",
-    "text": "Amount IDR",
-    "format": ""
+    column: 'amountIDR',
+    text: 'Amount IDR',
+    format: '',
   },
   {
-    "column": "ctc",
-    "text": "Cost To Cost",
-    "format": ""
+    column: 'ctc',
+    text: 'Cost To Cost',
+    format: '',
   },
   {
-    "column": "ppn",
-    "text": "PPn / VAT",
-    "format": ""
+    column: 'ppn',
+    text: 'PPn / VAT',
+    format: '',
   },
   {
-    "column": "fakturId",
-    "text": "Faktur No",
-    "format": ""
+    column: 'fakturId',
+    text: 'Faktur No',
+    format: '',
   },
   {
-    "column": "nopol",
-    "text": "NoPol Truck",
-    "format": ""
+    column: 'nopol',
+    text: 'NoPol Truck',
+    format: '',
   },
   {
-    "column": "driver",
-    "text": "Driver",
-    "format": ""
-  }
-]
+    column: 'driver',
+    text: 'Driver',
+    format: '',
+  },
+];
