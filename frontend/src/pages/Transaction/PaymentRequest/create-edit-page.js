@@ -463,10 +463,11 @@ const CrudPaymentRequestPage = () => {
       });
   };
 
-  const getShipmentOrder = (rowsCount = 50, NumPage = 1) => {
+  const getShipmentOrder = (rowsCount = 50, NumPage = 1, isIncome = false) => {
     axios
       .post(
-        `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=PAGE&pageNumber=${NumPage}&pageSize=${rowsCount}`,
+        // `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=PAGE&pageNumber=${NumPage}&pageSize=${rowsCount}`,
+        `http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLossV1/estimateProfitLoss/PostBySearchShipmentNo?pageNumber=${NumPage}&pageSize=${rowsCount}&isIncome=${isIncome}`,
         {
           userCode: 'luna',
           countryId: 101,
@@ -475,6 +476,7 @@ const CrudPaymentRequestPage = () => {
         }
       )
       .then((response) => {
+        console.log(response, '<<<responseModal');
         if (
           response &&
           response.data &&
@@ -850,11 +852,11 @@ const CrudPaymentRequestPage = () => {
       fetchEditData(prId);
       getContact(50, 1);
       getRateCurrency(50, 1);
-      getShipmentOrder(50, 1);
+      getShipmentOrder(50, 1, false);
     } else {
       getContact(50, 1);
       getRateCurrency(50, 1);
-      getShipmentOrder(50, 1);
+      getShipmentOrder(50, 1, false);
     }
     return () => controller.abort();
   }, [prId]);
@@ -1275,7 +1277,7 @@ const CrudPaymentRequestPage = () => {
           </Stack>
         </Grid>
         <Paper variant="outlined" sx={{m: 2, p: 2}}>
-          <ModalTableInvoice
+          {/* <ModalTableInvoice
             open={openMLSO}
             onClose={() => setOpenMLSO(false)}
             setSelectedData={(e) => handleSelectedShipment(e)}
@@ -1300,7 +1302,8 @@ const CrudPaymentRequestPage = () => {
             setTotalVATUSD={(e) => setTotalVATUSD(e)}
             setAllVat={(e) => setAllVat(e)}
             setShipmentId={(e) => setShipmentId(e)}
-          />
+          /> */}
+          {/* <ModalTableShipementNo /> */}
           <ModalTableTruck
             open={openStorage}
             onClose={() => setOpenStorage(false)}
