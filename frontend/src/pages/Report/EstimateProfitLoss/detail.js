@@ -21,7 +21,7 @@ import {useNavigate} from "react-router-dom";
 import ListTab1 from "../../../components/pageEPL/ListTab1"
 import ListTab2 from "../../../components/pageEPL/ListTab2"
 import Snackbar from '@mui/material/Snackbar';
-import { Alert } from '@mui/material';
+import {Alert} from '@mui/material';
 
 const EstimateProfitLossDetailPage = () => {
     const [LSOData, setLSOData] = useState([]);
@@ -321,7 +321,7 @@ const EstimateProfitLossDetailPage = () => {
 
     const getShipperById = (id) => {
 
-        axios.get(API_URL_MASTER + `regContact/regContact/PostById?id=${id}`) //untuk dapat contact detail
+        axios.get(API_URL + `regContact/regContact/PostById?id=${id}`) //untuk dapat contact detail
         .then((response) => {
             
         })

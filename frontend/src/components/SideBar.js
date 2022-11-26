@@ -1,5 +1,5 @@
 import React from 'react';
-import { styled, useTheme, alpha } from '@mui/material/styles';
+import {alpha, styled, useTheme} from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
@@ -16,7 +16,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import Footer from '../components/Footer';
-import { Route, Routes, useNavigate } from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 import ListBooking from '../pages/Transaction/Booking/ListBooking';
 import ListAirline from '../pages/Master/Airline/ListAirline';
 import ListAirport from '../pages/Master/Airport/ListAirport';
@@ -29,8 +29,8 @@ import ListRegion from '../pages/Master/Region/ListRegion';
 import ListSeaport from '../pages/Master/Seaport/ListSeaport';
 import ListVessel from '../pages/Master/Vessel/ListVessel';
 import ListBank from '../pages/Master/Bank/ListBank';
-import { TreeView } from '@mui/lab';
-import TreeItem, { treeItemClasses } from '@mui/lab/TreeItem';
+import {TreeView} from '@mui/lab';
+import TreeItem, {treeItemClasses} from '@mui/lab/TreeItem';
 import Label from '@mui/icons-material/Label';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -44,9 +44,8 @@ import InvoicePage from '../pages/Transaction/Invoice';
 import InvoiceDetailsPage from '../pages/Transaction/Invoice/details';
 import ViewInvoicePage from '../pages/Transaction/Invoice/viewOnly';
 import PaymentRequestPage from '../pages/Transaction/PaymentRequest';
-import PaymentRequestDetailPage from '../pages/Transaction/PaymentRequest/detail';
-import PaymentRequestEditPage from '../pages/Transaction/PaymentRequest/edit';
-import PaymentRequestViewPage from '../pages/Transaction/PaymentRequest/view';
+import CrudPaymentRequestPage from '../pages/Transaction/PaymentRequest/create-edit-page';
+import PaymentRequestAddPage from "../pages/Transaction/PaymentRequest/detail";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     color: theme.palette.text.secondary,
@@ -579,9 +578,10 @@ export default function MiniDrawer() {
                     <Route path="/epl/detail" element={<><EstimateProfitLossDetailPage /></>} />
                     <Route path="/epl/edit/:SOId" element={<><EstimateProfitLossEditPage /></>} />
                     <Route path="/payment-request" element={<><PaymentRequestPage /></>} />
-                    <Route path="/payment-request/detail" element={<><PaymentRequestDetailPage /></>} />
-                    <Route path="/payment-request/edit/:SOId" element={<><PaymentRequestEditPage /></>} />
-                    <Route path="/payment-request/view/:SOId" element={<><PaymentRequestViewPage /></>} />
+                    <Route path="/payment-request/createe" element={<><PaymentRequestAddPage /></>} />
+                    <Route path="/payment-request/create" element={<><CrudPaymentRequestPage /></>} />
+                    <Route path="/payment-request/edit/:prId" element={<><CrudPaymentRequestPage /></>} />
+                    <Route path="/payment-request/view/:prId" element={<><CrudPaymentRequestPage /></>} />
                     <Route path="/invoice" element={<><InvoicePage /></>} />
                     <Route path='/invoice/create' element={<><InvoiceDetailsPage /></>} />
                     <Route path='/invoice/edit/:invId' element={<><InvoiceDetailsPage /></>} />

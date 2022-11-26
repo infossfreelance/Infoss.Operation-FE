@@ -1,12 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Button,
-  Modal,
-  Table
-} from 'react-bootstrap';
+import React, {useEffect, useState} from 'react';
+import {Button, Modal, Table} from 'react-bootstrap';
 import Swal from 'sweetalert2';
-import FindInPageIcon from '@mui/icons-material/FindInPage';
-import { API_URL_MASTER } from '../../helpers/constant'
 import axios from 'axios';
 import AddIncShipperListRow from './AddIncShipperListRow'
 
@@ -28,7 +22,7 @@ const getShipperList = () => {
     branchId: 12,
     contactTypeId: 2
   }
-  axios.post(API_URL_MASTER + 'regContact/regcontact/PostByPage?pageNo=1&pageSize=5', payload)
+  axios.post(API_URL + 'regContact/regcontact/PostByPage?pageNo=1&pageSize=5', payload)
   .then((response) => {
     setShipperList(response.data)
   })

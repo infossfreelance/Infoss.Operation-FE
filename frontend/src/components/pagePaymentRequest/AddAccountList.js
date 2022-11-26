@@ -1,66 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Button,
-  Modal,
-  Table
-} from 'react-bootstrap';
+import React, {useEffect, useState} from 'react';
+import {Button, Modal, Table} from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import FindInPageIcon from '@mui/icons-material/FindInPage';
-import { API_URL_MASTER } from '../../helpers/constant'
+import {API_URL_MASTER} from '../../helpers/constant';
 import axios from 'axios';
-import AddAccountListRow from './AddAccountListRow'
+import AddAccountListRow from './AddAccountListRow';
 
 export default function AddAccountList(props) {
-
   const [selectedId, setSelectedId] = useState('');
   const [AccountList, setAccountList] = useState([]);
   const [selectedData, setSelectedData] = useState({});
 
   useEffect(() => {
-    getAccountList()
-}, []);
+    getAccountList();
+  }, []);
 
-const getAccountList = () => {
-  const payload = {
-    userCode: "luna",
-    countryId: 101,
-    companyId: 32,
-    branchId: 12
-  }
-  axios.post('http://stage-master.api.infoss.solusisentraldata.com/account/account/PostById?id=1', payload)
-  .then((response) => {
-    console.log("ACCOUNT", response)
-    // setAccountList(response.data)
-  })
-  .catch(function (error) {
-    Swal.fire({
-        icon: 'error',
-        title: 'Something Went Wrong!',
-        text: error,
-        customClass: {
-            confirmButton: 'btn-infoss px-4'
-        }
-    });
-  })
-}
-
+  const getAccountList = () => {
+    const payload = {
+      userCode: 'luna',
+      countryId: 101,
+      companyId: 32,
+      branchId: 12,
+    };
+    axios
+      .post(
+        'http://stage-master.api.infoss.solusisentraldata.com/account/account/PostById?id=1',
+        payload
+      )
+      .then((response) => {
+        // setAccountList(response.data)
+      })
+      .catch(function (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Something Went Wrong!',
+          text: error,
+          customClass: {
+            confirmButton: 'btn-infoss px-4',
+          },
+        });
+      });
+  };
 
   const saveData = () => {
-    selectedData.id === undefined ?
-    ErrorAlert('Please Select Data!')
-    :
-    props.setSelectedAccount(selectedData)
-    props.onHide()
-  }
+    selectedData.id === undefined
+      ? ErrorAlert('Please Select Data!')
+      : props.setSelectedAccount(selectedData);
+    props.onHide();
+  };
 
   const ErrorAlert = (string) => {
     Swal.fire({
-        icon: 'warning',
-        title: 'Oops',
-        text: string,
-        customClass: {
-            confirmButton: 'btn btn-infoss px-4'
-        }
+      icon: 'warning',
+      title: 'Oops',
+      text: string,
+      customClass: {
+        confirmButton: 'btn btn-infoss px-4',
+      },
     });
   };
 
@@ -79,7 +75,6 @@ const getAccountList = () => {
       </Modal.Header>
 
       <Modal.Body>
-        
         <Table>
           <thead>
             <tr>
@@ -88,8 +83,7 @@ const getAccountList = () => {
             </tr>
           </thead>
           <tbody>
-            {
-              AccountList.length > 0 ?
+            {AccountList.length > 0 ? (
               AccountList.map((v, k) => {
                 return (
                   <AddAccountListRow
@@ -99,17 +93,17 @@ const getAccountList = () => {
                     setSelectedData={(e) => setSelectedData(e)}
                     selectedId={selectedData.id === v.id ? true : false}
                   />
-                )
+                );
               })
-              :
+            ) : (
               <tr>
-                  <td colSpan={3} className="text-center py-3 text-muted">Data Empty</td>
+                <td colSpan={3} className="text-center py-3 text-muted">
+                  Data Empty
+                </td>
               </tr>
-            }
-            
+            )}
           </tbody>
         </Table>
-
       </Modal.Body>
     </Modal>
   );
