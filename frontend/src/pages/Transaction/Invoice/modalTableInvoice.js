@@ -97,7 +97,6 @@ const ModalTableInvoice = (props) => {
             if (res.data.code === 200) {
               tempSelected.invHeader = res.data.data.jobOwner.masterCode;
               props.setSelectedData(tempSelected);
-              console.log(tempSelected, '<<<tempSelected');
             }
           })
           .catch((error) => console.error(error));

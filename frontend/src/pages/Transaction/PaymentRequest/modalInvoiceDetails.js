@@ -24,6 +24,7 @@ import Select from '@mui/material/Select';
 import {NumericFormat} from 'react-number-format';
 import axios from 'axios';
 import {Dropdown, Pagination} from 'react-bootstrap';
+import {useNavigate, useParams} from 'react-router-dom';
 
 const invoiceDetailTemp = [
   {
@@ -31,75 +32,41 @@ const invoiceDetailTemp = [
     countryId: 101,
     companyId: 32,
     branchId: 12,
-    id: 0,
-    invoiceId: 0,
+    paymentRequestId: 0,
     sequence: 0,
     debetCredit: 'D',
     accountId: 0,
-    description: 's',
+    description: 'string',
     type: 0,
     codingQuantity: true,
     quantity: 0,
     perQty: 0,
-    sign: true,
-    amountCrr: 0,
     amount: 0,
-    percentVat: 0,
-    amountVat: 0,
+    amountCrr: 0,
+    paid: true,
+    paidOn: '2022-11-12T09:42:20.162Z',
+    paidPV: true,
+    shipmentId: 'string',
+    shipmentNo: 0,
     eplDetailId: 0,
-    vatId: 0,
+    statusMemo: true,
+    memoNo: 0,
     idLama: 0,
     isCostToCost: true,
+    isPpn: true,
+    persenPpn: 0,
+    fakturNo: 'string',
+    fakturDate: '2022-11-12T09:42:20.162Z',
+    isCostTrucking: true,
+    kendaraanId: 0,
+    kendaraanNopol: 'string',
+    employeeId: 0,
+    employeeName: 'string',
+    mrgId: 0,
+    deliveryDate: '2022-11-12T09:42:20.162Z',
     originalUsd: 0,
     originalRate: 0,
-    user: 's',
-    invoiceDetailProfitShares: [
-      {
-        rowStatus: 's',
-        countryId: 0,
-        companyId: 0,
-        branchId: 0,
-        invoiceDetilId: 0,
-        sequence: 0,
-        sFeet20: 0,
-        sFeet40: 0,
-        sFeetHQ: 0,
-        sFeetM3: 0,
-        sRate20: 0,
-        sRate40: 0,
-        sRateHQ: 0,
-        sRateM3: 0,
-        bFeet20: 0,
-        bFeet40: 0,
-        bFeetHQ: 0,
-        bFeetM3: 0,
-        bRate20: 0,
-        bRate40: 0,
-        bRateHQ: 0,
-        bRateM3: 0,
-        percentage: 0,
-        idLama: 0,
-        user: 's',
-      },
-    ],
-    invoiceDetailStorages: [
-      {
-        rowStatus: 's',
-        countryId: 0,
-        companyId: 0,
-        branchId: 0,
-        invoiceDetailId: 0,
-        sequence: 0,
-        fromDate: '2022-09-26T04:48:42.216Z',
-        toDate: '2022-09-26T04:48:42.216Z',
-        totalDays: 0,
-        storageDetailId: 0,
-        amountIDR: 0,
-        amountUSD: 0,
-        storageId: 0,
-        user: 's',
-      },
-    ],
+    user: 'string',
   },
 ];
 
@@ -409,16 +376,22 @@ function ChildModal(props) {
 }
 
 export default function NestedModal(props) {
-  const [shipperNo, setShipperNo] = useState('');
+  console.log(props, '<<<props');
+  const {prId} = useParams();
+  const [shipperNo, setShipperNo] = useState(props.shipmentNo);
+  console.log(props, '<<<props');
+  console.log(shipperNo, '<<<shipperNo');
   const [shipperName, setShipperName] = useState('');
   const [accountRadio, setAccountRadio] = useState(0);
   const [accountId, setAccountId] = useState(0);
   const [accountName, setAccountName] = useState('');
   const [description, setDescription] = useState('');
   const [currencyRadio, setCurrencyRadio] = useState(1);
+  const [paidStatusRadio, setPaidStatusRadio] = useState(1);
   const [checked, setChecked] = useState(false);
+  const [checkedTruck, setCheckedTruck] = useState(false);
   const [signRadio, setSignRadio] = useState(true);
-  const [vat, setVat] = useState('');
+  const [vat, setVat] = useState(false);
   const [quantity, setQuantity] = useState(0);
   const [cost, setCost] = useState(0);
   const [rate, setRate] = useState(0);
@@ -439,13 +412,16 @@ export default function NestedModal(props) {
 
     if (props.edit === true) {
       let temp = props.selected;
+      console.log(temp, '<<<temp');
       setAccountId(temp.accountId);
       setDescription(temp.description);
       setAccountRadio(temp.type);
       setCurrencyRadio(temp.amountCrr);
+      setPaidStatusRadio(temp.paid === false ? 0 : 1);
       setChecked(temp.isCostToCost);
+      setCheckedTruck(temp.isCostTrucking);
       setSignRadio(temp.sign);
-      setVat(temp.percentVat);
+      setVat(temp.isPpn === undefined ? false : true);
       setQuantity(temp.quantity);
       setCost(temp.perQty);
       setRate(temp.originalRate);
@@ -501,9 +477,11 @@ export default function NestedModal(props) {
     setAccountName('');
     setDescription('');
     setCurrencyRadio(1);
+    setPaidStatusRadio(1);
     setChecked(false);
+    setCheckedTruck(false);
     setSignRadio(true);
-    setVat('');
+    setVat(false);
     setQuantity(0);
     setCost(0);
     setRate(0);
@@ -519,9 +497,9 @@ export default function NestedModal(props) {
 
   const handleSave = () => {
     let payload = {...invoiceDetailTemp[0]};
-
-    let tempVat = 0;
-    if (vat === 11 || vat === 1.1) tempVat = vat;
+    console.log(payload, '<<<payload');
+    // let tempVat = 0;
+    // if (vat === 11 || vat === 1.1) tempVat = vat;
 
     let sequence = 1;
     if (props.edit === true) {
@@ -529,29 +507,69 @@ export default function NestedModal(props) {
     } else {
       if (props.sequence > 0) sequence = props.sequence + 1;
     }
-
-    payload.accountId = accountId;
-    payload.accountName = accountName;
-    payload.description = description;
-    payload.type = accountRadio;
-    payload.amountCrr = Number(currencyRadio);
-    payload.isCostToCost = checked;
-    payload.sign = signRadio;
-    payload.percentVat = tempVat;
-    payload.amountVat = (tempVat / 100) * amount;
-    payload.quantity = quantity;
-    payload.perQty = cost;
-    payload.originalRate = rate;
-    payload.amount = amount;
-    payload.originalUsd = originalUsd;
-    payload.invoiceDetailProfitShares = [];
-    payload.invoiceDetailStorages = [];
-    payload.user = 'luna';
+    payload.rowStatus = 'ACT';
+    payload.countryId = 101;
+    payload.companyId = 32;
+    payload.branchId = 12;
+    payload.paymentRequestId = Number(prId) || 0;
     payload.sequence = sequence;
     payload.debetCredit = props.dcStatus;
+    payload.accountId = accountId;
+    payload.accountName = accountName || '';
+    payload.description = description;
+    payload.type = accountRadio;
     payload.codingQuantity = codingQuantity;
+    payload.quantity = quantity;
+    payload.perQty = cost;
+    payload.amount = amount;
+    payload.paid =
+      typeof paidStatusRadio === 'number' || typeof paidStatusRadio === 'string'
+        ? Number(paidStatusRadio) === 0
+          ? false
+          : true
+        : paidStatusRadio;
+    payload.paidOn = new Date();
     payload.eplDetailId = eplDetailId;
+    payload.statusMemo = true;
+    payload.memoNo = 0;
+    payload.idLama = 0;
+    payload.isCostToCost = checked;
+    payload.isPpn = vat;
+    payload.persenPpn = 0;
+    payload.fakturNo = 'string';
+    payload.fakturDate = new Date() || '';
+    payload.isCostTrucking = checkedTruck;
+    payload.kendaraanId = 0;
+    payload.kendaraanNopol = 'string';
+    payload.employeeId = 0;
+    payload.employeeName = 'string';
+    payload.mrgId = 0;
+    payload.deliveryDate = new Date() || '';
+    payload.originalUsd = originalUsd;
+    payload.originalRate = rate;
+    payload.user = 'luna';
+    payload.createdOn = new Date();
+    payload.createdBy = 'luna';
+    payload.modifiedOn = new Date();
+    payload.modifiedBy = 'string';
+    payload.shipmentNo = props.shipmentNo;
+    // payload.shipmentId = props.shipmentId;
+    payload.shipperNo = props.shipperNo;
+    // payload.shipperId = props.shipperId;
 
+    // payload.paymentRequestId = prId;
+    // payload.amountCrr = Number(currencyRadio);
+    // payload.sign = signRadio;
+    // payload.percentVat = tempVat;
+    // payload.amountVat = (tempVat / 100) * amount;
+    // payload.invoiceDetailProfitShares = [];
+    // payload.invoiceDetailStorages = [];
+    //
+    //
+    //
+    //
+
+    console.log(payload, '<<<payload');
     props.saveDetail(payload);
     handleClose();
   };
@@ -699,7 +717,7 @@ export default function NestedModal(props) {
               <Grid item xs={2}>
                 <FormLabel id="account-label">Account Name :</FormLabel>
               </Grid>
-              <Grid item xs={10}>
+              <Grid item xs={6}>
                 <TextField
                   id="account-name"
                   value={accountName}
@@ -707,6 +725,30 @@ export default function NestedModal(props) {
                   variant="filled"
                   disabled
                 />
+              </Grid>
+              <Grid item xs={4}>
+                <Box sx={{border: 1, borderRadius: 1, p: 1}}>
+                  <RadioGroup
+                    row
+                    name="paid-radio"
+                    value={paidStatusRadio}
+                    onChange={(e) => {
+                      console.log(e.target.value, '<<<ePadiStatusRadio');
+                      setPaidStatusRadio(e.target.value);
+                    }}
+                  >
+                    <FormControlLabel
+                      value={0}
+                      control={<Radio />}
+                      label="Paid"
+                    />
+                    <FormControlLabel
+                      value={1}
+                      control={<Radio />}
+                      label="Not Paid"
+                    />
+                  </RadioGroup>
+                </Box>
               </Grid>
             </Grid>
             <Grid
@@ -737,7 +779,7 @@ export default function NestedModal(props) {
               flexDirection="row"
               justifyContent="space-between"
             >
-              <Grid item>
+              <Grid item columns={6}>
                 <Box sx={{border: 1, borderRadius: 1, p: 1}}>
                   <RadioGroup
                     row
@@ -758,7 +800,7 @@ export default function NestedModal(props) {
                   </RadioGroup>
                 </Box>
               </Grid>
-              <Grid item>
+              <Grid item column={3}>
                 <Box sx={{border: 1, borderRadius: 1, p: 1}}>
                   <FormGroup>
                     <FormControlLabel
@@ -769,6 +811,21 @@ export default function NestedModal(props) {
                         />
                       }
                       label="Cost To Cost"
+                    />
+                  </FormGroup>
+                </Box>
+              </Grid>
+              <Grid item columns={3}>
+                <Box sx={{border: 1, borderRadius: 1, p: 1}}>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={checkedTruck}
+                          onChange={(e) => setCheckedTruck(e.target.checked)}
+                        />
+                      }
+                      label="Cost To Truck"
                     />
                   </FormGroup>
                 </Box>
@@ -904,21 +961,21 @@ export default function NestedModal(props) {
               xs={12}
             >
               <Grid item xs={2}>
-                <FormLabel id="amount-label">Vat :</FormLabel>
+                <FormLabel id="amount-label">Subject Vat 10%</FormLabel>
               </Grid>
-              <Grid item xs={10}>
-                <FormControl sx={{minWidth: 110}}>
-                  <Select
-                    id="vat-select"
-                    value={vat}
-                    onChange={(e) => setVat(e.target.value)}
-                    displayEmpty
-                  >
-                    <MenuItem value={11.0}>11.00%</MenuItem>
-                    <MenuItem value={1.1}>1.10%</MenuItem>
-                  </Select>
-                </FormControl>
+              <Grid item xs={2}>
+                <FormGroup>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={vat}
+                        onChange={(e) => setVat(e.target.checked)}
+                      />
+                    }
+                  />
+                </FormGroup>
               </Grid>
+              <Grid item xs={8} />
             </Grid>
           </Grid>
         </Box>

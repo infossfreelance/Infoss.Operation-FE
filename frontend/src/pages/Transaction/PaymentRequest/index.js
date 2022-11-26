@@ -16,6 +16,7 @@ import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 import {API_URL, dateFormat} from '../../../helpers/constant';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 
@@ -34,6 +35,7 @@ const EstimateProfitLossPage = () => {
   const [headersData, setHeadersData] = useState([]);
   const [filterJson, setFilterJson] = useState({});
   const [filterArr, setFilterArr] = useState([]);
+  const [openModalApproveMng, setOpenModalApproveMng] = useState(false);
 
   const ErrorAlert = (string, isError = false) => {
     let icon = 'warning';
@@ -200,7 +202,7 @@ const EstimateProfitLossPage = () => {
           },
         }).then((result) => {
           if (result.isConfirmed === true) {
-            history('/booking/payment-request/create');
+            history('/booking/payment-request/edit/' + SelectedData.id);
           } else if (result.isDenied === true) {
             history('/booking/payment-request/view/' + SelectedData.id);
           }
@@ -261,45 +263,47 @@ const EstimateProfitLossPage = () => {
     if (SelectedData.id === undefined) {
       NotifAlert('Please Select Data!', 'warning');
       return false;
+    } else {
+      setOpenModalApproveMng(true);
     }
 
-    if (SelectedData.deleted === 0) {
-      NotifAlert('Data Already Approved!', 'error');
-      return false;
-    }
+    // if (SelectedData.deleted === 0) {
+    //   NotifAlert('Data Already Approved!', 'error');
+    //   return false;
+    // }
 
-    Swal.fire({
-      icon: 'question',
-      title: 'Are you sure you want to Multi Approval - Payment Request?',
-      showCancelButton: true,
-      confirmButtonText: 'Ok',
-      cancelButtonText: 'Cancel',
-      customClass: {
-        confirmButton: 'btn btn-infoss px-4',
-        cancelButton: 'btn btn-outline-infoss px-4',
-      },
-    }).then((result) => {
-      if (result.value) {
-        const payload = {
-          id: SelectedData.id,
-        };
-        axios
-          .put(
-            API_URL +
-              'estimateProfitLoss/Estimateprofitloss/ApiV1/Header/UnDelete',
-            payload
-          )
-          .then((response) => {
-            setSelectedData({});
-            NotifAlert('Data Un-Deleted!', 'success');
-            getData();
-          })
-          .catch(function (error) {
-            setIsLoading(false);
-            NotifAlert('Something Went Wrong!', 'error');
-          });
-      }
-    });
+    // Swal.fire({
+    //   icon: 'question',
+    //   title: 'Are you sure you want to Multi Approval - Payment Request?',
+    //   showCancelButton: true,
+    //   confirmButtonText: 'Ok',
+    //   cancelButtonText: 'Cancel',
+    //   customClass: {
+    //     confirmButton: 'btn btn-infoss px-4',
+    //     cancelButton: 'btn btn-outline-infoss px-4',
+    //   },
+    // }).then((result) => {
+    //   if (result.value) {
+    //     const payload = {
+    //       id: SelectedData.id,
+    //     };
+    //     axios
+    //       .put(
+    //         API_URL +
+    //           'estimateProfitLoss/Estimateprofitloss/ApiV1/Header/UnDelete',
+    //         payload
+    //       )
+    //       .then((response) => {
+    //         setSelectedData({});
+    //         NotifAlert('Data Un-Deleted!', 'success');
+    //         getData();
+    //       })
+    //       .catch(function (error) {
+    //         setIsLoading(false);
+    //         NotifAlert('Something Went Wrong!', 'error');
+    //       });
+    //   }
+    // });
   };
 
   const renderPagination = () => {
@@ -737,6 +741,7 @@ const EstimateProfitLossPage = () => {
           )}
         </div>
       </Grid>
+      <Paper></Paper>
     </section>
   );
 };

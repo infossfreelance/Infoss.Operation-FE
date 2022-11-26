@@ -15,7 +15,7 @@ import { Alert, AlertTitle } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
 export default function AddbeingForPayment(props) {
-
+  console.log(props, '<<<props')
   useEffect(() => {
     
   }, []);

@@ -549,13 +549,13 @@ const CreateInvoicePage = () => {
         setInvoiceDetails(response.data.data.invoice.invoiceDetails);
 
         let tempDetail = response.data.data.invoice.invoiceDetails;
-
+        console.log(tempDetail, '<<<tempDetail');
         setDetailMap(tempDetail);
 
         if (tempDetail.length > 0) {
           setDetailSequence(tempDetail[tempDetail.length - 1].sequence);
         }
-
+        console.log(detailSequence, '<<<detailSequence');
         setEditInvoice(response.data.data.invoice);
 
         let temp = response.data.data.invoice;
@@ -963,7 +963,6 @@ const CreateInvoicePage = () => {
       let vatIdr = 0;
 
       let tempSequence = selectedDetail.sequence;
-
       // let fromEpl = false
 
       // invoiceDetails.forEach(el =>  {
