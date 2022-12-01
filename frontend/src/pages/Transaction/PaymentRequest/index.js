@@ -19,6 +19,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import {API_URL, dateFormat} from '../../../helpers/constant';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import ModalApproval from './modalApprovalByGeneral';
 
 const EstimateProfitLossPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +37,8 @@ const EstimateProfitLossPage = () => {
   const [filterJson, setFilterJson] = useState({});
   const [filterArr, setFilterArr] = useState([]);
   const [openModalApproveMng, setOpenModalApproveMng] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [modalType, setModalType] = useState('');
 
   const ErrorAlert = (string, isError = false) => {
     let icon = 'warning';
@@ -43,6 +46,23 @@ const EstimateProfitLossPage = () => {
     if (isError === true) {
       icon = 'error';
       title = 'Something went wrong';
+    }
+    Swal.fire({
+      icon,
+      title,
+      text: string,
+      customClass: {
+        confirmButton: 'btn btn-infoss px-4',
+      },
+    });
+  };
+
+  const ErrorAlerNodal = (string, isError = false) => {
+    let icon = 'warning';
+    let title = 'Peringatan';
+    if (isError === true) {
+      icon = 'error';
+      title = 'Terjadi Kesalahan';
     }
     Swal.fire({
       icon,
@@ -259,6 +279,70 @@ const EstimateProfitLossPage = () => {
     });
   };
 
+  const handleApproveByGeneralPR = () => {
+    if (!SelectedData?.id) {
+      NotifAlert('Please Select Data!', 'warning');
+      return false;
+    } else {
+      setModalType('byGeneralPR');
+      setOpenModal(true);
+    }
+  };
+
+  const handleApproveMKT = () => {
+    if (!SelectedData?.id) {
+      NotifAlert('Please Select Data!', 'warning');
+      return false;
+    } else {
+      setModalType('byMKT');
+      setOpenModal(true);
+    }
+  };
+
+  const handleOpenApproveByAccMgr = () => {
+    if (!SelectedData?.id) {
+      ErrorAlert('Please Select Data!');
+    } else {
+      Swal.fire({
+        title: 'Confirm',
+        text: 'Are you want to Multi Approval - Payment Request?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'OK',
+      });
+
+      // setModalType('openByAcc');
+      // setOpenModal(true);
+    }
+  };
+
+  const handleApproveByAccMgr = () => {
+    if (!SelectedData?.id) {
+      ErrorAlert('Please Select Data!');
+    } else {
+      Swal.fire({
+        title: 'Confirm',
+        text: 'Are you want to Multi Approval - Payment Request?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
+
+  const handlePrint = () => {
+    if (SelectedData?.id) {
+      setModalType('printing');
+      setOpenModal(true);
+    } else {
+      ErrorAlert('Please select data');
+    }
+  };
+
   const handleApprove = (appv_id) => {
     if (SelectedData.id === undefined) {
       NotifAlert('Please Select Data!', 'warning');
@@ -393,6 +477,15 @@ const EstimateProfitLossPage = () => {
     setOpenAlert(false);
   };
 
+  const handleSaveModal = (payload) => {
+    setIsLoading(true);
+  };
+
+  const printFunction = () => {
+    if (SelectedData.id) {
+    }
+  };
+
   const action = (
     <React.Fragment>
       <Button color="secondary" size="small" onClick={handleClose}>
@@ -468,34 +561,38 @@ const EstimateProfitLossPage = () => {
           >
             <DeleteForeverIcon /> Delete
           </Button>
-          <Button variant="outline-infoss" className="me-2 mb-2">
+          <Button
+            variant="outline-infoss"
+            className="me-2 mb-2"
+            onClick={() => handlePrint()}
+          >
             <PrintIcon /> Print EPL
           </Button>
           <Button
             variant="outline-infoss"
             className="me-2 mb-2"
-            onClick={() => handleApprove(1)}
+            onClick={() => handleApproveByAccMgr()}
           >
             <CheckCircleIcon /> Approve By Acc Mgr
           </Button>
           <Button
             variant="outline-infoss"
             className="me-2 mb-2"
-            onClick={() => handleApprove(2)}
+            onClick={() => handleOpenApproveByAccMgr()}
           >
             <CheckCircleIcon /> Open Approve By Acc Mgr
           </Button>
           <Button
             variant="outline-infoss"
             className="me-2 mb-2"
-            onClick={() => handleApprove(3)}
+            onClick={() => handleApproveByGeneralPR()}
           >
             <CheckCircleIcon /> Approve General PR
           </Button>
           <Button
             variant="outline-infoss"
             className="me-2 mb-2"
-            onClick={() => handleApprove(4)}
+            onClick={() => handleApproveMKT()}
           >
             <CheckCircleIcon /> Approve MKT
           </Button>
@@ -540,6 +637,14 @@ const EstimateProfitLossPage = () => {
           ) : (
             <>
               <Table className="table-borderless">
+                <ModalApproval
+                  open={openModal}
+                  close={() => setOpenModal(false)}
+                  handleSave={(e) => handleSaveModal(e)}
+                  type={modalType}
+                  resetType={() => setModalType('')}
+                  doPrint={() => printFunction()}
+                />
                 <thead
                   className="text-center text-infoss"
                   style={{

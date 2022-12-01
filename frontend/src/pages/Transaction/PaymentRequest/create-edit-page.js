@@ -1005,7 +1005,6 @@ const CrudPaymentRequestPage = () => {
 
   //#region: Data Table
   const saveDetail = (payload) => {
-    console.log(payload, '<<<payload');
     let sumUsd = 0;
     let sumIdr = 0;
     let vatUsd = 0;
@@ -1333,13 +1332,17 @@ const CrudPaymentRequestPage = () => {
       const tempArray = [...stateBeingForPaymentByCustomer];
       if (tempArray.length >= 0) {
         const data = tempArray.map((ele) => {
+          const sequenceId =
+            stateShipmentOrderList?.length > 0
+              ? stateShipmentOrderList?.length + ele?.sequence
+              : ele?.sequence;
           const tempPayload = {};
           tempPayload['rowStatus'] = ele.rowStatus || 'ACT';
           tempPayload['countryId'] = ele.countryId;
           tempPayload['companyId'] = ele.companyId;
           tempPayload['branchId'] = ele.branchId;
           tempPayload['paymentRequestId'] = ele?.paymentRequestId || 0;
-          tempPayload['sequence'] = ele?.sequence;
+          tempPayload['sequence'] = sequenceId;
           tempPayload['debetCredit'] = ele?.debetCredit || 'string';
           tempPayload['accountId'] = ele?.accountId || 0;
           tempPayload['accountName'] = ele?.accountName || '';
