@@ -113,53 +113,6 @@ const ModalCustomer = (props) => {
                     <TableCell>Name</TableCell>
                   </TableRow>
                 </TableHead>
-                {/* <TableBody>
-                                    <TableRow>
-                                        {props.headersData.map((el, index) => {
-                                            return (
-                                                <TableCell
-                                                    key={index}
-                                                    onChange={(e) =>
-                                                        filterTable(el.column, e.target.value)
-                                                    }
-                                                >
-                                                    <input className="form-control col-search-form border-infoss" />
-                                                </TableCell>
-                                            );
-                                        })}
-                                    </TableRow>
-                                    {
-                                        props.bodyData.length > 0 ?
-                                            props.bodyData?.map((el, index) => {
-                                                return (
-                                                    <TableRow key={el[identifier]}
-                                                        onClick={() => setSelectedData(el)}
-                                                        sx={
-                                                            selectedData[identifier] === el[identifier]
-                                                                ? selectedStyle
-                                                                : {}
-                                                        }
-                                                    >
-                                                        {
-                                                            props.headersData.map((elHeaders, index) => {
-                                                                return (
-                                                                    <TableCell key={index}>
-                                                                        {el[elHeaders.column]}
-                                                                    </TableCell>
-                                                                )
-                                                            })
-                                                        }
-
-                                                    </TableRow>
-                                                )
-                                            }) :
-                                            <TableRow>
-                                                <TableCell colSpan={6} sx={{ textAlign: 'center' }}>
-                                                    Data Empty
-                                                </TableCell>
-                                            </TableRow>
-                                    }
-                                </TableBody> */}
                 <TableBody>
                   {handleTemplateCustomerByCostumerTypeId.map((el, index) => {
                     return (
