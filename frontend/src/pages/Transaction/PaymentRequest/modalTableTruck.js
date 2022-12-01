@@ -57,10 +57,7 @@ const ModalTableTruck = (props) => {
   };
 
   // FilterTable
-  const filterTable = (key, val) => {
-    // console.log('key', key);
-    // console.log('value', val);
-  };
+  const filterTable = (key, val) => {};
 
   return (
     <Modal open={props.open} onClose={handleClose}>
@@ -109,7 +106,6 @@ const ModalTableTruck = (props) => {
                     {props.headersData.payloadHeaderDummyTruck.length > 0
                       ? props.headersData.payloadHeaderDummyTruck.map(
                           (el, index) => {
-                            console.log(el, '<<<element');
                             return <TableCell key={index}>{el.text}</TableCell>;
                           }
                         )

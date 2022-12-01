@@ -40,11 +40,11 @@ const handleTemplateCustomerByCostumerTypeId = [
   },
 ];
 
-const ModalCustomer = (props) => {
+const MOdalCustomerMKT = (props) => {
   const [selectedData, setSelectedData] = useState({});
   const [rowsCount, setRowsCount] = useState(50);
   const [numPage, setNumPage] = useState(1);
-  let identifier = 'customerId';
+  let identifier = 'id';
   const handleClose = () => {
     setSelectedData({});
     setRowsCount(50);
@@ -53,13 +53,13 @@ const ModalCustomer = (props) => {
   };
 
   const renderTitle = () => {
-    if (props.type === 'customer') {
-      return <h4>List Vendor</h4>;
+    if (props.type === 'personal') {
+      return <h4>List Personal</h4>;
     }
   };
 
   const saveSelectedData = () => {
-    if (selectedData.customerId) {
+    if (selectedData.id) {
       props.setSelectedData(selectedData);
     }
     handleClose();
@@ -113,53 +113,6 @@ const ModalCustomer = (props) => {
                     <TableCell>Name</TableCell>
                   </TableRow>
                 </TableHead>
-                {/* <TableBody>
-                                    <TableRow>
-                                        {props.headersData.map((el, index) => {
-                                            return (
-                                                <TableCell
-                                                    key={index}
-                                                    onChange={(e) =>
-                                                        filterTable(el.column, e.target.value)
-                                                    }
-                                                >
-                                                    <input className="form-control col-search-form border-infoss" />
-                                                </TableCell>
-                                            );
-                                        })}
-                                    </TableRow>
-                                    {
-                                        props.bodyData.length > 0 ?
-                                            props.bodyData?.map((el, index) => {
-                                                return (
-                                                    <TableRow key={el[identifier]}
-                                                        onClick={() => setSelectedData(el)}
-                                                        sx={
-                                                            selectedData[identifier] === el[identifier]
-                                                                ? selectedStyle
-                                                                : {}
-                                                        }
-                                                    >
-                                                        {
-                                                            props.headersData.map((elHeaders, index) => {
-                                                                return (
-                                                                    <TableCell key={index}>
-                                                                        {el[elHeaders.column]}
-                                                                    </TableCell>
-                                                                )
-                                                            })
-                                                        }
-
-                                                    </TableRow>
-                                                )
-                                            }) :
-                                            <TableRow>
-                                                <TableCell colSpan={6} sx={{ textAlign: 'center' }}>
-                                                    Data Empty
-                                                </TableCell>
-                                            </TableRow>
-                                    }
-                                </TableBody> */}
                 <TableBody>
                   {handleTemplateCustomerByCostumerTypeId.map((el, index) => {
                     return (
@@ -180,8 +133,8 @@ const ModalCustomer = (props) => {
                               : {}
                           }
                         >
-                          <TableCell>{el?.customerId}</TableCell>
-                          <TableCell>{el?.customerName}</TableCell>
+                          <TableCell>{el?.id}</TableCell>
+                          <TableCell>{el?.name}</TableCell>
                         </TableRow>
                       );
                     })
@@ -201,4 +154,5 @@ const ModalCustomer = (props) => {
     </Modal>
   );
 };
-export default ModalCustomer;
+
+export default MOdalCustomerMKT;

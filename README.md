@@ -1,3 +1,5 @@
 # Infoss.Operation-FE
-- First Run
-In frontend folder run command "yarn install" to install project dependencies, after installation complete run project with command "npm start"
+On First Run :
+1. Get in to frontend folder 
+2. In terminal run command "yarn install" to install project dependencies
+3. after installation complete run project with command "npm start"

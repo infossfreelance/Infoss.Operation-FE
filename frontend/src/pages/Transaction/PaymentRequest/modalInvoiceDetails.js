@@ -376,11 +376,8 @@ function ChildModal(props) {
 }
 
 export default function NestedModal(props) {
-  console.log(props, '<<<props');
   const {prId} = useParams();
   const [shipperNo, setShipperNo] = useState(props.shipmentNo);
-  console.log(props, '<<<props');
-  console.log(shipperNo, '<<<shipperNo');
   const [shipperName, setShipperName] = useState('');
   const [accountRadio, setAccountRadio] = useState(0);
   const [accountId, setAccountId] = useState(0);
@@ -412,7 +409,6 @@ export default function NestedModal(props) {
 
     if (props.edit === true) {
       let temp = props.selected;
-      console.log(temp, '<<<temp');
       setAccountId(temp.accountId);
       setDescription(temp.description);
       setAccountRadio(temp.type);
@@ -497,7 +493,6 @@ export default function NestedModal(props) {
 
   const handleSave = () => {
     let payload = {...invoiceDetailTemp[0]};
-    console.log(payload, '<<<payload');
     // let tempVat = 0;
     // if (vat === 11 || vat === 1.1) tempVat = vat;
 
@@ -569,7 +564,6 @@ export default function NestedModal(props) {
     //
     //
 
-    console.log(payload, '<<<payload');
     props.saveDetail(payload);
     handleClose();
   };
@@ -733,7 +727,6 @@ export default function NestedModal(props) {
                     name="paid-radio"
                     value={paidStatusRadio}
                     onChange={(e) => {
-                      console.log(e.target.value, '<<<ePadiStatusRadio');
                       setPaidStatusRadio(e.target.value);
                     }}
                   >
@@ -871,8 +864,18 @@ export default function NestedModal(props) {
                   customInput={TextField}
                   thousandSeparator=","
                   onValueChange={(values, sourceInfo) => {
-                    setCost(values.floatValue);
+                    if (values.floatValue === 0) {
+                      setCost(values.floatValue);
+                      setAmount(quantity);
+                    }
+                    if (values.floatValue >= 1) {
+                      setCost(values.floatValue);
+                      setRate(0);
+                      setOriginalUsd(0);
+                      setAmount(values.floatValue * quantity);
+                    }
                   }}
+                  disabled={originalUsd !== 0 || rate !== 0}
                   value={cost}
                   id="unit-cost"
                   variant="standard"
@@ -886,11 +889,34 @@ export default function NestedModal(props) {
                   customInput={TextField}
                   thousandSeparator=","
                   onValueChange={(values, sourceInfo) => {
-                    setRate(values.floatValue);
+                    if (values.floatValue !== 0) {
+                      setRate(values.floatValue);
+                      if (quantity !== 0) {
+                        if (originalUsd !== 0) {
+                          setAmount(quantity * values.floatValue * originalUsd);
+                        } else {
+                          setAmount(quantity * values.floatValue);
+                        }
+                      } else {
+                        setAmount(values.floatValue);
+                      }
+                    } else {
+                      if (originalUsd !== 0) {
+                        if (quantity !== 0) {
+                          setAmount(quantity * originalUsd);
+                        } else {
+                          setAmount(originalUsd);
+                        }
+                      } else {
+                        setAmount(0);
+                      }
+                      setAmount(0);
+                    }
                   }}
                   value={rate}
                   id="original-rate"
                   variant="standard"
+                  disabled={cost !== 0}
                 />
               </Grid>
             </Grid>
@@ -910,10 +936,31 @@ export default function NestedModal(props) {
                   customInput={TextField}
                   thousandSeparator=","
                   onValueChange={(values, sourceInfo) => {
-                    setAmount(values.floatValue);
+                    if (cost >= 1) {
+                      const qty = quantity;
+                      const total = cost * qty;
+                      setAmount(total);
+                    }
+                    if (originalUsd >= 0 && cost === 0) {
+                      const qty = quantity;
+                      const total = originalUsd * qty;
+                      setAmount(total);
+                    }
+                    if (rate >= 0 && cost === 0) {
+                      const qty = quantity;
+                      const total = rate * qty;
+                      setAmount(total);
+                    }
+
+                    if (rate >= 0 && originalUsd >= 0 && cost === 0) {
+                      const qty = quantity;
+                      const total = rate * qty * originalUsd;
+                      setAmount(total);
+                    }
                   }}
                   value={amount}
                   id="amount"
+                  disabled
                   variant="standard"
                 />
               </Grid>
@@ -944,10 +991,33 @@ export default function NestedModal(props) {
                   customInput={TextField}
                   thousandSeparator=","
                   onValueChange={(values, sourceInfo) => {
-                    setOriginalUsd(values.floatValue);
+                    if (values.floatValue !== 0) {
+                      setOriginalUsd(values.floatValue);
+                      if (quantity !== 0) {
+                        if (rate !== 0) {
+                          setAmount(quantity * values.floatValue * rate);
+                        } else {
+                          setAmount(quantity * values.floatValue);
+                        }
+                      } else {
+                        setAmount(values.floatValue);
+                      }
+                    } else {
+                      if (rate !== 0) {
+                        if (quantity !== 0) {
+                          setAmount(quantity * rate);
+                        } else {
+                          setAmount(rate);
+                        }
+                      } else {
+                        setAmount(0);
+                      }
+                      setAmount(0);
+                    }
                   }}
                   value={originalUsd}
                   id="original-usd"
+                  disabled={cost >= 1}
                   variant="standard"
                 />
               </Grid>

@@ -1,8 +1,6 @@
-import React, {useEffect, useState, Dispatch} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Button as RButton} from 'react-bootstrap';
-
-import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
@@ -26,14 +24,12 @@ import AddToPhotosIcon from '@mui/icons-material/AddToPhotos';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import RadioGroup from '@mui/material/RadioGroup';
-import InputLabel from '@mui/material/InputLabel';
+// import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import TableCell from '@mui/material/TableCell';
 import Radio from '@mui/material/Radio';
-
 import 'jspdf-autotable';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -42,16 +38,29 @@ import {NumericFormat} from 'react-number-format';
 import {dateFormat} from '../../../helpers/constant';
 import NestedModal from './modalInvoiceDetails';
 import ModalTableTruck from './modalTableTruck';
-import ModalTableInvoice from '../Invoice/modalTableInvoice';
-import ModalInvoiceUtilities from '../Invoice/modalInvoiceUtilities';
+// import ModalTableInvoice from '../Invoice/modalTableInvoice';
+// import ModalInvoiceUtilities from '../Invoice/modalInvoiceUtilities';
 import {PaymentRequestFormModel, PaymentHeadersDummy} from './model';
-import {ButtonBase} from '@mui/material';
-import AddCustomer from '../../../components/pagePaymentRequest/AddCustomer';
-import AddPersonal from '../../../components/pagePaymentRequest/AddPersonal';
-import ModalListShipmentOrder from '../../../components/pagePaymentRequest/ModalListShipmentOrder';
-import AddbeingForPayment from '../../../components/pagePaymentRequest/AddbeingForPayment';
+// import {ButtonBase} from '@mui/material';
+// import { NumericFormat } from 'react-number-format';
+// import { dateFormat } from '../../../helpers/constant';
+// import NestedModal from '../Invoice/modalInvoiceDetails';
+// import ModalTableInvoice from '../Invoice/modalTableInvoice';
+// import ModalInvoiceUtilities from '../Invoice/modalInvoiceUtilities';
+// import {
+//   PaymentRequestFormModel,
+//   PaymentRequestFormTableModel,
+//   PaymentHeadersDummy,
+// } from './model';
+// import { ButtonBase } from '@mui/material';
+// import AddCustomer from '../../../components/pagePaymentRequest/AddCustomer';
+// import AddPersonal from '../../../components/pagePaymentRequest/AddPersonal';
+// import ModalListShipmentOrder from '../../../components/pagePaymentRequest/ModalListShipmentOrder';
+// import AddbeingForPayment from '../../../components/pagePaymentRequest/AddbeingForPayment';
 import PaymentHeaderDummyTruck from './dummy/index';
-import ModalCustomer from './modalCustomer';
+import ModalTableShipmentNo from './ModalTableShipmentNo';
+import ModalCustomer from './ModalCustomer';
+import ModalCustomerMKT from './ModalCustomerMKT';
 
 function Img(props) {
   return null;
@@ -86,8 +95,6 @@ let templatePaymentRequest = {
     paymentIDR: 0,
     prContraStatus: 'string',
     prContraNo: 0,
-    // paidUSD: true,
-    // datePaidUSD: '2022-11-12T09:42:20.162Z',
     paidIDR: true,
     datePaidIDR: '2022-11-12T09:42:20.162Z',
     deleted: true,
@@ -163,46 +170,6 @@ let templatePaymentRequest = {
   ],
 };
 
-const payloadDetail = {
-  rowStatus: 'string',
-  countryId: 101,
-  companyId: 32,
-  branchId: 12,
-  paymentRequestId: 0,
-  sequence: 0,
-  debetCredit: 'string',
-  accountId: 0,
-  description: 'string',
-  type: 0,
-  codingQuantity: true,
-  quantity: 0,
-  perQty: 0,
-  amount: 0,
-  amountCrr: 0,
-  paid: true,
-  paidOn: '2022-11-12T09:42:20.162Z',
-  paidPV: true,
-  eplDetailId: 0,
-  statusMemo: true,
-  memoNo: 0,
-  idLama: 0,
-  isCostToCost: true,
-  isPpn: true,
-  persenPpn: 0,
-  fakturNo: 'string',
-  fakturDate: '2022-11-12T09:42:20.162Z',
-  isCostTrucking: true,
-  kendaraanId: 0,
-  kendaraanNopol: 'string',
-  employeeId: 0,
-  employeeName: 'string',
-  mrgId: 0,
-  deliveryDate: '2022-11-12T09:42:20.162Z',
-  originalUsd: 0,
-  originalRate: 0,
-  user: 'string',
-};
-
 const CrudPaymentRequestPage = () => {
   const {prId} = useParams();
   const history = useNavigate();
@@ -212,19 +179,26 @@ const CrudPaymentRequestPage = () => {
   const [openMLSO, setOpenMLSO] = useState(false);
   const [LSOHeaders, setLSOHeaders] = useState([]);
   const [LSOData, setLSOData] = useState([]);
-  const [openCustomerBycustomerTypeId, setOpenCustomercustomerTypeId] =
-    useState(false);
-  const [stateShipment, setStateShipment] = useState(723);
+  const [stateCustomerMrkt, setStateCustomerMrkt] = useState([]);
+  const [openCustomerMKT, setOpenCustomerMKT] = useState(false);
+  // const [stateShipment, setStateShipment] = useState(723);
+  const [stateCustomerData, setStateCustomerData] = useState([]);
+  const [customerMKTId, setCustomerMKTId] = useState(0);
+  const [customerMKTName, setCustomerMKTName] = useState('');
+  const [stateBeingForPaymentByCustomer, setStateBeingForPaymentCustomer] =
+    useState([]);
+
+  const [openCustomer, setOpenCustomer] = useState(false);
   // Payment Trucking Table
-  const [openModalPayment, setOpenModalPayment] = useState(false);
-  const [IncShipperHeaders, setIncShipperHeaders] =
-    useState(PaymentHeadersDummy);
+  // const [openModalPayment, setOpenModalPayment] = useState(false);
+  // const [IncShipperHeaders, setIncShipperHeaders] =
+  //   useState(PaymentHeadersDummy);
   const [IncShipperData, setIncShipperData] = useState([]);
 
   const [editPaymentRequest, setEditPaymentRequest] = useState({});
   const [selectedDetail, setSelectedDetail] = useState({});
   const [paymentRequestNo, setPaymentRequestNo] = useState('');
-  const [paymentRequestDetails, setPaymentRequestDetail] = useState([]);
+  const [paymentRequestDetails, setPaymentRequestDetails] = useState([]);
   const [IsGeneralPR, setIsGeneralPR] = useState(false);
   const [isCostToCost, setIsCostToCost] = useState(false);
   const [statePRNo, setStatePRNo] = useState(0);
@@ -270,32 +244,19 @@ const CrudPaymentRequestPage = () => {
   const [stateCustomerId, setStateCustomerId] = useState(0);
   const [detailEdit, setDetailEdit] = useState(false);
   const [debetCredit, setDebetCredit] = useState('D');
-  const [stateCustomerType, setStateCustomerType] = useState(11);
-  const [stateCustomerTypeName, setStateCustomerTypeName] = useState('SSLine');
+  // const [stateCustomerType, setStateCustomerType] = useState(11);
+  // const [stateCustomerTypeName, setStateCustomerTypeName] = useState('SSLine');
   const [stateShipmentOrderList, setStateShipmentOrderList] = useState([]);
   const [customerAddress, setCustomerAddress] = useState('');
-  const [agentName, setAgentName] = useState('');
-  const [agentId, setAgentId] = useState('');
-  const [agentAddress, setAgentAddress] = useState('');
-  const [invoiceDetails, setInvoiceDetails] = useState([]);
-  const [allVat, setAllVat] = useState(0);
-  const [stateDataArr, setStateDataArr] = useState([]);
-  const [statePaymentRequest, setStatePaymentRequest] = useState({});
-  const [stateOpenTruck, setStateOpenTruck] = useState(false);
   const [openStorage, setOpenStorage] = useState(false);
-  const [stateSelectedTruck, setStateSelectedTruck] = useState({});
   const [selectedStorage, setSelectedStorage] = useState({});
   const [headerStorage, setHeaderStorage] = useState(PaymentHeaderDummyTruck);
   const [dataStorage, setDataStorage] = useState([]);
-  const [stateOpenApproveMng, setStateOpenApproveMng] = useState(false);
   const [stateGetDataCustomer, setStateGetDataCustomer] = useState({});
+  const [stateCustomerType, setStateCustomerType] = useState(11);
+  const [stateCustomerTypeName, setStateCustomerTypeName] = useState('SSLine');
+  const [statePaymentRequest, setStatePaymentRequest] = useState({});
 
-  const [stateCustomersByCustomerTypeId, setStaseCustomersByCustomerTypeId] =
-    useState([]);
-  const [
-    stateCustomersHeaderByCustomerTypeId,
-    setStateCustomersHeaderByCustomerTypeId,
-  ] = useState([]);
   //#region: API handling
   const fetchEditData = (prId) => {
     let body = {
@@ -305,97 +266,169 @@ const CrudPaymentRequestPage = () => {
       branchId: 12,
     };
 
-    if (prId) {
-      axios
-        .post(
-          `http://stage-operation.api.infoss.solusisentraldata.com/paymentRequest/paymentRequest/PostById?Id=${prId}`,
-          body
-        )
-        .then((response) => {
-          setPaymentRequestDetail(
-            response.data.data.paymentRequest.paymentRequestDetails
-          );
-          setStatePaymentRequest(response.data.data.paymentRequest);
-          let tempDetail =
-            response.data.data.paymentRequest.paymentRequestDetails;
-          setDetailMap(tempDetail);
-          if (tempDetail.length > 0) {
-            setDetailSequence(tempDetail[tempDetail.length - 1].sequence);
-          }
-          setEditPaymentRequest(response.data.data.paymentRequest);
-          let temp = response.data.data.paymentRequest;
-          setStateID(temp.id);
-          setStateTicketId(temp.ticketId);
-          setStatePRNo(temp.prNo);
-          setStatePRNo2(temp.prNo2);
-          setStateDebitCredit(temp.debetCredit);
-          setStateShipmenID(temp.shipmentId);
-          setStateShipmentNo(temp.shipmentNo);
-          setIsGeneralPR(temp.isGeneralPR);
-          setIsCostToCost(temp.isCostToCost);
-          setEtd(temp.etd);
-          setShipmentNo(temp.shipmentNo);
-          setJobOwnerId(temp.jobOwnerId);
-          setStatePRRef(temp.reference);
-          setCustomerId(temp.customerId);
-          setCustomerName(temp.customerName);
-          setStateRate(temp.rate);
-          setStateDN(temp.vendorDN);
-          setStatePersonalName(temp.PersonalName);
-          setStatePaidIDR(temp.paidIDR);
-          setStatePaidUSD(temp.paidUSD);
-          setStatePaymentUSD(temp.paymentUSD);
-          setStatePaymentIDR(temp.paymentIDR);
-          setStatePPNIDR(temp.totalPpnIDR);
-          setStatePPNUSD(temp.totalPpnUSD);
-          setStatusStatePrint(temp.prStatus);
-          setStatePrint(temp.printing);
-          setStateCustomerId(temp.customerId);
-          setDebetCredit(temp.debetCredit === '' ? 'D' : temp.debetCredit);
-          setTotalVATIDR(temp.totalVATIDR);
-          setTotalVATUSD(temp.totalVATUSD);
-          setPaymentRequestNo(temp.prNo2);
-          setStateCustomerType(temp.customerTypeId);
-          setStateShipmentOrderList(temp.paymentRequestDetails);
-          // setIsCTC(temp.isCostToCost)
-          // setInvoiceNo(temp.invoiceNo)
-          // setPrinting(temp.printing)
-          // setPrintedOn(temp.printedOn)
-          // setPackingListNo(temp.packingListNo)
-          // setSiCustomerNo(temp.siCustomerNo)
-          // setCustomerTypeId(temp.customerTypeId)
-          // setCustomerName(temp.customerName)
-          // setCustomerAddress(temp.customerAddress)
-          // setDebetCredit(temp.debetCredit === '' ? 'D' : temp.debetCredit)
-          // setIsStampDuty(temp.isStampDuty)
-          // setStampDutyAmount(temp.stampDutyAmount)
-          // setPaymentUSD(temp.paymentUSD)
-          // setPaymentIDR(temp.paymentIDR)
-          // setTotalVATIDR(temp.totalVatIDR)
-          // setTotalVATUSD(temp.totalVatUSD)
-          // setPaid(temp.paid)
-          // setPaidOn(temp.paidOn)
-          // setRate(temp.rate)
-          // setKursKMK(temp.kursKMK)
-          // setEFaktur(temp.sfpReference)
-          // setJobOwnerId(temp.invHeader)
-          // setEtd(temp.etd)
-          // setEta(temp.eta)
-          // setJenisInvoices(temp.jenisInvoices)
-          if (jobOwnerId) {
-            return axios.post(
-              `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${jobOwnerId}`,
-              body
-            );
-          }
-        })
-        .then((job) => {
-          if (job.data.code === 200) {
-            setInvHeader(job.data.data.jobOwner.masterCode);
-          }
-        })
-        .catch((error) => console.error(error));
-    }
+    axios
+      .post(
+        `http://stage-operation.api.infoss.solusisentraldata.com/PaymentRequest/PaymentRequest/PostById?id=${prId}`,
+        body
+      )
+      .then((response) => {
+        console.log(response, '<<<responseDetail');
+        setPaymentRequestDetails(
+          response.data.data.paymentRequest.paymentRequestDetails
+        );
+        setStateShipmentOrderList(
+          response.data.data?.paymentRequest?.paymentRequestDetails
+        );
+        setStatePaymentRequest(response?.data?.data?.paymentRequest);
+        let tempDetail =
+          response.data.data.paymentRequest.paymentRequestDetails;
+        setDetailMap(tempDetail);
+
+        if (tempDetail.length > 0) {
+          setDetailSequence(tempDetail[tempDetail.length - 1].sequence);
+        }
+        // setEditInvoice(response.data.data.paymentRequest);
+
+        let temp = response.data.data.paymentRequest;
+        setIsGeneralPR(temp.isGeneralPR);
+        setIsCostToCost(temp.isCostToCost);
+        setEtd(temp.etd);
+        setShipmentNo(temp.shipmentNo);
+        setJobOwnerId(temp.jobOwnerId);
+        setStatePRNo(temp.prNo);
+        setStatePRNo2(temp.prNo2);
+        setStatePRRef(temp.reference);
+        setCustomerId(temp.customerId);
+        setCustomerName(temp.customerName);
+        setStateRate(temp.rate);
+        setStateDN(temp.vendorDN);
+        setStatePersonalName(temp.PersonalName);
+        setStatePaidIDR(temp.paidIDR);
+        setStatePaidUSD(temp.paidUSD);
+        setStatePaymentUSD(temp.paymentUSD);
+        setStatePaymentIDR(temp.paymentIDR);
+        setStatePPNIDR(temp.totalPpnIDR);
+        setStatePPNUSD(temp.totalPpnUSD);
+        setStatusStatePrint(temp.prStatus);
+        setStatePrint(temp.printing);
+        setCustomerMKTId(temp.personalId);
+        setCustomerMKTName(temp.personalName);
+        setStateCustomerType(temp.customerTypeId);
+        // setIsCTC(temp.isCostToCost)
+        // setInvoiceNo(temp.invoiceNo)
+        // setPrinting(temp.printing)
+        // setPrintedOn(temp.printedOn)
+        // setPackingListNo(temp.packingListNo)
+        // setSiCustomerNo(temp.siCustomerNo)
+        // setCustomerTypeId(temp.customerTypeId)
+        // setCustomerName(temp.customerName)
+        // setCustomerAddress(temp.customerAddress)
+        // setDebetCredit(temp.debetCredit === '' ? 'D' : temp.debetCredit)
+        // setIsStampDuty(temp.isStampDuty)
+        // setStampDutyAmount(temp.stampDutyAmount)
+        // setPaymentUSD(temp.paymentUSD)
+        // setPaymentIDR(temp.paymentIDR)
+        // setTotalVATIDR(temp.totalVatIDR)
+        // setTotalVATUSD(temp.totalVatUSD)
+        // setPaid(temp.paid)
+        // setPaidOn(temp.paidOn)
+        // setRate(temp.rate)
+        // setKursKMK(temp.kursKMK)
+        // setEFaktur(temp.sfpReference)
+        // setJobOwnerId(temp.invHeader)
+        // setEtd(temp.etd)
+        // setEta(temp.eta)
+        // setJenisInvoices(temp.jenisInvoices)
+        return axios
+          .post(
+            `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${jobOwnerId}`,
+            body
+          )
+          .then((response) => {
+            // setPaymentRequestDetail(
+            //   response.data.data.paymentRequest.paymentRequestDetails
+            // );
+            setStatePaymentRequest(response.data.data.paymentRequest);
+            let tempDetail =
+              response.data.data.paymentRequest.paymentRequestDetails;
+            setDetailMap(tempDetail);
+            if (tempDetail.length > 0) {
+              setDetailSequence(tempDetail[tempDetail.length - 1].sequence);
+            }
+            setEditPaymentRequest(response.data.data.paymentRequest);
+            let temp = response.data.data.paymentRequest;
+            setStateID(temp.id);
+            setStateTicketId(temp.ticketId);
+            setStatePRNo(temp.prNo);
+            setStatePRNo2(temp.prNo2);
+            setStateDebitCredit(temp.debetCredit);
+            setStateShipmenID(temp.shipmentId);
+            setStateShipmentNo(temp.shipmentNo);
+            setIsGeneralPR(temp.isGeneralPR);
+            setIsCostToCost(temp.isCostToCost);
+            setEtd(temp.etd);
+            setShipmentNo(temp.shipmentNo);
+            setJobOwnerId(temp.jobOwnerId);
+            setStatePRRef(temp.reference);
+            setCustomerId(temp.customerId);
+            setCustomerName(temp.customerName);
+            setStateRate(temp.rate);
+            setStateDN(temp.vendorDN);
+            setStatePersonalName(temp.PersonalName);
+            setStatePaidIDR(temp.paidIDR);
+            setStatePaidUSD(temp.paidUSD);
+            setStatePaymentUSD(temp.paymentUSD);
+            setStatePaymentIDR(temp.paymentIDR);
+            setStatePPNIDR(temp.totalPpnIDR);
+            setStatePPNUSD(temp.totalPpnUSD);
+            setStatusStatePrint(temp.prStatus);
+            setStatePrint(temp.printing);
+            setStateCustomerId(temp.customerId);
+            setDebetCredit(temp.debetCredit === '' ? 'D' : temp.debetCredit);
+            setTotalVATIDR(temp.totalVATIDR);
+            setTotalVATUSD(temp.totalVATUSD);
+            setPaymentRequestNo(temp.prNo2);
+            setStateCustomerType(temp.customerTypeId);
+            setStateShipmentOrderList(temp.paymentRequestDetails);
+            // setIsCTC(temp.isCostToCost)
+            // setInvoiceNo(temp.invoiceNo)
+            // setPrinting(temp.printing)
+            // setPrintedOn(temp.printedOn)
+            // setPackingListNo(temp.packingListNo)
+            // setSiCustomerNo(temp.siCustomerNo)
+            // setCustomerTypeId(temp.customerTypeId)
+            // setCustomerName(temp.customerName)
+            // setCustomerAddress(temp.customerAddress)
+            // setDebetCredit(temp.debetCredit === '' ? 'D' : temp.debetCredit)
+            // setIsStampDuty(temp.isStampDuty)
+            // setStampDutyAmount(temp.stampDutyAmount)
+            // setPaymentUSD(temp.paymentUSD)
+            // setPaymentIDR(temp.paymentIDR)
+            // setTotalVATIDR(temp.totalVatIDR)
+            // setTotalVATUSD(temp.totalVatUSD)
+            // setPaid(temp.paid)
+            // setPaidOn(temp.paidOn)
+            // setRate(temp.rate)
+            // setKursKMK(temp.kursKMK)
+            // setEFaktur(temp.sfpReference)
+            // setJobOwnerId(temp.invHeader)
+            // setEtd(temp.etd)
+            // setEta(temp.eta)
+            // setJenisInvoices(temp.jenisInvoices)
+            if (jobOwnerId) {
+              return axios.post(
+                `http://stage-master.api.infoss.solusisentraldata.com/jobowner/jobowner/PostById?id=${jobOwnerId}`,
+                body
+              );
+            }
+          })
+          .then((job) => {
+            if (job.data.code === 200) {
+              setInvHeader(job.data.data.jobOwner.masterCode);
+            }
+          })
+          .catch((error) => console.error(error));
+      });
   };
 
   const fetchJobOwners = () => {
@@ -466,7 +499,6 @@ const CrudPaymentRequestPage = () => {
   const getShipmentOrder = (rowsCount = 50, NumPage = 1, isIncome = false) => {
     axios
       .post(
-        // `http://stage-operation.api.infoss.solusisentraldata.com/shipmentorder/shipmentorder/PostByPage?columnCode=PAGE&pageNumber=${NumPage}&pageSize=${rowsCount}`,
         `http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLossV1/estimateProfitLoss/PostBySearchShipmentNo?pageNumber=${NumPage}&pageSize=${rowsCount}&isIncome=${isIncome}`,
         {
           userCode: 'luna',
@@ -476,7 +508,6 @@ const CrudPaymentRequestPage = () => {
         }
       )
       .then((response) => {
-        console.log(response, '<<<responseModal');
         if (
           response &&
           response.data &&
@@ -484,44 +515,110 @@ const CrudPaymentRequestPage = () => {
           response.data.data.columns
         ) {
           setLSOHeaders(response.data.data.columns.headerColumns);
-          setLSOData(response.data.data.shipmentOrder);
+          setLSOData(response.data.data.estimateProfitLoss);
         }
       })
-      .catch(function (error) {
-        console.error(error);
-      });
+      .catch((err) => console.log(err));
   };
-  //#endregion: API handling
 
-  const getCustomerListByEplId = (
-    rowsCount = 50,
+  const getCustomerByCustomerTypeId = (
+    rowStatus = 50,
     NumPage = 1,
+    shipmentId,
     customerId = 0,
-    eplId = 2,
-    customerTypeId = 6,
+    stateCustomerType,
     isIncome = false
+  ) => {
+    if (stateCustomerType) {
+      // http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLossV1/estimateProfitLoss/PostBySearchCustomerEPL
+      axios
+        .post(
+          `http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLossV1/estimateProfitLoss/PostBySearchCustomerEPL?pageNumber=${NumPage}&pageSize=${rowStatus}&eplId=${shipmentId}&customerId=${customerId}&customerTypeId=${stateCustomerType}&isIncome=${isIncome}`,
+          {
+            userCode: 'luna',
+            countryId: 101,
+            companyId: 32,
+            branchId: 12,
+          }
+        )
+        .then((response) => {
+          setStateCustomerData(response.data.data.estimateProfitLossDetail);
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+
+  const getBeingForPaymentByCustomer = (
+    rowStatus = 50,
+    NumPage = 1,
+    shipmentId,
+    customerId,
+    stateCustomerType = 0,
+    isIncome = false
+  ) => {
+    if (customerId) {
+      axios
+        .post(
+          `http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLossV1/estimateProfitLoss/PostBySearchCustomerEPL?pageNumber=${NumPage}&pageSize=${rowStatus}&eplId=${shipmentId}&customerId=${customerId}&customerTypeId=${stateCustomerType}&isIncome=${isIncome}`,
+          {
+            userCode: 'luna',
+            countryId: 101,
+            companyId: 32,
+            branchId: 12,
+          }
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            setStateBeingForPaymentCustomer(
+              response?.data?.data?.estimateProfitLossDetail
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  const getUserPersonByMKT = (
+    rowStatus = 50,
+    NumPage = 1,
+    department = 'MKT'
   ) => {
     axios
       .post(
-        `http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLossV1/estimateProfitLoss/PostBySearchCustomerEPL?pageNumber=${NumPage}&pageSize=${rowsCount}&eplId=${eplId}&customerId=${customerId}&customerTypeId=${customerTypeId}&isIncome=${isIncome}`,
+        `http://stage-master.api.infoss.solusisentraldata.com/user/user/PostBySearch?pageNumber=${NumPage}&pageSize=${rowStatus}&department=${department}`,
         {
-          userCode: 'string',
+          userCode: 'luna',
           countryId: 101,
           companyId: 32,
           branchId: 12,
         }
       )
       .then((response) => {
-        setStaseCustomersByCustomerTypeId(
-          response?.data?.data?.estimateProfitLossDetail
-        );
-        setStateCustomersHeaderByCustomerTypeId(response?.data?.data?.columns);
-        console.log(response, '<<<response');
+        if (response.status === 200) {
+          setStateCustomerMrkt(response?.data?.data?.user);
+        }
       })
-      .catch((error) => {});
+      .catch((err) => console.log(err));
   };
 
-  //#region: Form handling
+  useEffect(() => {
+    getUserPersonByMKT(50, 1, 'MKT');
+  }, []);
+
+  useEffect(() => {
+    if (stateCustomerType) {
+      getCustomerByCustomerTypeId(50, 1, 2, 0, stateCustomerType, false);
+    }
+  }, [stateCustomerType]);
+
+  useEffect(() => {
+    if (customerId) {
+      getBeingForPaymentByCustomer(50, 1, 2, customerId, 0, false);
+    }
+  }, [customerId]);
+
   const successAlert = (text) => {
     Swal.fire({
       position: 'center',
@@ -564,11 +661,13 @@ const CrudPaymentRequestPage = () => {
       payload.paymentRequest.reference = statePRRef;
       payload.paymentRequest.prStatus = 0;
       payload.paymentRequest.isGeneralPR = true;
-      payload.paymentRequest.customerId = 0;
-      payload.paymentRequest.customerTypeId = stateCustomerType || 0;
-      payload.paymentRequest.personalId = 0;
-      payload.paymentRequest['paymentUSD'] = statePaymentUSD || 0;
-      payload.paymentRequest['paymentIDR'] = statePaymentIDR || 0;
+      payload.paymentRequest['customerId'] = customerId || 0;
+      payload.paymentRequest['customerName'] = customerName || 'string';
+      payload.paymentRequest['customerTypeId'] = stateCustomerType;
+      payload.paymentRequest.personalId = customerMKTId || 0;
+      payload.paymentRequest.personalName = customerMKTName || 'string';
+      payload.paymentRequest['paymentUSD'] = statePaymentUSD;
+      payload.paymentRequest['paymentIDR'] = statePaymentIDR;
       payload.paymentRequest.prContraStatus = 'string';
       payload.paymentRequest.prContraNo = 0;
       payload.paymentRequest.datePaidUSD = '2022-11-12T09:42:20.162Z';
@@ -589,9 +688,10 @@ const CrudPaymentRequestPage = () => {
       payload.paymentRequest.deletedRemarks = 'string';
       payload.paymentRequest.idLama = 0;
       payload.paymentRequest.isCostToCost = true;
-      payload.paymentRequest.totalPpnUSD = statePPNUSD || 0;
-      payload.paymentRequest.totalPpnIDR = statePPNIDR || 0;
+      payload.paymentRequest['totalPpnUSD'] = statePPNUSD;
+      payload.paymentRequest['totalPpnIDR'] = statePPNIDR;
       payload.paymentRequest.uniqueKeyPR = 'string';
+      payload.paymentRequest['vendorDN'] = stateDN || 'string';
       payload.paymentRequest.packingListNo = 'string';
       payload.paymentRequest.siCustomerNo = 'string';
       payload.paymentRequest.vendorDN = 'string';
@@ -652,9 +752,11 @@ const CrudPaymentRequestPage = () => {
         payload.paymentRequest.reference = statePRRef;
         payload.paymentRequest['prStatus'] = 0;
         payload.paymentRequest['isGeneralPR'] = true;
-        payload.paymentRequest['customerId'] = 0;
+        payload.paymentRequest['customerId'] = customerId || 0;
+        payload.paymentRequest['customerName'] = customerName || 'string';
         payload.paymentRequest['customerTypeId'] = stateCustomerType;
-        payload.paymentRequest.personalId = 0;
+        payload.paymentRequest.personalId = customerMKTId || 0;
+        payload.paymentRequest.personalName = customerMKTName || 'string';
         payload.paymentRequest['paymentUSD'] = statePaymentUSD;
         payload.paymentRequest['paymentIDR'] = statePaymentIDR;
         payload.paymentRequest['prContraStatus'] = 'string';
@@ -684,7 +786,7 @@ const CrudPaymentRequestPage = () => {
         payload.paymentRequest['uniqueKeyPR'] = 'string';
         payload.paymentRequest['packingListNo'] = 'string';
         payload.paymentRequest['siCustomerNo'] = 'string';
-        payload.paymentRequest['vendorDN'] = 'string';
+        payload.paymentRequest['vendorDN'] = stateDN || 'string';
         payload.paymentRequest['approved'] = true;
         payload.paymentRequest['approvedOn'] = '2022-11-12T09:42:20.162Z';
         payload.paymentRequest['approvedBy'] = 'string';
@@ -732,84 +834,14 @@ const CrudPaymentRequestPage = () => {
     });
   };
 
-  const handleAllVat = (value) => {
-    let cast = Number(value);
-    // setAllVat(cast)
-    if (IncShipperData.length > 0) {
-      let tempIdr = 0;
-      let tempUsd = 0;
-      IncShipperData.forEach((el) => {
-        if (el.rowStatus !== 'DEL') {
-          let calculation = Number(el.amount) * (cast / 100);
-          el.percentVat = cast;
-          el.amountVat = calculation;
-
-          if (el.amountCrr === 0) {
-            tempUsd += calculation;
-          } else {
-            tempIdr += calculation;
-          }
-        }
-      });
-      // setTotalVATIDR(Number(tempIdr.toFixed(2)))
-      // setTotalVATUSD(Number(tempUsd.toFixed(2)))
-    }
-  };
-
-  const handleSelectContact = (value, type) => {
-    if (type === 'shipper-customer') {
-      if (IncShipperData === 2) {
-        // setCustomerId(value.contactId)
-        // setCustomerName(value.pic)
-        // setCustomerAddress(value.contactAddress)
-        // setSelectedContact(value)
-      } else {
-        // setAgentId(value.contactId)
-        // setAgentName(value.pic)
-        // setAgentAddress(value.contactAddress)
-        // setSelectedContact(value)
-      }
-    } else if (type === 'shipper-bill') {
-      if (IncShipperData === 2) {
-        // setBillId(value.contactId)
-        // setBillName(value.pic)
-        // setBillAddress(value.contactAddress)
-        // setSelectedContact(value)
-      } else {
-        // setBillIdAgent(value.contactId)
-        // setBillNameAgent(value.pic)
-        // setBillAddressAgent(value.contactAddress)
-        // setSelectedContact(value)
-      }
-    }
-  };
-
   const handleSelectedShipment = (value) => {
-    const f = {...formPayment};
-    f.Id = value['paymentrequestId'];
-    f.ShipmentId = value['shipperId'];
-    f.etd = value.etd;
-    f.eta = value.eta;
-    f.PrincipleBy = value.agentName;
-    setFormPayment(f);
-    setInvHeader(value.invHeader);
     setShipmentNo(value.shipmentNo);
-    stateDetail(value);
-    // setPaidOn(value.paidOn);
+    setStateDetail(value);
     setEta(value.eta);
     setEtd(value.etd);
     setShipmentId(value.shipmentId);
-    // setShipperId(value.shipperId);
     setShipperName(value.shipperName);
-    // setInvHeader(value.invHeader)
-    // setShipmentNo(value.shipmentNo)
-    setShipmentId(value.id);
-    // setEtd(value.etd)
-    // setEta(value.eta)
-    // setShipmentData(value)
   };
-
-  const handleSelectedCustomerByCustomerTypeId = (value) => {};
 
   const handleSetPaymentTo = (value) => {
     setStateCustomerTypeName(value);
@@ -825,6 +857,9 @@ const CrudPaymentRequestPage = () => {
     if (value.toLowerCase() === 'depo') {
       setStateCustomerType(3);
     }
+    setCustomerId(0);
+    setCustomerName('');
+    setStateShipmentOrderList([]);
   };
 
   useEffect(() => {
@@ -861,38 +896,16 @@ const CrudPaymentRequestPage = () => {
     return () => controller.abort();
   }, [prId]);
 
-  useEffect(() => {
-    if (stateCustomerType) {
-      fetchEPL(stateCustomerType);
-    }
-  }, [stateCustomerType, stateCustomerTypeName]);
+  // useEffect(() => {
+  //   if (stateCustomerType) {
+  //     // getCustomerListByEplId(50, 1, 0, 2, stateCustomerType, false);
+  //   }
+  // }, [stateCustomerType]);
 
   useEffect(() => {
-    if (stateCustomerType) {
-      getCustomerListByEplId(50, 1, 0, 2, stateCustomerType, false);
+    if (shipmentId && stateCustomerType) {
     }
-  }, [stateCustomerType]);
-
-  const fetchEPL = (stateCustomerType) => {
-    let body = {
-      flag: 1,
-      shipmentId: 1,
-      countryId: 101,
-      CustomerTypeId: stateCustomerType,
-      branchId: 12,
-      companyId: 32,
-    };
-    axios
-      .post(
-        `http://stage-operation.api.infoss.solusisentraldata.com/estimateProfitLoss/estimateProfitLoss/API/ShipmentOrderListById`,
-        body
-      )
-      .then((resp) => {
-        const {data} = resp;
-        // setStateShipmentOrderList(data.data);
-      })
-      .catch((err) => {});
-  };
+  }, [shipmentId, stateCustomerType]);
 
   const handlePrint = () => {
     let printCount = IncShipperData.printing;
@@ -989,17 +1002,17 @@ const CrudPaymentRequestPage = () => {
   };
 
   const handleApprove = (approveCode) => {};
-  //#endregion: Form handling
 
   //#region: Data Table
   const saveDetail = (payload) => {
+    console.log(payload, '<<<payload');
     let sumUsd = 0;
     let sumIdr = 0;
     let vatUsd = 0;
     let vatIdr = 0;
 
     if (detailEdit === true) {
-      const newArr = detailMap.slice();
+      const newArr = stateShipmentOrderList.slice();
       newArr.forEach((el) => {
         if (el.sequence === payload.sequence) {
           if (el.rowStatus !== 'DEL') {
@@ -1048,13 +1061,59 @@ const CrudPaymentRequestPage = () => {
       setTotalVATUSD(Number(vatUsd.toFixed(2)));
 
       setDetailMap(newArr);
-
+      setStateShipmentOrderList(newArr);
       setDetailEdit(false);
       setSelectedDetail({});
     } else {
       setDetailSequence(payload.sequence);
       let arrDetail = [...IncShipperData, payload];
-      stateShipmentOrderList.push(...arrDetail);
+      const data = arrDetail?.map((ele) => {
+        const tempPayload = {};
+        tempPayload['rowStatus'] = ele.rowStatus || 'ACT';
+        tempPayload['countryId'] = ele.countryId;
+        tempPayload['companyId'] = ele.companyId;
+        tempPayload['branchId'] = ele.branchId;
+        tempPayload['paymentRequestId'] = ele?.paymentRequestId || 0;
+        tempPayload['sequence'] =
+          stateShipmentOrderList?.length > 0
+            ? stateShipmentOrderList?.length + 1
+            : ele?.sequence;
+        tempPayload['debetCredit'] = ele?.debetCredit || 'string';
+        tempPayload['accountId'] = ele?.accountId || 0;
+        tempPayload['accountName'] = ele?.accountName || '';
+        tempPayload['description'] = ele?.description || '';
+        tempPayload['type'] = ele?.type || 0;
+        tempPayload['codingQuantity'] = ele?.codingQuantity || true;
+        tempPayload['quantity'] = ele?.quantity || 0;
+        tempPayload['perQty'] = ele?.perQty || 0;
+        tempPayload['amount'] = ele?.amount || 0;
+        tempPayload['amountCrr'] = ele?.amountCrr || 0;
+        tempPayload['paid'] = ele.paid === 0 ? false : true;
+        tempPayload['paidOn'] = ele?.paidOn || '2022-11-20T15:12:02.333Z';
+        tempPayload['paidPv'] = ele?.paidPv || true;
+        tempPayload['eplDetailId'] = ele?.id || 0;
+        tempPayload['statusMemo'] = ele?.statusMemo || false;
+        tempPayload['memoNo'] = ele?.memoNo || 0;
+        tempPayload['idLama'] = ele?.idLama || 0;
+        tempPayload['isCostToCost'] = ele?.isCostToCost || false;
+        tempPayload['isPpn'] = ele?.isPpn || true;
+        tempPayload['persenPpn'] = ele?.persenPpn || 0;
+        tempPayload['fakturNo'] = ele?.fakturNo || '2022-11-20T15:12:02.333Z';
+        tempPayload['fakturDate'] =
+          ele?.fakturDate || '2022-11-20T15:12:02.333Z';
+        tempPayload['isCostTrucking'] = ele?.isCostToCost || false;
+        tempPayload['kendaraanId'] = ele?.kendaraanId || 0;
+        tempPayload['kendaraanNopol'] = ele?.kendaraanNopol || '';
+        tempPayload['employeeId'] = ele?.employeeId || 0;
+        tempPayload['employeeName'] = ele?.employeeName || '';
+        tempPayload['mrgId'] = ele?.mrgId || 0;
+        tempPayload['deliveryDate'] = '2022-11-20T15:12:02.332Z';
+        tempPayload['originalUsd'] = ele?.originalUsd || 0;
+        tempPayload['originalRate'] = ele?.originalRate || 0;
+        tempPayload['user'] = ele?.user || 'string';
+        return tempPayload;
+      });
+      stateShipmentOrderList.push(...data);
       arrDetail.forEach((el) => {
         if (el.rowStatus !== 'DEL') {
           if (el.amountCrr === 1) {
@@ -1071,6 +1130,7 @@ const CrudPaymentRequestPage = () => {
       setTotalVATIDR(Number(vatIdr.toFixed(2)));
       setTotalVATUSD(Number(vatUsd.toFixed(2)));
       setDetailMap(arrDetail);
+      // setStateShipmentOrderList(arrDetail);
     }
   };
 
@@ -1083,18 +1143,6 @@ const CrudPaymentRequestPage = () => {
       );
     } else {
       setOpenModalDetail(true);
-    }
-  };
-
-  const handleCustomer = () => {
-    if (!shipmentNo) {
-      Swal.fire(
-        'Information',
-        "Shipment Order Number can't be empty...!!",
-        'info'
-      );
-    } else {
-      setOpenCustomercustomerTypeId(true);
     }
   };
 
@@ -1135,73 +1183,75 @@ const CrudPaymentRequestPage = () => {
     if (!selectedDetail.sequence) {
       Swal.fire('Information', 'Please select detail data...!!', 'info');
     } else {
-      let sumUsd = 0;
-      let sumIdr = 0;
-      let vatUsd = 0;
-      let vatIdr = 0;
-
       let tempSequence = selectedDetail.sequence;
-      if (selectedDetail.eplDetailId != 0) {
-        sumUsd = statePaymentUSD;
-        sumIdr = statePaymentIDR;
-        vatUsd = totalVATUSD;
-        vatIdr = totalVATIDR;
-        detailMap.forEach((el) => {
-          if (el.sequence === tempSequence) {
-            el.rowStatus = 'ACT';
+      const selectedId = selectedDetail?.eplDetailId;
+      console.log(selectedId, '<<<selectedId');
+      console.log(tempSequence, '<<<tempSequence');
+      const nextPayments = (stateShipmentOrderList || [])?.filter(
+        (c) => c?.eplDetailId !== selectedId
+      );
+      setStateShipmentOrderList(nextPayments);
+      // if (selectedDetail.eplDetailId != 0) {
+      //   sumUsd = statePaymentUSD;
+      //   sumIdr = statePaymentIDR;
+      //   vatUsd = totalVATUSD;
+      //   vatIdr = totalVATIDR;
+      //   stateShipmentOrderList.forEach((el) => {
+      //     if (el.sequence === tempSequence) {
+      //       el.rowStatus = 'DEL';
 
-            if (el.amountCrr === 1) {
-              sumIdr -= el.amount;
-              vatIdr -= el.amountVat;
-            } else {
-              sumUsd -= el.amount;
-              vatUsd -= el.amountVat;
-            }
-          }
-        });
-      } else {
-        const deleteFunction = (invoices) => {
-          return invoices.sequence !== tempSequence;
-        };
-        const result = detailMap.filter(deleteFunction);
-        if (result.length > 0) {
-          tempSequence = 0;
-          result.forEach((el) => {
-            if (el.rowStatus !== 'ACT') {
-              if (el.amountCrr === 1) {
-                sumIdr += el.amount;
-                vatIdr += el.amountVat;
-              } else {
-                sumUsd += el.amount;
-                vatUsd += el.amountVat;
-              }
-            }
+      //       if (el.amountCrr === 1) {
+      //         sumIdr -= el.amount;
+      //         vatIdr -= el.amountVat;
+      //       } else {
+      //         sumUsd -= el.amount;
+      //         vatUsd -= el.amountVat;
+      //       }
+      //     }
+      //   });
+      // } else {
+      //   const deleteFunction = (invoices) => {
+      //     return invoices.sequence !== tempSequence;
+      //   };
+      //   const result = stateShipmentOrderList.filter(deleteFunction);
+      //   if (result.length > 0) {
+      //     tempSequence = 0;
+      //     result.forEach((el) => {
+      //       if (el.rowStatus !== 'DEL') {
+      //         if (el.amountCrr === 1) {
+      //           sumIdr += el.amount;
+      //           vatIdr += el.amountVat;
+      //         } else {
+      //           sumUsd += el.amount;
+      //           vatUsd += el.amountVat;
+      //         }
+      //       }
 
-            if (el.eplDetailId != 0) {
-              tempSequence = el.sequence;
-            } else {
-              tempSequence += 1;
-              el.sequence = tempSequence;
-            }
-          });
+      //       if (el.eplDetailId != 0) {
+      //         tempSequence = el.sequence;
+      //       } else {
+      //         tempSequence += 1;
+      //         el.sequence = tempSequence;
+      //       }
+      //     });
 
-          setDetailSequence(tempSequence);
-          setStateShipmentOrderList(tempSequence);
-        } else {
-          setDetailSequence(0);
-          setStateShipmentOrderList(0);
-        }
+      //     setDetailSequence(tempSequence);
+      //     setStateShipmentOrderList(tempSequence);
+      //   } else {
+      //     setDetailSequence(0);
+      //     setStateShipmentOrderList(0);
+      //   }
 
-        setDetailMap(result);
-        setStateShipmentOrderList(result);
-      }
+      //   setDetailMap(result);
+      //   setStateShipmentOrderList(result);
+      // }
 
-      setStatePaymentIDR(Number(sumIdr.toFixed(2)));
-      setStatePaymentUSD(Number(sumUsd.toFixed(2)));
-      setTotalVATIDR(Number(vatIdr.toFixed(2)));
-      setTotalVATUSD(Number(vatUsd.toFixed(2)));
+      // setStatePaymentIDR(Number(sumIdr.toFixed(2)));
+      // setStatePaymentUSD(Number(sumUsd.toFixed(2)));
+      // setTotalVATIDR(Number(vatIdr.toFixed(2)));
+      // setTotalVATUSD(Number(vatUsd.toFixed(2)));
 
-      setSelectedDetail({});
+      // setSelectedDetail({});
     }
   };
 
@@ -1216,10 +1266,143 @@ const CrudPaymentRequestPage = () => {
     }
   };
 
-  //#endregion: Data Table
-
   const change = (e) =>
     setFormPayment({...formPayment, [e.target.name]: e.target.value});
+
+  const handleGetCustomerForBeingPayment = () => {
+    const tempArray = [...stateBeingForPaymentByCustomer];
+    if (tempArray.length >= 0) {
+      const data = tempArray.map((ele) => {
+        const tempPayload = {};
+        tempPayload['rowStatus'] = ele.rowStatus || 'ACT';
+        tempPayload['countryId'] = ele.countryId;
+        tempPayload['companyId'] = ele.companyId;
+        tempPayload['branchId'] = ele.branchId;
+        tempPayload['paymentRequestId'] = ele?.paymentRequestId || 0;
+        tempPayload['sequence'] = ele?.sequence || 0;
+        tempPayload['debetCredit'] = ele?.debetCredit || 'string';
+        tempPayload['accountId'] = ele?.accountId || 0;
+        tempPayload['accountName'] = ele?.accountName || '';
+        tempPayload['description'] = ele?.description || '';
+        tempPayload['type'] = ele?.type || 0;
+        tempPayload['codingQuantity'] = ele?.codingQuantity || true;
+        tempPayload['quantity'] = ele?.quantity || 0;
+        tempPayload['perQty'] = ele?.perQty || 0;
+        tempPayload['amount'] = ele?.amount || 0;
+        tempPayload['amountCrr'] = ele?.amountCrr || 0;
+        tempPayload['paid'] = ele.paid === 0 ? false : true;
+        tempPayload['paidOn'] = ele?.paidOn || '2022-11-20T15:12:02.333Z';
+        tempPayload['paidPv'] = ele?.paidPv || true;
+        tempPayload['eplDetailId'] = ele?.id || 0;
+        tempPayload['statusMemo'] = ele?.statusMemo || false;
+        tempPayload['memoNo'] = ele?.memoNo || 0;
+        tempPayload['idLama'] = ele?.idLama || 0;
+        tempPayload['isCostToCost'] = ele?.isCostToCost || false;
+        tempPayload['isPpn'] = ele?.isPpn || true;
+        tempPayload['persenPpn'] = ele?.persenPpn || 0;
+        tempPayload['fakturNo'] = ele?.fakturNo || '2022-11-20T15:12:02.333Z';
+        tempPayload['fakturDate'] =
+          ele?.fakturDate || '2022-11-20T15:12:02.333Z';
+        tempPayload['isCostTrucking'] = ele?.isCostToCost || false;
+        tempPayload['kendaraanId'] = ele?.kendaraanId || 0;
+        tempPayload['kendaraanNopol'] = ele?.kendaraanNopol || '';
+        tempPayload['employeeId'] = ele?.employeeId || 0;
+        tempPayload['employeeName'] = ele?.employeeName || '';
+        tempPayload['mrgId'] = ele?.mrgId || 0;
+        tempPayload['deliveryDate'] = '2022-11-20T15:12:02.332Z';
+        tempPayload['originalUsd'] = ele?.originalUsd || 0;
+        tempPayload['originalRate'] = ele?.originalRate || 0;
+        tempPayload['user'] = ele?.user || 'string';
+        return tempPayload;
+      });
+      stateShipmentOrderList.push(...data);
+      setDetailMap.push(...data);
+    }
+  };
+
+  const handleCustomer = () => {
+    if (!shipmentNo && !shipmentId && shipmentNo !== '-') {
+      Swal.fire(
+        'Information',
+        "Shipment Order Number Can't be empty...!",
+        'info'
+      );
+    } else {
+      setOpenCustomer(true);
+      getBeingForPaymentByCustomer(50, 1, 2, customerId, 0, false);
+      const tempArray = [...stateBeingForPaymentByCustomer];
+      if (tempArray.length >= 0) {
+        const data = tempArray.map((ele) => {
+          const tempPayload = {};
+          tempPayload['rowStatus'] = ele.rowStatus || 'ACT';
+          tempPayload['countryId'] = ele.countryId;
+          tempPayload['companyId'] = ele.companyId;
+          tempPayload['branchId'] = ele.branchId;
+          tempPayload['paymentRequestId'] = ele?.paymentRequestId || 0;
+          tempPayload['sequence'] = ele?.sequence;
+          tempPayload['debetCredit'] = ele?.debetCredit || 'string';
+          tempPayload['accountId'] = ele?.accountId || 0;
+          tempPayload['accountName'] = ele?.accountName || '';
+          tempPayload['description'] = ele?.description || '';
+          tempPayload['type'] = ele?.type || 0;
+          tempPayload['codingQuantity'] = ele?.codingQuantity || true;
+          tempPayload['quantity'] = ele?.quantity || 0;
+          tempPayload['perQty'] = ele?.perQty || 0;
+          tempPayload['amount'] = ele?.amount || 0;
+          tempPayload['amountCrr'] = ele?.amountCrr || 0;
+          tempPayload['paid'] = ele.paid === 0 ? false : true;
+          tempPayload['paidOn'] = ele?.paidOn || '2022-11-20T15:12:02.333Z';
+          tempPayload['paidPv'] = ele?.paidPv || true;
+          tempPayload['eplDetailId'] = ele?.id || 0;
+          tempPayload['statusMemo'] = ele?.statusMemo || false;
+          tempPayload['memoNo'] = ele?.memoNo || 0;
+          tempPayload['idLama'] = ele?.idLama || 0;
+          tempPayload['isCostToCost'] = ele?.isCostToCost || false;
+          tempPayload['isPpn'] = ele?.isPpn || true;
+          tempPayload['persenPpn'] = ele?.persenPpn || 0;
+          tempPayload['fakturNo'] = ele?.fakturNo || '2022-11-20T15:12:02.333Z';
+          tempPayload['fakturDate'] =
+            ele?.fakturDate || '2022-11-20T15:12:02.333Z';
+          tempPayload['isCostTrucking'] = ele?.isCostToCost || false;
+          tempPayload['kendaraanId'] = ele?.kendaraanId || 0;
+          tempPayload['kendaraanNopol'] = ele?.kendaraanNopol || '';
+          tempPayload['employeeId'] = ele?.employeeId || 0;
+          tempPayload['employeeName'] = ele?.employeeName || '';
+          tempPayload['mrgId'] = ele?.mrgId || 0;
+          tempPayload['deliveryDate'] = '2022-11-20T15:12:02.332Z';
+          tempPayload['originalUsd'] = ele?.originalUsd || 0;
+          tempPayload['originalRate'] = ele?.originalRate || 0;
+          tempPayload['user'] = ele?.user || 'string';
+          return tempPayload;
+        });
+        stateShipmentOrderList.push(...data);
+        setDetailMap.push(...data);
+      }
+    }
+  };
+
+  const handleCustomerMKT = () => {
+    setOpenCustomerMKT(true);
+  };
+
+  const handleCloseCustomer = () => {
+    setOpenCustomer(false);
+  };
+
+  const handleCloseCustomerMKT = () => {
+    setOpenCustomerMKT(false);
+  };
+
+  const handleSelectedCustomer = (data) => {
+    setCustomerId(data.customerId);
+    setCustomerName(data.customerName);
+  };
+
+  const handleSelectedCustomerMKT = (data) => {
+    setCustomerMKTName(data?.name);
+    setCustomerMKTId(data?.id);
+  };
+
   return (
     <>
       <Grid container spacing={2} direction="column">
@@ -1277,33 +1460,6 @@ const CrudPaymentRequestPage = () => {
           </Stack>
         </Grid>
         <Paper variant="outlined" sx={{m: 2, p: 2}}>
-          {/* <ModalTableInvoice
-            open={openMLSO}
-            onClose={() => setOpenMLSO(false)}
-            setSelectedData={(e) => handleSelectedShipment(e)}
-            headersData={LSOHeaders}
-            bodyData={LSOData}
-            fetchData={(r, p) => getShipmentOrder(r, p)}
-            maxPage={1}
-            type={'revised'}
-            setId={(e) => setCustomerId(e)}
-            setName={(e) => setCustomerName(e)}
-            setAddress={(e) => setCustomerAddress(e)}
-            setAgentName={(e) => setAgentName(e)}
-            setAgentId={(e) => setAgentId(e)}
-            setAgentAddress={(e) => setAgentAddress(e)}
-            setInvoiceDetails={(e) => setInvoiceDetails(e)}
-            setDetailMap={(e) => setDetailMap(e)}
-            setDetailSequence={(e) => setDetailSequence(e)}
-            dcStatus={debetCredit}
-            setPaymentIDR={(e) => setStatePaymentIDR(e)}
-            setPaymentUSD={(e) => setStatePaymentUSD(e)}
-            setTotalVATIDR={(e) => setTotalVATIDR(e)}
-            setTotalVATUSD={(e) => setTotalVATUSD(e)}
-            setAllVat={(e) => setAllVat(e)}
-            setShipmentId={(e) => setShipmentId(e)}
-          /> */}
-          {/* <ModalTableShipementNo /> */}
           <ModalTableTruck
             open={openStorage}
             onClose={() => setOpenStorage(false)}
@@ -1331,50 +1487,39 @@ const CrudPaymentRequestPage = () => {
             dcStatus={debetCredit}
             shipmentData={shipmentData}
           />
-
-          <ModalCustomer
-            open={openCustomerBycustomerTypeId}
-            onClose={() => setOpenCustomercustomerTypeId(false)}
-            headersData={stateCustomersHeaderByCustomerTypeId}
-            bodyData={stateCustomersByCustomerTypeId}
-            state={shipmentNo}
-            setSelectedData={(e) => handleSelectedCustomerByCustomerTypeId(e)}
+          <ModalTableShipmentNo
+            open={openMLSO}
+            onClose={() => setOpenMLSO(false)}
+            setSelectedData={(e) => handleSelectedShipment(e)}
+            headersData={LSOHeaders}
+            fetchData={(r, p, b) => getShipmentOrder(r, p, b)}
+            maxPage={1}
+            type="listShipmentOrder"
+            bodyData={LSOData}
           />
-          {/*<ModalListShipmentOrder
-          {/*    show={showMLSO}
-          {/*    onHide={() => setShowMLSO(false)}*/}
-          {/*    LSOData={LSOData}*/}
-          {/*    setSelectedData={(e) => {*/}
-          {/*        setSelectedData(e)*/}
-          {/*    }}*/}
-          {/*    setdefShipNo={(e) => setdefShipNo(e)}*/}
-          {/*    MaxPage={1}*/}
-          {/*    NumPage={NumPage}*/}
-          {/*    RowsCount={RowsCount}*/}
-          {/*    setNumPage={(e) => setNumPage(e)}*/}
-          {/*    setRowsCount={(e) => setRowsCount(e)}*/}
-          {/*/>*/}
-          {/*<AddCustomer*/}
-          {/*    show={showAddCustomer}*/}
-          {/*    onHide={() => {*/}
-          {/*        setShowAddCustomer(false)*/}
-          {/*    }}*/}
-          {/*    NotifAlert={(e, d) => NotifAlert(e, d)}*/}
-          {/*    staticId={staticId}*/}
-          {/*    AccountName={AccountName}*/}
-          {/*    data={IsAdd ? '' : SelectedShipperList}*/}
-          {/*/>*/}
-          {/*<AddPersonal*/}
-          {/*    show={showAddPersonal}*/}
-          {/*    onHide={() => {*/}
-          {/*        setShowAddPersonal(false)*/}
-          {/*    }}*/}
-          {/*    NotifAlert={(e, d) => NotifAlert(e, d)}*/}
-          {/*    staticId={staticId}*/}
-          {/*    AccountName={AccountName}*/}
-          {/*    IsAdd={IsAdd}*/}
-          {/*    data={IsAdd ? '' : SelectedShipperList}*/}
-          {/*/>*/}
+          <ModalCustomer
+            open={openCustomer}
+            onClose={() => {
+              handleCloseCustomer();
+            }}
+            type="customer"
+            setSelectedData={(e) => handleSelectedCustomer(e)}
+            fetchDataCustomer={(r, p, si, sct, ci, boo) =>
+              getCustomerByCustomerTypeId(r, p, si, sct, ci, boo)
+            }
+            bodyData={stateCustomerData}
+            customerId={customerId}
+          />
+          <ModalCustomerMKT
+            open={openCustomerMKT}
+            onClose={() => {
+              handleCloseCustomerMKT();
+            }}
+            type="personal"
+            setSelectedData={(e) => handleSelectedCustomerMKT(e)}
+            fetchDataCustomer={(r, p, si) => getUserPersonByMKT(r, p, si)}
+            bodyData={stateCustomerMrkt}
+          />
           <Grid container spacing={3} direction="row">
             <Grid item xs={5}>
               <div className="border border-secondary rounded p-3">
@@ -1441,9 +1586,11 @@ const CrudPaymentRequestPage = () => {
                   label="ETD/ETA"
                   variant="filled"
                   name={'etd/eta'}
-                  value={etd.length > 0 ? dateFormat(etd) : ''}
+                  value={
+                    etd?.length > 0 ? dateFormat(etd) : dateFormat('01-01-1953')
+                  }
                   onChange={(e) => setEtd(e.target.value)}
-                  disabled
+                  disabled={true}
                 />
               </div>
             </Grid>
@@ -1460,14 +1607,32 @@ const CrudPaymentRequestPage = () => {
                     className="block"
                     variant="standard"
                     size="small"
-                    onChange={(e) => setShipmentNo(e.target.value)}
+                    onChange={(e) => {
+                      if (
+                        e === null ||
+                        e.target.value === undefined ||
+                        e.target.value === '' ||
+                        e.target.value === '-'
+                      ) {
+                        setShipmentNo(e.target.value);
+                        setCustomerId(0);
+                        setCustomerName('');
+                        setStateShipmentOrderList([]);
+                      }
+                      setShipmentNo(e.target.value);
+                    }}
                     disabled={isEditDisabled}
                   />
                 </div>
                 <div className="col-4 pt-3">
                   <FindInPageIcon
                     className="text-infoss"
-                    onClick={() => setOpenMLSO(true)}
+                    onClick={() => {
+                      setOpenMLSO(true);
+                      setCustomerId(0);
+                      setCustomerName('');
+                      setStateShipmentOrderList([]);
+                    }}
                   />
                 </div>
               </div>
@@ -1478,12 +1643,12 @@ const CrudPaymentRequestPage = () => {
               <div>
                 <TextField
                   className="block"
-                  id="principle"
+                  id="payment Request"
                   label="Payment Request No"
                   variant="filled"
                   name={'PaymentRequestNo'}
-                  value={paymentRequestNo}
-                  onChange={(e) => setPaymentRequestNo(e.target.value)}
+                  value={statePRNo2}
+                  onChange={(e) => setStatePRNo2(e.target.value)}
                   disabled={!isEditDisabled}
                 />
               </div>
@@ -1581,9 +1746,6 @@ const CrudPaymentRequestPage = () => {
                   label="Printing"
                   name={'PrintingL'}
                   value={stateStatusPrint}
-                  onClick={() =>
-                    !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)
-                  }
                   onChange={(e) => setStatusStatePrint(e.target.value)}
                   className="block"
                   variant="filled"
@@ -1596,9 +1758,6 @@ const CrudPaymentRequestPage = () => {
                   label="-"
                   name={'PrintingR'}
                   value={statePrint}
-                  onClick={() =>
-                    !isEditDisabled ? setOpenMLSO(true) : setOpenMLSO(false)
-                  }
                   className="block"
                   variant="filled"
                   disabled={isEditDisabled}
@@ -1613,8 +1772,8 @@ const CrudPaymentRequestPage = () => {
                     id="filled-basic"
                     label="Vendor"
                     name={'CustomerId'}
-                    value={formPayment.CustomerId}
-                    onChange={(e) => handleApprove(e.target.value)}
+                    value={customerId}
+                    onChange={(e) => setCustomerId(e.value.target)}
                     className="block"
                     variant="standard"
                     size="small"
@@ -1663,8 +1822,8 @@ const CrudPaymentRequestPage = () => {
                     id="filled-basic"
                     label="Personal"
                     name={'PersonalId'}
-                    value={formPayment.PersonalId}
-                    onChange={(e) => handleApprove(e.target.value)}
+                    value={customerMKTId}
+                    onChange={(e) => setCustomerMKTId(e.target.value)}
                     className="block"
                     variant="standard"
                     size="small"
@@ -1674,7 +1833,9 @@ const CrudPaymentRequestPage = () => {
                 <div className="col-1 text-center pt-3">
                   <FindInPageIcon
                     className="text-infoss"
-                    onClick={() => handleApprove(true)}
+                    onClick={() => {
+                      handleCustomerMKT();
+                    }}
                   />
                 </div>
                 <div className="col-7">
@@ -1682,8 +1843,8 @@ const CrudPaymentRequestPage = () => {
                     id="filled-basic"
                     label="Personal Name"
                     name={'PersonalName'}
-                    value={statePersonalName || '-'}
-                    onChange={(e) => setStatePersonalName(e.target.value)}
+                    value={customerMKTName || '-'}
+                    onChange={(e) => setCustomerMKTName(e.target.value)}
                     className="block"
                     variant="filled"
                     size="small"
@@ -1706,25 +1867,6 @@ const CrudPaymentRequestPage = () => {
                     Being For Payment
                   </Typography>
                 </Grid>
-                {/* <Grid item>
-                  <RadioGroup
-                    row
-                    name="vat-radio"
-                    value={allVat}
-                    onChange={(e) => handleAllVat(e.target.value)}
-                  >
-                    <FormControlLabel
-                      value={11}
-                      control={<Radio />}
-                      label="ALL - VAT 11%"
-                    />
-                    <FormControlLabel
-                      value={1.1}
-                      control={<Radio />}
-                      label="ALL - VAT 1,1%"
-                    />
-                  </RadioGroup>
-                </Grid> */}
               </Grid>
               <TableContainer component={Paper}>
                 <Table sx={{minWidth: 650}} aria-label="simple table">
@@ -1745,6 +1887,7 @@ const CrudPaymentRequestPage = () => {
                   <TableBody>
                     {stateShipmentOrderList.length > 0 ? (
                       stateShipmentOrderList.map((el, index) => {
+                        console.log(el, '<<<element');
                         return (
                           <TableRow
                             key={`${el.sequence} ${index}`}
@@ -1752,8 +1895,6 @@ const CrudPaymentRequestPage = () => {
                             sx={
                               selectedDetail.sequence === el.sequence
                                 ? selectedStyle
-                                : el.rowStatus === 'DEL'
-                                ? deletedDetailStyle
                                 : {}
                             }
                           >
@@ -1812,28 +1953,6 @@ const CrudPaymentRequestPage = () => {
                       ADD
                     </Button>
                   </Grid>
-
-                  {/* <Grid item>
-                    <Button
-                      variant="outlined"
-                      startIcon={<ModeEditIcon />}
-                      color="secondary"
-                      onClick={() => handleDetailEdit()}
-                    >
-                      edit
-                    </Button>
-                  </Grid> */}
-                  {/* <Grid item>
-                    <Button
-                      variant="outlined"
-                      startIcon={<DeleteIcon />}
-                      color="secondary"
-                      onClick={() => handleDetailDelete()}
-                    >
-                      Delete
-                    </Button>
-                  </Grid> */}
-
                   <Grid item>
                     <Button
                       variant="outlined"
